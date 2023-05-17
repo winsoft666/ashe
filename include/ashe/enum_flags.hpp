@@ -1,0 +1,303 @@
+/*******************************************************************************
+*    C++ Common Library
+*    ---------------------------------------------------------------------------
+*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*
+*    This program is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+******************************************************************************/
+
+#ifndef ASHE_ENUM_FLAGS_HPP_
+#define ASHE_ENUM_FLAGS_HPP_
+
+#include "allow_enum_flags.hpp"
+#include "enum_iterator.hpp"
+#include <bitset>
+#include <initializer_list>
+#include <numeric>
+#include <utility>
+
+namespace ashe {
+namespace enum_flags {
+
+constexpr struct empty_t {
+    constexpr empty_t() noexcept = default;
+} empty;
+
+template <class E>
+class EnumFlags {
+   public:
+    static_assert(is_flags<E>::value,
+                  "ashe::enum_flags::EnumFlags is disallowed for this type; "
+                  "use ALLOW_FLAGS_FOR_ENUM macro.");
+
+    using enum_type = typename std::decay<E>::type;
+    using underlying_type = typename std::underlying_type<enum_type>::type;
+    using impl_type = typename std::make_unsigned<underlying_type>::type;
+
+    using iterator = FlagsIterator<enum_type>;
+    using const_iterator = iterator;
+    using value_type = typename iterator::value_type;
+    using reference = typename iterator::reference;
+    using const_reference = typename iterator::reference;
+    using pointer = enum_type*;
+    using const_pointer = const enum_type*;
+    using size_type = std::size_t;
+    using difference_type = typename iterator::difference_type;
+
+    constexpr static std::size_t bit_size() { return sizeof(impl_type) * 8; }
+
+   private:
+    template <class T, class Res = std::nullptr_t>
+    using convertible = std::enable_if<std::is_convertible<T, enum_type>::value,
+                                       Res>;
+
+   public:
+    EnumFlags() noexcept = default;
+    EnumFlags(const EnumFlags& fl) noexcept = default;
+    EnumFlags& operator=(const EnumFlags& fl) noexcept = default;
+    EnumFlags(EnumFlags&& fl) noexcept = default;
+    EnumFlags& operator=(EnumFlags&& fl) noexcept = default;
+
+    explicit constexpr EnumFlags(empty_t) noexcept :
+        val_(0) {}
+
+#ifdef ENUM_CLASS_FLAGS_FORBID_IMPLICT_CONVERSION
+    explicit
+#endif
+        constexpr EnumFlags(enum_type e) noexcept
+        :
+        val_(static_cast<impl_type>(e)) {
+    }
+
+    EnumFlags& operator=(enum_type e) noexcept {
+        val_ = static_cast<impl_type>(e);
+        return *this;
+    }
+
+    EnumFlags(std::initializer_list<enum_type> il) noexcept :
+        val_(0) { insert(il); }
+
+    EnumFlags& operator=(std::initializer_list<enum_type> il) noexcept {
+        clear();
+        insert(il);
+        return *this;
+    }
+
+    template <class... Args>
+    EnumFlags(enum_type e, Args... args) noexcept :
+        EnumFlags{e, args...} {}
+
+    template <class FwIter>
+    EnumFlags(FwIter b, FwIter e, typename convertible<decltype(*b)>::type = nullptr) noexcept(noexcept(std::declval<EnumFlags>().insert(std::declval<FwIter>(),
+                                                                                                                                 std::declval<FwIter>()))) :
+        val_(0) { insert(b, e); }
+
+    constexpr explicit operator bool() const noexcept { return val_ != 0; }
+
+    constexpr bool operator!() const noexcept { return !val_; }
+
+    friend constexpr bool operator==(EnumFlags fl1, EnumFlags fl2) {
+        return fl1.val_ == fl2.val_;
+    }
+
+    friend constexpr bool operator!=(EnumFlags fl1, EnumFlags fl2) {
+        return fl1.val_ != fl2.val_;
+    }
+
+    constexpr EnumFlags operator~() const noexcept { return EnumFlags(~val_); }
+
+    EnumFlags& operator|=(const EnumFlags& fl) noexcept {
+        val_ |= fl.val_;
+        return *this;
+    }
+
+    EnumFlags& operator&=(const EnumFlags& fl) noexcept {
+        val_ &= fl.val_;
+        return *this;
+    }
+
+    EnumFlags& operator^=(const EnumFlags& fl) noexcept {
+        val_ ^= fl.val_;
+        return *this;
+    }
+
+    EnumFlags& operator|=(enum_type e) noexcept {
+        val_ |= static_cast<impl_type>(e);
+        return *this;
+    }
+
+    EnumFlags& operator&=(enum_type e) noexcept {
+        val_ &= static_cast<impl_type>(e);
+        return *this;
+    }
+
+    EnumFlags& operator^=(enum_type e) noexcept {
+        val_ ^= static_cast<impl_type>(e);
+        return *this;
+    }
+
+    friend constexpr EnumFlags operator|(EnumFlags f1, EnumFlags f2) noexcept {
+        return EnumFlags{static_cast<impl_type>(f1.val_ | f2.val_)};
+    }
+
+    friend constexpr EnumFlags operator&(EnumFlags f1, EnumFlags f2) noexcept {
+        return EnumFlags{static_cast<impl_type>(f1.val_ & f2.val_)};
+    }
+
+    friend constexpr EnumFlags operator^(EnumFlags f1, EnumFlags f2) noexcept {
+        return EnumFlags{static_cast<impl_type>(f1.val_ ^ f2.val_)};
+    }
+
+    void swap(EnumFlags& fl) noexcept { std::swap(val_, fl.val_); }
+
+    constexpr underlying_type underlying_value() const noexcept {
+        return static_cast<underlying_type>(val_);
+    }
+
+    void set_underlying_value(underlying_type newval) noexcept {
+        val_ = static_cast<impl_type>(newval);
+    }
+
+    constexpr explicit operator std::bitset<EnumFlags<E>::bit_size()>() const noexcept {
+        return to_bitset();
+    }
+
+    constexpr std::bitset<EnumFlags<E>::bit_size()> to_bitset() const noexcept {
+        return {val_};
+    }
+
+    constexpr bool empty() const noexcept { return !val_; }
+
+    size_type size() const noexcept {
+        return std::distance(this->begin(), this->end());
+    }
+
+    constexpr size_type max_size() const noexcept { return bit_size(); }
+
+    iterator begin() const noexcept { return cbegin(); }
+    iterator cbegin() const noexcept { return iterator{val_}; }
+
+    constexpr iterator end() const noexcept { return cend(); }
+    constexpr iterator cend() const noexcept { return {}; }
+
+    constexpr iterator find(enum_type e) const noexcept { return {val_, e}; }
+
+    constexpr size_type count(enum_type e) const noexcept {
+        return find(e) != end() ? 1 : 0;
+    }
+
+    std::pair<iterator, iterator> equal_range(enum_type e) const noexcept {
+        auto i = find(e);
+        auto j = i;
+        return {i, ++j};
+    }
+
+    template <class... Args>
+    std::pair<iterator, bool> emplace(Args&&... args) noexcept {
+        return insert(enum_type{args...});
+    }
+
+    template <class... Args>
+    iterator emplace_hint(iterator, Args&&... args) noexcept {
+        return emplace(args...).first;
+    }
+
+    std::pair<iterator, bool> insert(enum_type e) noexcept {
+        auto i = find(e);
+        if (i == end()) {
+            i.mask_ = static_cast<impl_type>(e);
+            val_ |= i.mask_;
+            update_uvalue(i);
+            return {i, true};
+        }
+        return {i, false};
+    }
+
+    std::pair<iterator, bool> insert(iterator, enum_type e) noexcept {
+        return insert(e);
+    }
+
+    template <class FwIter>
+    auto insert(FwIter i1, FwIter i2) noexcept(noexcept(++i1) && noexcept(*i1) && noexcept(i1 == i2))
+        -> typename convertible<decltype(*i1), void>::type {
+        val_ |= std::accumulate(i1, i2, impl_type{0}, [](impl_type i, enum_type e) {
+            return i | static_cast<impl_type>(e);
+        });
+    }
+
+    template <class Container>
+    auto insert(const Container& ctn) noexcept
+        -> decltype(std::begin(ctn), std::end(ctn), void()) {
+        insert(std::begin(ctn), std::end(ctn));
+    }
+
+    iterator erase(iterator i) noexcept {
+        val_ ^= i.mask_;
+        update_uvalue(i);
+        return ++i;
+    }
+
+    size_type erase(enum_type e) noexcept {
+        auto e_count = count(e);
+        val_ &= ~static_cast<impl_type>(e);
+        return e_count;
+    }
+
+    iterator erase(iterator i1, iterator i2) noexcept {
+        val_ ^= EnumFlags(i1, i2).val_;
+        update_uvalue(i2);
+        return i2;
+    }
+
+    void clear() noexcept { val_ = 0; }
+
+   private:
+    constexpr explicit EnumFlags(impl_type val) noexcept :
+        val_(val) {}
+
+    void update_uvalue(iterator& it) const noexcept { it.uvalue_ = val_; }
+
+    impl_type val_;
+};
+
+template <class E>
+void swap(EnumFlags<E>& fl1, EnumFlags<E>& fl2) noexcept {
+    fl1.swap(fl2);
+}
+
+}  // namespace enum_flags
+}  // namespace ashe
+
+template <class E>
+constexpr auto operator|(E e1, E e2) noexcept
+    -> typename std::enable_if<ashe::enum_flags::is_flags<E>::value,
+                               ashe::enum_flags::EnumFlags<E>>::type {
+    return ashe::enum_flags::EnumFlags<E>(e1) | e2;
+}
+
+template <class E>
+constexpr auto operator&(E e1, E e2) noexcept
+    -> typename std::enable_if<ashe::enum_flags::is_flags<E>::value,
+                               ashe::enum_flags::EnumFlags<E>>::type {
+    return ashe::enum_flags::EnumFlags<E>(e1) & e2;
+}
+
+template <class E>
+constexpr auto operator^(E e1, E e2) noexcept
+    -> typename std::enable_if<ashe::enum_flags::is_flags<E>::value,
+                               ashe::enum_flags::EnumFlags<E>>::type {
+    return ashe::enum_flags::EnumFlags<E>(e1) ^ e2;
+}
+
+#endif  // ASHE_ENUM_FLAGS_HPP_

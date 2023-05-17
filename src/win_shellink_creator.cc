@@ -1,0 +1,239 @@
+#include "ashe/config.hpp"
+#include "ashe/win_shellink_creator.hpp"
+#ifdef ASHE_WIN
+#include "ashe/windows_lite.hpp"
+#include <shellapi.h>
+#include <shlobj.h>
+#include <propkey.h>
+#include <strsafe.h>
+#include "ashe/os_ver.hpp"
+#include <assert.h>
+#include "ashe/file.hpp"
+#include "ashe/filesystem.hpp"
+#include "ashe/scoped_object.hpp"
+
+namespace ashe {
+namespace {
+void InitializeShortcutInterfaces(const wchar_t* shortcut,
+                                  IShellLink** i_shell_link,
+                                  IPersistFile** i_persist_file) {
+    if ((*i_shell_link))
+        (*i_shell_link)->Release();
+    if ((*i_persist_file))
+        (*i_persist_file)->Release();
+
+    HRESULT hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink,
+                                    (void**)i_shell_link);
+    if (FAILED(hres)) {
+        return;
+    }
+
+    hres = (*i_shell_link)->QueryInterface(IID_IPersistFile, (void**)i_persist_file);
+    if (FAILED(hres)) {
+        (*i_shell_link)->Release();
+        return;
+    }
+
+    if (shortcut) {
+        if (FAILED((*i_persist_file)->Load(shortcut, STGM_READWRITE))) {
+            (*i_shell_link)->Release();
+            (*i_persist_file)->Release();
+        }
+    }
+}
+}  // namespace
+
+bool WinShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
+                                                    const ShellLinkProperties& properties,
+                                                    OperationOption operation) {
+    ashe::ScopedComInitialize comInit;
+
+    // A target is required unless |operation| is SHORTCUT_UPDATE_EXISTING.
+    if (operation != OperationOption::SHORTCUT_UPDATE_EXISTING &&
+        !(properties.options & ShellLinkProperties::PROPERTIES_TARGET)) {
+        return false;
+    }
+
+    std::error_code ec;
+    bool shortcut_existed = fs::exists(shellLinkPath, ec);
+
+    // Interfaces to the old shortcut when replacing an existing shortcut.
+    IShellLink* oldShellLink = NULL;
+    IPersistFile* oldPersistFile = NULL;
+
+    // Interfaces to the shortcut being created/updated.
+    IShellLink* iShellLink = NULL;
+    IPersistFile* iPersistFile = NULL;
+    switch (operation) {
+        case OperationOption::SHORTCUT_CREATE_ALWAYS:
+            InitializeShortcutInterfaces(NULL, &iShellLink, &iPersistFile);
+            break;
+        case OperationOption::SHORTCUT_UPDATE_EXISTING:
+            InitializeShortcutInterfaces(shellLinkPath.c_str(), &iShellLink, &iPersistFile);
+            break;
+        case OperationOption::SHORTCUT_REPLACE_EXISTING:
+            InitializeShortcutInterfaces(shellLinkPath.c_str(), &oldShellLink, &oldPersistFile);
+            // Confirm |shortcut_path| exists and is a shortcut by verifying
+            // |old_i_persist_file| was successfully initialized in the call above. If
+            // so, initialize the interfaces to begin writing a new shortcut (to
+            // overwrite the current one if successful).
+            if (oldPersistFile)
+                InitializeShortcutInterfaces(NULL, &iShellLink, &iPersistFile);
+            break;
+        default:
+            assert(false);
+    }
+
+    // Return false immediately upon failure to initialize shortcut interfaces.
+    if (!iPersistFile)
+        return false;
+
+    if ((properties.options & ShellLinkProperties::PROPERTIES_TARGET) &&
+        FAILED(iShellLink->SetPath(properties.target.c_str()))) {
+        return false;
+    }
+
+    if ((properties.options & ShellLinkProperties::PROPERTIES_WORKING_DIR) &&
+        FAILED(iShellLink->SetWorkingDirectory(properties.working_dir.c_str()))) {
+        return false;
+    }
+
+    if (properties.options & ShellLinkProperties::PROPERTIES_ARGUMENTS) {
+        if (FAILED(iShellLink->SetArguments(properties.arguments.c_str())))
+            return false;
+    }
+    else if (oldPersistFile) {
+        wchar_t current_arguments[MAX_PATH] = {0};
+        if (SUCCEEDED(oldShellLink->GetArguments(current_arguments, MAX_PATH))) {
+            iShellLink->SetArguments(current_arguments);
+        }
+    }
+
+    if ((properties.options & ShellLinkProperties::PROPERTIES_DESCRIPTION) &&
+        FAILED(iShellLink->SetDescription(properties.description.c_str()))) {
+        return false;
+    }
+
+    if ((properties.options & ShellLinkProperties::PROPERTIES_ICON) &&
+        FAILED(iShellLink->SetIconLocation(properties.icon.c_str(), properties.icon_index))) {
+        return false;
+    }
+
+    // Release the interfaces to the old shortcut to make sure it doesn't prevent
+    // overwriting it if needed.
+    if (oldPersistFile)
+        oldPersistFile->Release();
+    if (oldShellLink)
+        oldShellLink->Release();
+
+    HRESULT result = iPersistFile->Save(shellLinkPath.c_str(), TRUE);
+
+    // Release the interfaces in case the SHChangeNotify call below depends on
+    // the operations above being fully completed.
+    iPersistFile->Release();
+    iShellLink->Release();
+
+    // If we successfully created/updated the icon, notify the shell that we have
+    // done so.
+    const bool succeeded = SUCCEEDED(result);
+    if (succeeded) {
+        if (shortcut_existed) {
+            // TODO(gab): SHCNE_UPDATEITEM might be sufficient here; further testing
+            // required.
+            SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+        }
+        else {
+            SHChangeNotify(SHCNE_CREATE, SHCNF_PATH, shellLinkPath.c_str(), NULL);
+        }
+    }
+
+    return succeeded;
+}
+
+bool WinShellinkCreator::ResolveShellLink(const std::wstring& shellLinkPath, ShellLinkProperties& properties) {
+    ashe::ScopedComInitialize comInit;
+
+    HRESULT result;
+    IShellLink* iShellLink = NULL;
+    IPersistFile* persist = NULL;
+
+    HRESULT hres = CoCreateInstance(CLSID_ShellLink,
+                                    NULL,
+                                    CLSCTX_INPROC_SERVER,
+                                    IID_IShellLink,
+                                    (void**)&iShellLink);
+    if (FAILED(hres)) {
+        return false;
+    }
+
+    hres = iShellLink->QueryInterface(IID_IPersistFile, (void**)&persist);
+    if (FAILED(hres)) {
+        iShellLink->Release();
+        return false;
+    }
+
+    if (FAILED(persist->Load(shellLinkPath.c_str(), STGM_READWRITE))) {
+        iShellLink->Release();
+        persist->Release();
+        return false;
+    }
+
+    WCHAR temp[MAX_PATH] = {0};
+    // Try to find the target of a shortcut.
+    result = iShellLink->Resolve(0, SLR_NO_UI | SLR_NOSEARCH);
+    if (FAILED(result))
+        return false;
+
+    result = iShellLink->GetPath(temp, MAX_PATH, NULL, SLGP_UNCPRIORITY);
+    if (FAILED(result))
+        return false;
+    properties.target = temp;
+
+    result = iShellLink->GetArguments(temp, MAX_PATH);
+    if (FAILED(result))
+        return false;
+    properties.arguments = temp;
+
+    result = iShellLink->GetWorkingDirectory(temp, MAX_PATH);
+    if (FAILED(result))
+        return false;
+    properties.working_dir = temp;
+
+    result = iShellLink->GetDescription(temp, MAX_PATH);
+    if (FAILED(result))
+        return false;
+    properties.description = temp;
+
+    int iconIndex = 0;
+    result = iShellLink->GetIconLocation(temp, MAX_PATH, &iconIndex);
+    if (FAILED(result))
+        return false;
+    properties.icon = temp;
+    properties.icon_index = iconIndex;
+
+    if (persist)
+        persist->Release();
+
+    if (iShellLink)
+        iShellLink->Release();
+
+    return true;
+}
+
+bool WinShellinkCreator::TaskbarPinShellLink(const std::wstring& shellLinkPath) {
+    if (!OSVersion::IsWindowsVistaOrHigher())
+        return false;
+
+    int result = reinterpret_cast<int>(ShellExecuteW(NULL, L"taskbarpin", shellLinkPath.c_str(), NULL, NULL, 0));
+    return result > 32;
+}
+
+bool WinShellinkCreator::TaskbarUnpinShellLink(const std::wstring& shellLinkPath) {
+    if (!OSVersion::IsWindowsVistaOrHigher())
+        return false;
+
+    int result = reinterpret_cast<int>(ShellExecuteW(NULL, L"taskbarunpin", shellLinkPath.c_str(), NULL, NULL, 0));
+    return result > 32;
+}
+}  // namespace ashe
+#endif  // ASHE_WIN
