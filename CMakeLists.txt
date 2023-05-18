@@ -38,119 +38,27 @@ endfunction(group_sources)
 
 configure_file("${PROJECT_SOURCE_DIR}/include/ashe/config.hpp.in" "${PROJECT_SOURCE_DIR}/include/ashe/config.hpp")
 
-option(BUILD_TESTS "Build tests project" ON)
-option(USE_STATIC_CRT "Set to ON to build with static CRT on Windows (/MT)." OFF)
+option(ASHE_BUILD_TESTS "Build tests project" ON)
+option(ASHE_USE_STATIC_CRT "Set to ON to build with static CRT on Windows (/MT)." OFF)
+option(ASHE_BUILD_SHARED_LIBS "Set to ON to build dynamic library." OFF)
 
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Unicode Support
 add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set (CMAKE_CXX_STANDARD 11)
 
-#########################################
-# Add spdlog
-set(SPDLOG_NO_EXCEPTIONS ON)
-set(SPDLOG_WCHAR_FILENAMES ON)
-if(WIN32)
-  set(SPDLOG_WCHAR_SUPPORT ON)
-endif()
-add_subdirectory(./3rd/spdlog-1.x)
-
-###########################################
-set(DEBUG_LIBNAME_SUFFIX "-d" CACHE STRING "Optional suffix to append to the library name for a debug build")
-mark_as_advanced(DEBUG_LIBNAME_SUFFIX)
-
-include_directories(
-  ./include
-  ./include/ashe
-  ./3rd/spdlog-1.x/include
-)
 
 if(ASHE_BUILD_SHARED_LIBS)
-	set(LIB_NAME ashe)
+	set(ASHE_LIB_NAME ashe)
 	set(ASHE_STATIC ON)
 else()
-	set(LIB_NAME ashe-static)
+	set(ASHE_LIB_NAME ashe-static)
 	set(ASHE_STATIC OFF)
 endif()
 
-add_definitions(
-  -DSPDLOG_NO_EXCEPTIONS
-  -DSPDLOG_WCHAR_FILENAMES
-)
-
-if (MSVC)
-  add_definitions(
-    -D_WIN32
-  )
-endif()
-
-if (MSVC AND USE_STATIC_CRT)
-	set(CompilerFlags
-		CMAKE_CXX_FLAGS
-		CMAKE_CXX_FLAGS_DEBUG
-		CMAKE_CXX_FLAGS_RELEASE
-		CMAKE_C_FLAGS
-		CMAKE_C_FLAGS_DEBUG
-		CMAKE_C_FLAGS_RELEASE
-		)
-	foreach(CompilerFlag ${CompilerFlags})
-		string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-	endforeach()
-endif()
-
-file(GLOB_RECURSE HEADER_FILES 			./include/*.hpp ./include/*.h)
-file(GLOB_RECURSE SOURCE_FILES 			./src/*.cc ./src/*.cpp)
-
-group_sources(${HEADER_FILES} ${SOURCE_FILES})
-
-if(ASHE_BUILD_SHARED_LIBS)
-	add_definitions(-DASHE_EXPORTS)
-	
-	add_library(
-		${LIB_NAME}
-		SHARED
-		${HEADER_FILES}
-		${SOURCE_FILES}
-	)
-	
-	# set output name prefix/suffix
-	set_target_properties(${LIB_NAME} PROPERTIES 
-		OUTPUT_NAME ${LIB_NAME}
-		DEBUG_OUTPUT_NAME ${LIB_NAME}${DEBUG_LIBNAME_SUFFIX})
-else()
-	add_definitions(-DASHE_STATIC)
-	
-	add_library(
-		${LIB_NAME}
-		STATIC
-		${HEADER_FILES}
-		${SOURCE_FILES}
-	)
-	
-	# set output name prefix/suffix
-  set_target_properties(${LIB_NAME} PROPERTIES 
-		OUTPUT_NAME ${LIB_NAME}
-		DEBUG_OUTPUT_NAME ${LIB_NAME}${DEBUG_LIBNAME_SUFFIX})
-		
-	set_target_properties(${LIB_NAME} PROPERTIES 
-		INTERFACE_COMPILE_DEFINITIONS ASHE_STATIC)
-endif()
-
-set_target_properties(${LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
-
-if(WIN32)
-  set_target_properties(${LIB_NAME} PROPERTIES COMPILE_FLAGS "/wd4251")
-
-  target_link_libraries(${LIB_NAME} PUBLIC 
-	  Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
-endif()
-
-if(BUILD_TESTS)
+add_subdirectory(src)
+if(ASHE_BUILD_TESTS)
     add_subdirectory(test)
     enable_testing()
 endif()

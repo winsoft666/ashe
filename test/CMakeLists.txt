@@ -29,11 +29,10 @@ include_directories(../include)
 
 add_executable(
 	${EXE_NAME}
-	${ASHE_HEADER_FILES}
 	${TEST_SOURCE_FILES})
 
-add_dependencies(${EXE_NAME} ${LIB_NAME})
-target_link_libraries(${EXE_NAME} ${LIB_NAME})
+add_dependencies(${EXE_NAME} ${ASHE_LIB_NAME})
+target_link_libraries(${EXE_NAME} ${ASHE_LIB_NAME})
 
 # Win32 Console
 if (WIN32 OR _WIN32)

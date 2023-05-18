@@ -34,10 +34,5 @@
 *.user
 Debug/
 Release/
-/include/ashe/config.hpp
 
 build/
-/msvc/Debug_*
-/msvc/Release_*
-/msvc/lib/
-/msvc/x64/

@@ -1,0 +1,8 @@
+{
+  "name": "ashe",
+  "version": "1.0",
+  "maintainers": "winsoft666 <winsoft666@outlook.com>",
+  "description": "C++ Common Library.",
+  "homepage": "https://github.com/winsoft666/ashe",
+  "supports": "!osx & !uwp & !arm"
+}
