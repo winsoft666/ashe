@@ -17,8 +17,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_HPP_H__
-#define ASHE_HPP_H__
+#ifndef ASHE_ALL_HPP_H__
+#define ASHE_ALL_HPP_H__
 
 #include "ashe/config.hpp"
 #include "ashe/arch.hpp"
@@ -78,4 +78,4 @@
 #include "ashe/win_virtual_key.hpp"
 #include "ashe/xorstr.hpp"
 
-#endif
+#endif // !ASHE_ALL_HPP_H__

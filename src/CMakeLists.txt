@@ -96,6 +96,8 @@ if(WIN32)
 	  Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
 endif()
 
+install(FILES ${HEADER_FILES} 			DESTINATION include/ashe)
+
 install(TARGETS ${ASHE_LIB_NAME}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
