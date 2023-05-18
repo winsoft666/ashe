@@ -21,32 +21,19 @@ set (CMAKE_CXX_STANDARD 14)
 
 set(EXE_NAME ashe-test)
 
-file(GLOB ASHE_HEADER_FILES ../include/ashe.hpp)
 file(GLOB TEST_SOURCE_FILES ./*.cpp)
 
-if (ASHE_NOT_HEADER_ONLY)
-	source_group("ashe" FILES ${ASHE_HEADER_FILES})
-else()
-	source_group("ashe" FILES ${ASHE_HEADER_FILES} ${ASHE_IMPL_FILES})
-endif()
 source_group("test" FILES ${TEST_SOURCE_FILES})
 
 include_directories(../include)
 
-if (ASHE_NOT_HEADER_ONLY)
-	add_executable(
-		${EXE_NAME}
-		${ASHE_HEADER_FILES}
-		${TEST_SOURCE_FILES})
-	
-	add_dependencies(${EXE_NAME} ${LIB_NAME})
-	target_link_libraries(${EXE_NAME} ${LIB_NAME})
-else()
-	add_executable(
-		${EXE_NAME}
-		${ASHE_HEADER_FILES} ${ASHE_IMPL_FILES}
-		${TEST_SOURCE_FILES})
-endif()
+add_executable(
+	${EXE_NAME}
+	${ASHE_HEADER_FILES}
+	${TEST_SOURCE_FILES})
+
+add_dependencies(${EXE_NAME} ${LIB_NAME})
+target_link_libraries(${EXE_NAME} ${LIB_NAME})
 
 # Win32 Console
 if (WIN32 OR _WIN32)

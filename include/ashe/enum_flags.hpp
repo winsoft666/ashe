@@ -20,8 +20,8 @@
 #ifndef ASHE_ENUM_FLAGS_HPP_
 #define ASHE_ENUM_FLAGS_HPP_
 
-#include "allow_enum_flags.hpp"
-#include "enum_iterator.hpp"
+#include "enum_flags/allow_enum_flags.hpp"
+#include "enum_flags/enum_iterator.hpp"
 #include <bitset>
 #include <initializer_list>
 #include <numeric>

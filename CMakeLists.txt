@@ -22,6 +22,20 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 
 project(ashe CXX)
 
+function(group_sources)
+  foreach(_source IN ITEMS ${ARGN})
+  if (IS_ABSOLUTE "${_source}")
+      file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
+  else()
+      set(_source_rel "${_source}")
+  endif()
+  get_filename_component(_source_path "${_source_rel}" PATH)
+  string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
+  source_group("${_source_path_msvc}" FILES "${_source}")
+  endforeach()
+endfunction(group_sources)
+
+
 configure_file("${PROJECT_SOURCE_DIR}/include/ashe/config.hpp.in" "${PROJECT_SOURCE_DIR}/include/ashe/config.hpp")
 
 option(BUILD_TESTS "Build tests project" ON)
@@ -47,6 +61,7 @@ mark_as_advanced(DEBUG_LIBNAME_SUFFIX)
 
 include_directories(
   ./include
+  ./include/ashe
   ./3rd/spdlog-1.x/include
 )
 
@@ -78,11 +93,10 @@ if (MSVC AND USE_STATIC_CRT)
 	endforeach()
 endif()
 
-file(GLOB HEADER_FILES 			./include/ashe.hpp ./include/ashe/*.hpp)
-file(GLOB SOURCE_FILES 			./src/*.cc)
+file(GLOB_RECURSE HEADER_FILES 			./include/*.hpp ./include/*.h)
+file(GLOB_RECURSE SOURCE_FILES 			./src/*.cc ./src/*.cpp)
 
-source_group("Header Files" 			FILES ${HEADER_FILES})
-source_group("Source Files" 		  FILES ${SOURCE_FILES})
+group_sources(${HEADER_FILES} ${SOURCE_FILES})
 
 add_library(
   ${LIB_NAME}
@@ -101,7 +115,7 @@ if(WIN32)
   set_target_properties(${LIB_NAME} PROPERTIES COMPILE_FLAGS "/wd4251")
 
   target_link_libraries(${LIB_NAME} PUBLIC 
-	Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
+	  Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
 endif()
 
 # Set output directory
@@ -119,7 +133,6 @@ install(TARGETS ${LIB_NAME}
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-install(FILES ./include/ashe.hpp DESTINATION include)
 install(FILES ${HEADER_FILES} DESTINATION include/ashe)
 
 # Add spdlog
