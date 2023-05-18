@@ -31,9 +31,13 @@ class SingletonClass {
    protected:
     SingletonClass() {}
     SingletonClass(const SingletonClass&) {}
-    SingletonClass& operator=(const SingletonClass&) {}
+    SingletonClass& operator=(const SingletonClass&) {
+        return *this;
+    }
     SingletonClass(SingletonClass&&){}
-    SingletonClass& operator=(SingletonClass&&) {}
+    SingletonClass& operator=(SingletonClass&&) {
+        return *this;
+    }
    private:
     static T* this_;
     static std::mutex m_;

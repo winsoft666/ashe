@@ -46,16 +46,21 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Debug Output
-message(STATUS "USE_STATIC_CRT=${USE_STATIC_CRT}")
-message(STATUS "CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
-message(STATUS "VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
-
 # Unicode Support
 add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set (CMAKE_CXX_STANDARD 11)
-    
+
+#########################################
+# Add spdlog
+set(SPDLOG_NO_EXCEPTIONS ON)
+set(SPDLOG_WCHAR_FILENAMES ON)
+if(WIN32)
+  set(SPDLOG_WCHAR_SUPPORT ON)
+endif()
+add_subdirectory(./3rd/spdlog-1.x)
+
+###########################################
 set(DEBUG_LIBNAME_SUFFIX "-d" CACHE STRING "Optional suffix to append to the library name for a debug build")
 mark_as_advanced(DEBUG_LIBNAME_SUFFIX)
 
@@ -65,10 +70,15 @@ include_directories(
   ./3rd/spdlog-1.x/include
 )
 
-set(LIB_NAME ashe-static)
+if(ASHE_BUILD_SHARED_LIBS)
+	set(LIB_NAME ashe)
+	set(ASHE_STATIC ON)
+else()
+	set(LIB_NAME ashe-static)
+	set(ASHE_STATIC OFF)
+endif()
 
 add_definitions(
-  -DASHE_STATIC
   -DSPDLOG_NO_EXCEPTIONS
   -DSPDLOG_WCHAR_FILENAMES
 )
@@ -98,50 +108,47 @@ file(GLOB_RECURSE SOURCE_FILES 			./src/*.cc ./src/*.cpp)
 
 group_sources(${HEADER_FILES} ${SOURCE_FILES})
 
-add_library(
-  ${LIB_NAME}
-  STATIC
-  ${SOURCE_FILES}
-  ${HEADER_FILES})
+if(ASHE_BUILD_SHARED_LIBS)
+	add_definitions(-DASHE_EXPORTS)
+	
+	add_library(
+		${LIB_NAME}
+		SHARED
+		${HEADER_FILES}
+		${SOURCE_FILES}
+	)
+	
+	# set output name prefix/suffix
+	set_target_properties(${LIB_NAME} PROPERTIES 
+		OUTPUT_NAME ${LIB_NAME}
+		DEBUG_OUTPUT_NAME ${LIB_NAME}${DEBUG_LIBNAME_SUFFIX})
+else()
+	add_definitions(-DASHE_STATIC)
+	
+	add_library(
+		${LIB_NAME}
+		STATIC
+		${HEADER_FILES}
+		${SOURCE_FILES}
+	)
+	
+	# set output name prefix/suffix
+  set_target_properties(${LIB_NAME} PROPERTIES 
+		OUTPUT_NAME ${LIB_NAME}
+		DEBUG_OUTPUT_NAME ${LIB_NAME}${DEBUG_LIBNAME_SUFFIX})
+		
+	set_target_properties(${LIB_NAME} PROPERTIES 
+		INTERFACE_COMPILE_DEFINITIONS ASHE_STATIC)
+endif()
 
 set_target_properties(${LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-# set output name prefix/suffix
-set_target_properties(${LIB_NAME} PROPERTIES 
-  OUTPUT_NAME ${LIB_NAME}
-  DEBUG_OUTPUT_NAME ${LIB_NAME}${DEBUG_LIBNAME_SUFFIX})
-  
 if(WIN32)
   set_target_properties(${LIB_NAME} PROPERTIES COMPILE_FLAGS "/wd4251")
 
   target_link_libraries(${LIB_NAME} PUBLIC 
 	  Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
 endif()
-
-# Set output directory
-set_target_properties(${LIB_NAME}
-  PROPERTIES
-  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" )
-
-target_include_directories(${LIB_NAME} INTERFACE $<INSTALL_INTERFACE:include>)
-
-install(TARGETS ${LIB_NAME}
-  EXPORT ${LIB_NAME}-target
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-install(FILES ${HEADER_FILES} DESTINATION include/ashe)
-
-# Add spdlog
-set(SPDLOG_NO_EXCEPTIONS ON)
-set(SPDLOG_WCHAR_FILENAMES ON)
-if(WIN32)
-  set(SPDLOG_WCHAR_SUPPORT ON)
-endif()
-add_subdirectory(./3rd/spdlog-1.x)
 
 if(BUILD_TESTS)
     add_subdirectory(test)
