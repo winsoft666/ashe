@@ -28,7 +28,6 @@ include_directories(
   ../include
 )
 
-
 if (MSVC)
   add_definitions(
     -D_WIN32
