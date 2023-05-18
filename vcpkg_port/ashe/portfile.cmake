@@ -1,7 +1,7 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO winsoft666/ashe
-    HEAD_REF master
+    HEAD_REF main
     AUTHORIZATION_TOKEN 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
 )
 
@@ -13,7 +13,7 @@ vcpkg_cmake_configure(
     OPTIONS
         -DASHE_STATIC:BOOL=${ASHE_STATIC}
         -DASHE_USE_STATIC_CRT:BOOL=${ASHE_USE_STATIC_CRT}
-        -DBUILD_TESTS:BOOL=OFF
+        -DASHE_BUILD_TESTS:BOOL=OFF
 )
 
 vcpkg_cmake_install()

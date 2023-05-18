@@ -95,3 +95,11 @@ if(WIN32)
   target_link_libraries(${ASHE_LIB_NAME} PUBLIC 
 	  Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
 endif()
+
+install(TARGETS ${ASHE_LIB_NAME}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    OBJECTS DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
