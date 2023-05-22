@@ -38,7 +38,7 @@
 #include "ashe/macros.hpp"
 
 namespace ashe {
-class WinRegistry {
+class ASHE_API WinRegistry {
    public:
     ASHE_DISALLOW_COPY_MOVE(WinRegistry);
 
