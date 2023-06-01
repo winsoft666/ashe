@@ -200,17 +200,16 @@ std::string SHA512::GetFileSHA512(const fs::path& filePath) {
 }
 
 std::string SHA512::GetDataSHA512(const unsigned char* data, size_t dataSize) {
-    unsigned char digest[SHA512::DIGEST_SIZE];
-    memset(digest, 0, SHA512::DIGEST_SIZE);
+    unsigned char digest[SHA512::DIGEST_SIZE] = {0};
     SHA512 ctx;
     ctx.init();
     ctx.update((const unsigned char*)data, dataSize);
     ctx.final(digest);
 
-    char buf[2 * SHA512::DIGEST_SIZE + 1];
-    buf[2 * SHA512::DIGEST_SIZE] = 0;
-    for (int i = 0; i < SHA512::DIGEST_SIZE; i++)
-        sprintf_s(buf + i * 2, 2, "%02x", digest[i]);
+    char buf[2 * SHA512::DIGEST_SIZE + 1] = {0};
+    for (unsigned int i = 0; i < SHA512::DIGEST_SIZE; i++) {
+        sprintf_s(buf + i * 2, 3, "%02x", digest[i]);
+    }
     return std::string(buf);
 }
 }  // namespace ashe

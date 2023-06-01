@@ -25,7 +25,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "ashe.hpp"
+#include "ashe/all.hpp"
 
 // Test: uuid generator.
 //
