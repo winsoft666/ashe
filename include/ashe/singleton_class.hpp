@@ -25,8 +25,7 @@ namespace ashe {
 template <class T>
 class SingletonClass {
    public:
-    static T* Instance();
-    static void Release();
+    static T& Instance();
 
    protected:
     SingletonClass() {}
@@ -34,40 +33,23 @@ class SingletonClass {
     SingletonClass& operator=(const SingletonClass&) {
         return *this;
     }
-    SingletonClass(SingletonClass&&){}
+    SingletonClass(SingletonClass&&) {}
     SingletonClass& operator=(SingletonClass&&) {
         return *this;
     }
+
    private:
-    static T* this_;
     static std::mutex m_;
 };
-
-template <class T>
-T* SingletonClass<T>::this_ = nullptr;
 
 template <class T>
 std::mutex SingletonClass<T>::m_;
 
 template <class T>
-T* SingletonClass<T>::Instance() {
-    // double-check
-    if (this_ == nullptr) {
-        std::lock_guard<std::mutex> lg(m_);
-        if (this_ == nullptr) {
-            this_ = new T;
-        }
-    }
-    return this_;
-}
-
-template <class T>
-void SingletonClass<T>::Release() {
-    if (this_) {
-        delete this_;
-        this_ = nullptr;
-    }
+T& SingletonClass<T>::Instance() {
+    std::lock_guard<std::mutex> lg(m_);
+    static T inst;
+    return inst;
 }
 }  // namespace ashe
-#define ASHE_SINGLETON_CLASS_DECLARE(class_name) friend class ::ashe::SingletonClass<##class_name>;
 #endif  // !ASHE_SINGLETON_CLASS_HPP_

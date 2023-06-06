@@ -7,7 +7,4 @@ TEST_CASE("SingletonProcess", "") {
     ashe::SingletonProcess::Instance()->registerSecondaryCallback([](std::string secondaryCml) {
         printf("secondary startup: %s\n", secondaryCml.c_str());
     });
-
-
-    getchar();
 }

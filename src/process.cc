@@ -149,7 +149,7 @@ Process::id_type Process::open(const string_type& command,
     security_attributes.bInheritHandle = TRUE;
     security_attributes.lpSecurityDescriptor = nullptr;
 
-    std::lock_guard<std::mutex> lock(ProcessMutex::Instance()->create_process_mutex);
+    std::lock_guard<std::mutex> lock(ProcessMutex::Instance().create_process_mutex);
     if (stdin_fd_) {
         if (!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0) ||
             !SetHandleInformation(stdin_wr_p, HANDLE_FLAG_INHERIT, 0))

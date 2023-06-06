@@ -44,8 +44,6 @@ class WinServiceBase;
 class ASHE_API WinServiceHolder : public SingletonClass<WinServiceHolder> {
    public:
     WinServiceBase* service = NULL;
-
-    ASHE_SINGLETON_CLASS_DECLARE(WinServiceHolder);
 };
 
 class ASHE_API WinServiceBase {

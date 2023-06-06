@@ -28,6 +28,7 @@
 namespace ashe {
 class ASHE_API SingletonProcess : public SingletonClass<SingletonProcess> {
    public:
+    ~SingletonProcess();
     // when secondary process startup, SecondaryCallback will be call with the command line of secondary process.
     // The command line string is encoded in utf8.
     // SecondaryCallback is implemented only on windows platform.
@@ -48,9 +49,6 @@ class ASHE_API SingletonProcess : public SingletonClass<SingletonProcess> {
    protected:
     void check();
 
-   private:
-    ~SingletonProcess();
-
     std::string uniqueName_;
     bool isPrimary_ = true;
 #ifdef ASHE_WIN
@@ -64,7 +62,6 @@ class ASHE_API SingletonProcess : public SingletonClass<SingletonProcess> {
 #endif
     SecondaryCallback cb_;
     ashe::Event exit_;
-    ASHE_SINGLETON_CLASS_DECLARE(SingletonProcess);
 };
 }  // namespace ashe
 #endif  // !ASHE_SINGLETON_PROCESS_HPP__
