@@ -280,23 +280,23 @@ HRESULT WinRegistry::setBINARYValue(LPCWSTR pszValueName, const LPBYTE pbData, i
 
 HRESULT WinRegistry::setSZValue(LPCWSTR pszValueName, const std::wstring& strData) {
     return setValue(pszValueName, REG_SZ, (const LPBYTE)strData.c_str(),
-                    (strData.length()) * sizeof(WCHAR));
+                    ((DWORD)strData.length()) * sizeof(WCHAR));
 }
 
 HRESULT WinRegistry::setExpandSZValue(LPCWSTR pszValueName, const std::wstring& strData) {
     return setValue(pszValueName, REG_EXPAND_SZ, (const LPBYTE)strData.c_str(),
-                    (strData.length()) * sizeof(WCHAR));
+                    ((DWORD)strData.length()) * sizeof(WCHAR));
 }
 
 HRESULT WinRegistry::setMultiSZValue(LPCWSTR pszValueName, const std::vector<std::wstring>& vStrValues) {
     WCHAR* ptrValues = createDoubleNulTermList(vStrValues);
-    int cch = 1;
-    int n = vStrValues.size();
+    size_t cch = 1;
+    size_t n = vStrValues.size();
 
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
         cch += vStrValues[i].length() + 1;
 
-    HRESULT hr = setValue(pszValueName, REG_MULTI_SZ, (const LPBYTE)ptrValues, cch * sizeof(TCHAR));
+    HRESULT hr = setValue(pszValueName, REG_MULTI_SZ, (const LPBYTE)ptrValues, (DWORD)cch * sizeof(TCHAR));
 
     SAFE_DELETE_ARRAY(ptrValues);
 
@@ -361,7 +361,7 @@ HRESULT WinRegistry::getValue(LPCWSTR pszValueName, DWORD dwTypeExpected, LPBYTE
     return hr;
 }
 
-HRESULT WinRegistry::setValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, int cbData) {
+HRESULT WinRegistry::setValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, DWORD cbData) {
     HRESULT hr = RegSetValueExW(m_hkey, pszValueName, 0, dwValueType, pbData, cbData);
 
     return hr;

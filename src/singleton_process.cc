@@ -153,7 +153,7 @@ SingletonProcess::~SingletonProcess() {
         SetEvent(secondaryStartupEvent_);  // for fast exit
     }
 
-    if (asyncQuery_.valid())
+    if (STD_ASYNC_IS_RUNNING(asyncQuery_))
         asyncQuery_.wait();
 
     if (secondaryStartupEvent_) {

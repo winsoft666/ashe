@@ -15,11 +15,11 @@ std::string ashe::MD5::GetDataMD5(const unsigned char* buffer, size_t buffer_siz
 
     size_t offset = 0;
     while (offset < buffer_size) {
-        unsigned int needRead = 10240;
+        size_t needRead = 10240;
         if (offset + needRead > buffer_size)
             needRead = buffer_size - offset;
 
-        md5.MD5Update(&md5Context, buffer + offset, needRead);
+        md5.MD5Update(&md5Context, buffer + offset, (unsigned int)needRead);
         offset += needRead;
     }
 
@@ -47,11 +47,11 @@ std::string ashe::MD5::GetFileMD5(const ashe::fs::path& file_path) {
     MD5Context md5Context;
     md5.MD5Init(&md5Context);
 
-    size_t dwReadBytes = 0;
+    size_t readBytes = 0;
     unsigned char szData[1024] = {0};
 
-    while ((dwReadBytes = fread(szData, 1, 1024, f)) > 0) {
-        md5.MD5Update(&md5Context, szData, dwReadBytes);
+    while ((readBytes = fread(szData, 1, 1024, f)) > 0) {
+        md5.MD5Update(&md5Context, szData, (unsigned int)readBytes);
     }
 
     fclose(f);

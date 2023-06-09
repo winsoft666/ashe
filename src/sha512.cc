@@ -181,11 +181,11 @@ std::string SHA512::GetFileSHA512(const fs::path& filePath) {
     SHA512 ctx;
     ctx.init();
 
-    size_t dwReadBytes = 0;
+    size_t readBytes = 0;
     unsigned char szData[1024] = {0};
 
-    while ((dwReadBytes = file.readFrom(szData, 1024, -1)) > 0) {
-        ctx.update(szData, dwReadBytes);
+    while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
+        ctx.update(szData, (unsigned int)readBytes);
     }
     file.close();
 
@@ -203,7 +203,7 @@ std::string SHA512::GetDataSHA512(const unsigned char* data, size_t dataSize) {
     unsigned char digest[SHA512::DIGEST_SIZE] = {0};
     SHA512 ctx;
     ctx.init();
-    ctx.update((const unsigned char*)data, dataSize);
+    ctx.update((const unsigned char*)data, (unsigned int)dataSize);
     ctx.final(digest);
 
     char buf[2 * SHA512::DIGEST_SIZE + 1] = {0};

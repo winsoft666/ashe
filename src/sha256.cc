@@ -212,11 +212,11 @@ std::string ashe::SHA256::GetFileSHA256(const ashe::fs::path& filePath) {
     SHA256 sha256;
     sha256.init();
 
-    size_t dwReadBytes = 0;
+    size_t readBytes = 0;
     unsigned char szData[1024] = {0};
 
-    while ((dwReadBytes = file.readFrom(szData, 1024, -1)) > 0) {
-        sha256.update(szData, dwReadBytes);
+    while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
+        sha256.update(szData, (uint32_t)readBytes);
     }
     file.close();
 
@@ -232,11 +232,11 @@ std::string ashe::SHA256::GetDataSHA256(const unsigned char* data, size_t dataSi
 
     size_t offset = 0;
     while (offset < dataSize) {
-        unsigned int needRead = 10240;
+        size_t needRead = 10240;
         if (offset + needRead > dataSize)
             needRead = dataSize - offset;
 
-        sha256.update(data + offset, needRead);
+        sha256.update(data + offset, (uint32_t)needRead);
         offset += needRead;
     }
 

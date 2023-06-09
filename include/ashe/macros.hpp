@@ -22,6 +22,7 @@
 
 #include <float.h>
 #include <stdlib.h>
+#include <chrono>
 
 // Compare two float point value
 #ifndef IS_NEARLY_EQUAL
@@ -141,5 +142,8 @@
     if (!(condition)) {                         \
         ASHE_FAIL_MESSAGE(message);             \
     }
+
+
+#define STD_ASYNC_IS_RUNNING(x) ((x).valid() && (x).wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
 
 #endif  // ! ASHE_MACROS_HPP__

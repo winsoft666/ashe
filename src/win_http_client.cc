@@ -35,7 +35,7 @@ WinHttpClient::WinHttpClient(void) {
 WinHttpClient::~WinHttpClient(void) {
     abort();
 
-    if (future_.valid()) {
+    if (STD_ASYNC_IS_RUNNING(future_)) {
         future_.get();
     }
 

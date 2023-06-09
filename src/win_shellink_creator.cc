@@ -224,7 +224,7 @@ bool WinShellinkCreator::TaskbarPinShellLink(const std::wstring& shellLinkPath) 
     if (!OSVersion::IsWindowsVistaOrHigher())
         return false;
 
-    int result = reinterpret_cast<int>(ShellExecuteW(NULL, L"taskbarpin", shellLinkPath.c_str(), NULL, NULL, 0));
+    INT_PTR result = (INT_PTR)(ShellExecuteW(NULL, L"taskbarpin", shellLinkPath.c_str(), NULL, NULL, 0));
     return result > 32;
 }
 
@@ -232,7 +232,7 @@ bool WinShellinkCreator::TaskbarUnpinShellLink(const std::wstring& shellLinkPath
     if (!OSVersion::IsWindowsVistaOrHigher())
         return false;
 
-    int result = reinterpret_cast<int>(ShellExecuteW(NULL, L"taskbarunpin", shellLinkPath.c_str(), NULL, NULL, 0));
+    INT_PTR result = (INT_PTR)(ShellExecuteW(NULL, L"taskbarunpin", shellLinkPath.c_str(), NULL, NULL, 0));
     return result > 32;
 }
 }  // namespace ashe

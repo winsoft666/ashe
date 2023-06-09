@@ -11,6 +11,7 @@
 #include <Windows.h>
 #endif  // !_INC_WINDOWS
 #include <winhttp.h>
+#include <Intsafe.h>
 #pragma comment(lib, "winhttp")
 #include "ashe/string_helper.hpp"
 #include "ashe/file.hpp"
@@ -71,7 +72,7 @@ bool WinHttp::openConnect(const std::wstring& url) {
             urlComp.lpszExtraInfo = wszExtraInfo;
             urlComp.dwExtraInfoLength = ARRAYSIZE(wszExtraInfo);
 
-            if (WinHttpCrackUrl(url.c_str(), url.length(), ICU_ESCAPE, &urlComp)) {
+            if (WinHttpCrackUrl(url.c_str(), (DWORD)url.length(), ICU_ESCAPE, &urlComp)) {
                 strHostName_ = urlComp.lpszHostName;
                 strUrlPath_ = urlComp.lpszUrlPath;
                 strExtraInfo_ = urlComp.lpszExtraInfo;
@@ -107,11 +108,15 @@ bool WinHttp::openRequest(const std::wstring& method) {
     return !!hRequest_;
 }
 
-bool WinHttp::sendRequest(void* lpBuffer, unsigned int dwSize) {
+bool WinHttp::sendRequest(void* lpBuffer, size_t bufSize) {
+    DWORD dwBufSize = 0;
+    if (SIZETToDWord(bufSize, &dwBufSize) != S_OK)
+        return false;
+
     BOOL bResult = FALSE;
     if (hRequest_) {
-        if (lpBuffer != NULL && dwSize > 0)
-            bResult = WinHttpSendRequest(hRequest_, WINHTTP_NO_ADDITIONAL_HEADERS, 0, lpBuffer, dwSize, dwSize, 0);
+        if (lpBuffer != NULL && dwBufSize > 0)
+            bResult = WinHttpSendRequest(hRequest_, WINHTTP_NO_ADDITIONAL_HEADERS, 0, lpBuffer, dwBufSize, dwBufSize, 0);
         else
             bResult = WinHttpSendRequest(hRequest_, WINHTTP_NO_ADDITIONAL_HEADERS, 0, WINHTTP_NO_REQUEST_DATA, 0, 0, 0);
 

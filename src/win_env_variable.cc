@@ -129,7 +129,7 @@ unsigned int EnvVar::cut(std::wstring const& text) {
                    0,
                    REG_EXPAND_SZ,
                    reinterpret_cast<BYTE const*>(value_.c_str()),
-                   value_.length() * sizeof(wchar_t) + 1);
+                   (DWORD)value_.length() * sizeof(wchar_t) + 1);
     RegCloseKey(key);
 
     // Notify everyone of the change.
@@ -169,7 +169,7 @@ void EnvVar::paste(std::wstring const& text) {
                    0,
                    REG_EXPAND_SZ,
                    reinterpret_cast<BYTE const*>(value_.c_str()),
-                   value_.length() * sizeof(wchar_t) + 1);
+                   (DWORD)value_.length() * sizeof(wchar_t) + 1);
     RegCloseKey(key);
 
     // Notify everyone of the change.
@@ -207,7 +207,7 @@ void EnvVar::set(std::wstring const& text) {
                    0,
                    REG_EXPAND_SZ,
                    reinterpret_cast<const BYTE*>(value_.c_str()),
-                   value_.length() * sizeof(wchar_t) + 1);
+                   (DWORD)value_.length() * sizeof(wchar_t) + 1);
     RegCloseKey(key);
 
     // Notify everyone of the change.

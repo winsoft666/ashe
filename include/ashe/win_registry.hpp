@@ -114,7 +114,7 @@ class ASHE_API WinRegistry {
 
    private:
     HRESULT getValue(LPCWSTR pszValueName, DWORD dwTypeExpected, LPBYTE pbData, DWORD cbData) const;
-    HRESULT setValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, int cbData);
+    HRESULT setValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, DWORD cbData);
     LPWSTR createDoubleNulTermList(const std::vector<std::wstring>& vStrValues) const;
 
     static unsigned int _stdcall NotifyWaitThreadProc(LPVOID pvParam);

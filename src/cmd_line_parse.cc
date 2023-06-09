@@ -74,7 +74,7 @@ std::wstring ashe::CmdLineParser::getVal(const std::wstring& key) const {
     return it->second;
 }
 
-int ashe::CmdLineParser::getKeyCount() const {
+size_t ashe::CmdLineParser::getKeyCount() const {
     return value_map_.size();
 }
 

@@ -44,7 +44,7 @@ class ASHE_API CmdLineParser {
     bool hasVal(const std::wstring& key) const;
 
     std::wstring getVal(const std::wstring& key) const;
-    int getKeyCount() const;
+    size_t getKeyCount() const;
 
    private:
     void parse();

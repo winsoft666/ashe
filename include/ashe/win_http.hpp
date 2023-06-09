@@ -59,7 +59,7 @@ class ASHE_API WinHttp {
 
     bool openRequest(const std::wstring& method = L"GET");
 
-    bool sendRequest(void* lpBuffer = nullptr, unsigned int dwSize = 0);
+    bool sendRequest(void* lpBuffer = nullptr, size_t bufSize = 0);
 
     bool receiveResponse();
 
