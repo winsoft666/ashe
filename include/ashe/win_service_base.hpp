@@ -53,7 +53,7 @@ class ASHE_API WinServiceBase {
     // which results in a call to the OnStart method in the service. This
     // method blocks until the service has stopped.
     static BOOL Run(WinServiceBase& service) {
-        WinServiceHolder::Instance()->service = &service;
+        WinServiceHolder::Instance().service = &service;
 
         SERVICE_TABLE_ENTRYW serviceTable[] = {{service.m_name, ServiceMain}, {NULL, NULL}};
 
@@ -348,7 +348,7 @@ class ASHE_API WinServiceBase {
    private:
     // Entry point for the service. It registers the handler function for the service and starts the service.
     static void WINAPI ServiceMain(DWORD dwArgc, LPWSTR* lpszArgv) {
-        WinServiceBase* service = WinServiceHolder::Instance()->service;
+        WinServiceBase* service = WinServiceHolder::Instance().service;
         assert(service);
 
         // Register the handler function for the service
@@ -368,7 +368,7 @@ class ASHE_API WinServiceBase {
     // The function is called by the SCM whenever a control code is sent to
     // the service.
     static void WINAPI ServiceCtrlHandler(DWORD dwCtrl) {
-        WinServiceBase* service = WinServiceHolder::Instance()->service;
+        WinServiceBase* service = WinServiceHolder::Instance().service;
         switch (dwCtrl) {
             case SERVICE_CONTROL_STOP:
                 service->Stop();

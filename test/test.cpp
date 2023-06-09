@@ -622,14 +622,17 @@ TEST_CASE("VersionCompareTest") {
 // Test: Process singleton
 //
 TEST_CASE("SingletonProcessTest") {
-    ashe::SingletonProcess::Instance()->markAndCheckStartup("test");
-    REQUIRE(ashe::SingletonProcess::Instance()->isPrimary());
-    REQUIRE(ashe::SingletonProcess::Instance()->isPrimary());
+    {
+        ashe::SingletonProcess::Instance().markAndCheckStartup("test");
+        REQUIRE(ashe::SingletonProcess::Instance().isPrimary());
+        REQUIRE(ashe::SingletonProcess::Instance().isPrimary());
+    }
 
-    ashe::SingletonProcess::Release();
-    ashe::SingletonProcess::Instance()->markAndCheckStartup("test");
-    REQUIRE(ashe::SingletonProcess::Instance()->isPrimary());
-    REQUIRE(ashe::SingletonProcess::Instance()->isPrimary());
+    {
+        ashe::SingletonProcess::Instance().markAndCheckStartup("test");
+        REQUIRE(ashe::SingletonProcess::Instance().isPrimary());
+        REQUIRE(ashe::SingletonProcess::Instance().isPrimary());
+    }
 }
 
 // Test: Windows virtual key convert.
@@ -828,6 +831,21 @@ TEST_CASE("TimerTest9", "Test remove timer id") {
         auto res = t.remove(id + 1);
         REQUIRE(res == false);
     }
+}
+
+
+class SingletonTest : public ashe::SingletonClass<SingletonTest> {
+   public:
+    int value = 0;
+   private:
+    SingletonTest() {}
+
+    friend class ashe::SingletonClass<SingletonTest>;
+};
+
+TEST_CASE("SingletonClass", "1") {
+    SingletonTest::Instance().value = 1;
+    SingletonTest::Instance().value = 2;
 }
 
 int main(int argc, char* argv[]) {
