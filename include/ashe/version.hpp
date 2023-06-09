@@ -29,101 +29,31 @@
 namespace ashe {
 class ASHE_API Version {
    public:
-    Version(const std::string& s) {
-        const std::string sc = StringHelper::Trim(s);
-        const std::vector<std::string> v = StringHelper::Split(sc, ".");
-        const bool valid = !v.empty() &&
-                           std::find_if(v.begin(),
-                                        v.end(),
-                                        [](const std::string& c) {
-                                            return !StringHelper::IsDigit(c);
-                                        }) == v.end();
-        if (valid) {
-            for (const auto& c : v) {
-                verElems_.push_back(atoi(c.c_str()));
-            }
-        }
-    }
+    Version(const std::string& s);
 
-    Version(const std::wstring& s) {
-        const std::wstring sc = StringHelper::Trim(s);
-        const std::vector<std::wstring> v = StringHelper::Split(sc, L".");
-        const bool valid = !v.empty() &&
-                           std::find_if(v.begin(),
-                                        v.end(),
-                                        [](const std::wstring& c) {
-                                            return !StringHelper::IsDigit(c);
-                                        }) == v.end();
-        if (valid) {
-            for (const auto& c : v) {
-                verElems_.push_back(_wtoi(c.c_str()));
-            }
-        }
-    }
+    Version(const std::wstring& s);
 
-    Version(const Version& that) noexcept {
-        this->verElems_ = that.verElems_;
-    }
+    Version(const Version& that) noexcept;
 
-    bool isValid() const noexcept {
-        return !verElems_.empty();
-    }
+    bool isValid() const noexcept;
 
-    bool isSameFormat(const Version& that) const noexcept {
-        return (this->verElems_.size() == that.verElems_.size());
-    }
+    bool isSameFormat(const Version& that) const noexcept;
 
-    bool operator==(const Version& that) noexcept {
-        if (!isSameFormat(that))
-            return false;
+    bool operator==(const Version& that) noexcept;
 
-        bool result = true;
-        for (size_t i = 0; i < verElems_.size(); i++) {
-            if (verElems_[i] != that.verElems_[i]) {
-                result = false;
-                break;
-            }
-        }
-        return result;
-    }
+    bool operator!=(const Version& that) noexcept;
 
-    bool operator!=(const Version& that) noexcept {
-        return !(*this == that);
-    }
+    bool operator>(const Version& that);
 
-    bool operator>(const Version& that) {
-        return compare(that) > 0;
-    }
+    bool operator<(const Version& that);
 
-    bool operator<(const Version& that) {
-        return compare(that) < 0;
-    }
+    bool operator<=(const Version& that);
 
-    bool operator<=(const Version& that) {
-        return compare(that) <= 0;
-    }
+    bool operator>=(const Version& that);
 
-    bool operator>=(const Version& that) {
-        return compare(that) >= 0;
-    }
+    Version& operator=(const Version& that) noexcept;
 
-    Version& operator=(const Version& that) noexcept {
-        this->verElems_ = that.verElems_;
-        return *this;
-    }
-
-    int compare(const Version& that) {
-        assert(isSameFormat(that));
-
-        for (size_t i = 0; i < verElems_.size(); i++) {
-            if (verElems_[i] > that.verElems_[i])
-                return 1;
-
-            if (verElems_[i] < that.verElems_[i])
-                return -1;
-        }
-        return 0;
-    }
+    int compare(const Version& that);
 
    protected:
     std::vector<unsigned int> verElems_;

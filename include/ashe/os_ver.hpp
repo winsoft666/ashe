@@ -26,12 +26,12 @@
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif // !WIN32_LEAN_AND_MEAN
+#endif  // !WIN32_LEAN_AND_MEAN
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_
 #endif  // !_WINSOCKAPI_
 #include <Windows.h>
-#endif // !_INC_WINDOWS
+#endif  // !_INC_WINDOWS
 #include <strsafe.h>
 #elif defined(ASHE_MACOS)
 #include <sys/sysctl.h>
@@ -43,6 +43,7 @@
 #include <fstream>
 #include <regex>
 #endif
+#include <string>
 
 #pragma warning(disable : 4996)
 
@@ -82,97 +83,16 @@ typedef struct _WinVerInfo {
 class ASHE_API OSVersion {
    public:
 #ifdef ASHE_WIN
-    static WinVerInfo GetWinVer() {
-        WinVerInfo wvf;
-        LONG(WINAPI * RtlGetVersion)
-        (LPOSVERSIONINFOEX);
-        *(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion");
+    static WinVerInfo GetWinVer();
 
-        OSVERSIONINFOEX osversion;
-        osversion.dwOSVersionInfoSize = sizeof(osversion);
-        osversion.szCSDVersion[0] = TEXT('\0');
+    static bool IsWindowsVistaOrHigher();
 
-        if (RtlGetVersion != NULL) {
-            // RtlGetVersion uses 0 (STATUS_SUCCESS) as return value when succeeding
-            if (RtlGetVersion(&osversion) != 0)
-                return wvf;
-        }
-        else {
-            // GetVersionEx was deprecated in Windows 10, only use it as fallback
-            OSVERSIONINFOEX osversion;
-            osversion.dwOSVersionInfoSize = sizeof(osversion);
-            osversion.szCSDVersion[0] = TEXT('\0');
-            if (!GetVersionEx((LPOSVERSIONINFO)&osversion))
-                return wvf;
-        }
+    static bool IsWindows11();
 
-        wvf.major = (int)osversion.dwMajorVersion;
-        wvf.minor = (int)osversion.dwMinorVersion;
-        wvf.build = (int)osversion.dwBuildNumber;
-
-        DWORD dwProductType = 0;
-        if (GetProductInfo(osversion.dwMajorVersion, osversion.dwMinorVersion, 0, 0, &dwProductType)) {
-            wvf.productType = (int)dwProductType;
-        }
-        return wvf;
-    }
-
-    static bool IsWindowsVistaOrHigher() {
-        const WinVerInfo wvi = GetWinVer();
-        return (wvi.major >= 6);
-    }
-
-    static bool IsWindows11() {
-        const WinVerInfo wvi = GetWinVer();
-        return (wvi.major == 10 && wvi.minor == 0 && wvi.build >= 22000);
-    }
-
-    static bool IsWin64() {
-        typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
-        static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;
-        BOOL bIsWow64 = FALSE;
-
-        if (NULL == fnIsWow64Process) {
-            HMODULE h = GetModuleHandleW(L"kernel32");
-            if (h)
-                fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(h, "IsWow64Process");
-        }
-
-        if (NULL != fnIsWow64Process) {
-            fnIsWow64Process(GetCurrentProcess(), &bIsWow64);
-        }
-
-        return !!bIsWow64;
-    }
+    static bool IsWin64();
 #endif
 
-    static std::string GetOSVersion() {
-#ifdef ASHE_WIN
-        const WinVerInfo wvi = GetWinVer();
-        char result[100] = {0};
-        StringCchPrintfA(result, 100, "%d.%d.%d-%d", wvi.major, wvi.minor, wvi.build, wvi.productType);
-        return result;
-#elif defined(ASHE_MACOS)
-        char result[1024] = {0};
-        size_t size = sizeof(result);
-        if (sysctlbyname("kern.osrelease", result, &size, nullptr, 0) == 0)
-            return result;
-        return "<apple>";
-
-#elif defined(ASHE_LINUX)
-        static std::regex pattern("DISTRIB_DESCRIPTION=\"(.*)\"");
-
-        std::string line;
-        std::ifstream stream("/etc/lsb-release");
-        while (getline(stream, line)) {
-            std::smatch matches;
-            if (std::regex_match(line, matches, pattern))
-                return matches[1];
-        }
-
-        return "<linux>";
-#endif
-    }
+    static std::string GetOSVersion();
 };
 }  // namespace ashe
 #endif  // !ASHE_OS_VER_HPP__

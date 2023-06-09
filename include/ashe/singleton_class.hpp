@@ -25,31 +25,20 @@ namespace ashe {
 template <class T>
 class SingletonClass {
    public:
-    static T& Instance();
+    static T& Instance() {
+        // Meyers' Singleton
+        // If control enters the declaration concurrently while the variable is being initialized,
+        // the concurrent execution shall wait for completion of the initialization.
+        static T inst;
+        return inst;
+    }
 
    protected:
     SingletonClass() {}
-    SingletonClass(const SingletonClass&) {}
-    SingletonClass& operator=(const SingletonClass&) {
-        return *this;
-    }
-    SingletonClass(SingletonClass&&) {}
-    SingletonClass& operator=(SingletonClass&&) {
-        return *this;
-    }
-
-   private:
-    static std::mutex m_;
+    SingletonClass(const SingletonClass&) = delete;
+    SingletonClass& operator=(const SingletonClass&) = delete;
+    SingletonClass(SingletonClass&&) = delete;
+    SingletonClass& operator=(SingletonClass&&) = delete;
 };
-
-template <class T>
-std::mutex SingletonClass<T>::m_;
-
-template <class T>
-T& SingletonClass<T>::Instance() {
-    std::lock_guard<std::mutex> lg(m_);
-    static T inst;
-    return inst;
-}
 }  // namespace ashe
 #endif  // !ASHE_SINGLETON_CLASS_HPP_

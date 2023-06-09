@@ -62,7 +62,7 @@ namespace ashe {
 class ASHE_API Configor {
    public:
     ASHE_DISALLOW_COPY_MOVE(Configor);
-    class Element {
+    class ASHE_API Element {
         friend Configor;
 
        public:

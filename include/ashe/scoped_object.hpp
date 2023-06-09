@@ -39,7 +39,7 @@
 namespace ashe {
 #ifdef ASHE_WIN
 // Simple HANDLE wrapper to close it automatically from the destructor.
-class ASHE_API ScopedHandle {
+class ScopedHandle {
    public:
     ASHE_DISALLOW_COPY_MOVE(ScopedHandle);
     ScopedHandle(bool isNullInvalid = true) noexcept :

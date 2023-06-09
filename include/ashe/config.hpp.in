@@ -4,7 +4,7 @@
 
 #define ASHE_VERSION_MAJOR 1
 #define ASHE_VERSION_MINOR 0
-#define ASHE_VERSION_PATCH 1
+#define ASHE_VERSION_PATCH 4
 
 #ifdef ASHE_STATIC
 #define ASHE_API
@@ -18,6 +18,7 @@
 #else
 #if defined(_MSC_VER)
 #define ASHE_API __declspec(dllimport)
+#pragma warning(disable: 4251)
 #else
 #define ASHE_API
 #endif
