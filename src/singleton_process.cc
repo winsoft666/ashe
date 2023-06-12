@@ -81,18 +81,20 @@ void SingletonProcess::check() {
 
         asyncQuery_ = std::async(std::launch::async, [kSizeOfMap, this]() {
             while (!exit_.isSet()) {
-                if (WaitForSingleObject(secondaryStartupEvent_, 100) == WAIT_OBJECT_0) {
-                    if (exit_.isSet())  // check again, secondaryStartupEvent_ will be set when exit
-                        break;
+                if (secondaryStartupEvent_) {
+                    if (WaitForSingleObject(secondaryStartupEvent_, 60) == WAIT_OBJECT_0) {
+                        if (exit_.isSet())  // check again, secondaryStartupEvent_ will be set when exit
+                            break;
 
-                    if (cb_) {
-                        std::string secondaryCML;
+                        if (cb_) {
+                            std::string secondaryCML;
 
-                        if (viewOfFile_) {
-                            secondaryCML = (const char*)viewOfFile_;
-                            memset(viewOfFile_, 0, kSizeOfMap);
+                            if (viewOfFile_) {
+                                secondaryCML = (const char*)viewOfFile_;
+                                memset(viewOfFile_, 0, kSizeOfMap);
+                            }
+                            cb_(secondaryCML);
                         }
-                        cb_(secondaryCML);
                     }
                 }
             }
@@ -135,6 +137,10 @@ void SingletonProcess::check() {
 
 SingletonProcess::~SingletonProcess() {
 #ifdef ASHE_WIN
+    exit_.set();
+    if (STD_ASYNC_IS_RUNNING(asyncQuery_)) {
+        asyncQuery_.get();
+    }
     if (mutex_) {
         CloseHandle(mutex_);
         mutex_ = NULL;
@@ -147,14 +153,6 @@ SingletonProcess::~SingletonProcess() {
     if (fileMapping_) {
         CloseHandle(fileMapping_);
     }
-
-    exit_.set();
-    if (secondaryStartupEvent_) {
-        SetEvent(secondaryStartupEvent_);  // for fast exit
-    }
-
-    if (STD_ASYNC_IS_RUNNING(asyncQuery_))
-        asyncQuery_.wait();
 
     if (secondaryStartupEvent_) {
         CloseHandle(secondaryStartupEvent_);

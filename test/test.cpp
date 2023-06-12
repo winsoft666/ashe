@@ -623,15 +623,15 @@ TEST_CASE("VersionCompareTest") {
 //
 TEST_CASE("SingletonProcessTest") {
     {
-        ashe::SingletonProcess::Instance().markAndCheckStartup("test");
-        REQUIRE(ashe::SingletonProcess::Instance().isPrimary());
-        REQUIRE(ashe::SingletonProcess::Instance().isPrimary());
+        ashe::SingletonProcess::Instance()->markAndCheckStartup("test");
+        REQUIRE(ashe::SingletonProcess::Instance()->isPrimary());
+        REQUIRE(ashe::SingletonProcess::Instance()->isPrimary());
     }
 
     {
-        ashe::SingletonProcess::Instance().markAndCheckStartup("test");
-        REQUIRE(ashe::SingletonProcess::Instance().isPrimary());
-        REQUIRE(ashe::SingletonProcess::Instance().isPrimary());
+        ashe::SingletonProcess::Instance()->markAndCheckStartup("test");
+        REQUIRE(ashe::SingletonProcess::Instance()->isPrimary());
+        REQUIRE(ashe::SingletonProcess::Instance()->isPrimary());
     }
 }
 
@@ -844,8 +844,10 @@ class SingletonTest : public ashe::SingletonClass<SingletonTest> {
 };
 
 TEST_CASE("SingletonClass", "1") {
-    SingletonTest::Instance().value = 1;
-    SingletonTest::Instance().value = 2;
+    SingletonTest::Instance()->value = 1;
+    SingletonTest::Instance()->value = 2;
+
+    SingletonTest::Release();
 }
 
 int main(int argc, char* argv[]) {
