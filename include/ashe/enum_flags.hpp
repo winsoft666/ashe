@@ -99,8 +99,8 @@ class EnumFlags {
         EnumFlags{e, args...} {}
 
     template <class FwIter>
-    EnumFlags(FwIter b, FwIter e, typename convertible<decltype(*b)>::type = nullptr) noexcept(noexcept(std::declval<EnumFlags>().insert(std::declval<FwIter>(),
-                                                                                                                                 std::declval<FwIter>()))) :
+    EnumFlags(FwIter b, FwIter e, typename convertible<decltype(*std::declval<FwIter>())>::type = nullptr) 
+        noexcept(noexcept(std::declval<EnumFlags>().insert(std::declval<FwIter>(), std::declval<FwIter>()))) :
         val_(0) { insert(b, e); }
 
     constexpr explicit operator bool() const noexcept { return val_ != 0; }
