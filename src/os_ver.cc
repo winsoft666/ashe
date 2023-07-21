@@ -44,7 +44,7 @@ bool OSVersion::IsWindowsVistaOrHigher() {
 
 bool OSVersion::IsWindows11() {
     const WinVerInfo wvi = GetWinVer();
-    return (wvi.major == 10 && wvi.minor == 0 && wvi.build >= 22000);
+    return (wvi.major >= 10 && wvi.build >= 22000);
 }
 
 bool OSVersion::IsWin64() {

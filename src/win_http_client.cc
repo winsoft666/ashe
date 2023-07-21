@@ -227,6 +227,11 @@ void WinHttpClient::setProxy(const std::string& proxy) {
 std::string WinHttpClient::proxy() const {
     return proxy_;
 }
+
+std::shared_ptr<WinHttp> WinHttpClient::winHttp() {
+    return winHttp_;
+}
+
 }  // namespace ashe
 
 #endif  // ASHE_WIN

@@ -76,6 +76,8 @@ class ASHE_API WinHttpClient {
     void setProxy(const std::string& proxy);
     std::string proxy() const;
 
+    std::shared_ptr<WinHttp> winHttp();
+
    private:
     int doRequest(std::shared_ptr<HttpReqDatagram> reqDg,
                   HttpRspDatagram& rspDg,
