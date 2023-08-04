@@ -56,7 +56,18 @@ class ASHE_API PathUtil {
 
     static std::string ExpandEnvString(const std::string& src, bool disableWow64FsRedirection = true);
     static std::wstring ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection = true);
+
 #endif
+
+    static bool PathIsSurroundQuote(const wchar_t* szPath);
+    static bool PathIsSurroundQuote(const std::wstring& path);
+
+    // Remove the quotes that surrounding the path.
+    static void PathRemoveQuote(wchar_t* szPath);
+    static std::wstring PathRemoveQuote(const std::wstring& path);
+
+    static bool PathAddQuote(wchar_t* szPath, int buffSize, bool singleQuote = false);
+    static std::wstring PathAddQuote(const std::wstring& path, bool singleQuote = false);
 };
 }  // namespace ashe
 #endif  // !ASHE_PATH_UTIL_HPP_

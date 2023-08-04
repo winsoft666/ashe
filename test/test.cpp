@@ -536,6 +536,17 @@ TEST_CASE("FileSystemTest4", "[recursive remove non-empty attribute]") {
 #endif
 }
 
+TEST_CASE("FileSystemTest5", "path operate") {
+    ashe::fs::path p = L"C:\\Program Files(x86)\\a \\c.txt";
+    p.remove_filename();
+    REQUIRE(p == L"C:\\Program Files(x86)\\a \\");
+
+    std::wstring path = ashe::PathUtil::PathRemoveQuote(std::wstring(L"'C:\\Program Files(x86)\\a \\c.txt'"));
+    ashe::fs::path p2 = path;
+    p2.remove_filename();
+    REQUIRE(p2 == L"C:\\Program Files(x86)\\a \\");
+}
+
 #ifdef ASHE_WIN
 // Test: create process, send data to process's input and get process's output.
 //
@@ -833,10 +844,10 @@ TEST_CASE("TimerTest9", "Test remove timer id") {
     }
 }
 
-
 class SingletonTest : public ashe::SingletonClass<SingletonTest> {
    public:
     int value = 0;
+
    private:
     SingletonTest() {}
 

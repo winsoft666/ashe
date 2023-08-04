@@ -12,6 +12,7 @@
 #include "ashe/macros.hpp"
 #include "ashe/string_encode.hpp"
 #include "ashe/filesystem.hpp"
+#include "ashe/path_util.hpp"
 
 #pragma warning(disable : 4996)
 
@@ -88,15 +89,17 @@ bool ProcessUtil::SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAll
 }
 
 bool ProcessUtil::CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD* dwPID, HANDLE* pProcess) {
+    std::wstring newPath = PathUtil::PathRemoveQuote(path);
+
     WCHAR szDir[MAX_PATH] = {0};
-    StringCchPrintfW(szDir, MAX_PATH, L"%s", path.c_str());
+    StringCchPrintfW(szDir, MAX_PATH, L"%s", newPath.c_str());
     PathRemoveFileSpecW(szDir);
 
     WCHAR szFullCMD[1024];
     if (param.length() > 0)
-        StringCchPrintfW(szFullCMD, 1024, L"\"%s\" %s", path.c_str(), param.c_str());
+        StringCchPrintfW(szFullCMD, 1024, L"\"%s\" %s", newPath.c_str(), param.c_str());
     else
-        StringCchPrintfW(szFullCMD, 1024, L"\"%s\"", path.c_str());
+        StringCchPrintfW(szFullCMD, 1024, L"\"%s\"", newPath.c_str());
 
     STARTUPINFOW si = {sizeof(si)};
     PROCESS_INFORMATION pi = {0};
@@ -118,6 +121,22 @@ bool ProcessUtil::CreateNewProcess(const std::wstring& path, const std::wstring&
     }
 
     return true;
+}
+
+bool ProcessUtil::RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd /*= SW_SHOWDEFAULT*/) {
+    std::wstring newPath = PathUtil::PathRemoveQuote(path);
+    WCHAR szDir[MAX_PATH] = {0};
+    StringCchPrintfW(szDir, MAX_PATH, L"%s", newPath.c_str());
+    PathRemoveFileSpecW(szDir);
+
+    bool result = (INT_PTR)(::ShellExecuteW(
+                      nullptr,
+                      L"runas",
+                      path.c_str(),
+                      param.c_str(),
+                      szDir,
+                      nShowCmd)) > 31;
+    return result;
 }
 
 #endif

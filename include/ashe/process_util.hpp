@@ -48,6 +48,7 @@ class ASHE_API ProcessUtil {
 
     static bool CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD *dwPID, HANDLE* pProcess);
 
+    static bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd = SW_SHOWDEFAULT);
 #endif
 
     // On windows, path is encoded by ANSI, otherwise, is UTF8.

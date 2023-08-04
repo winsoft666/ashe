@@ -11,6 +11,7 @@
 
 #pragma comment(lib, "Shlwapi.lib")
 #endif
+#include <wchar.h>
 #include "ashe/os_ver.hpp"
 #include "ashe/string_helper.hpp"
 
@@ -71,7 +72,6 @@ std::wstring PathUtil::GetAllUserDesktopFolder() {
     return szDesktopDir;
 }
 
-
 std::wstring PathUtil::GetCurrentUserProgramsFolder() {
     wchar_t szDesktopDir[MAX_PATH] = {0};
     SHGetSpecialFolderPathW(NULL, szDesktopDir, CSIDL_PROGRAMS, 0);
@@ -87,7 +87,6 @@ std::wstring PathUtil::GetAllUserProgramsFolder() {
 
     return szDesktopDir;
 }
-
 
 std::wstring PathUtil::GetProgramFilesx86Folder() {
     wchar_t szDir[MAX_PATH] = {0};
@@ -244,5 +243,83 @@ std::wstring PathUtil::ExpandEnvString(const std::wstring& src, bool disableWow6
 
     return std::wstring(&buf[0]);
 }
+
 #endif
+
+bool PathUtil::PathIsSurroundQuote(const wchar_t* szPath) {
+    if (!szPath)
+        return false;
+
+    size_t oldLen = wcslen(szPath);
+    if (wcslen(szPath) < 2)
+        return false;
+
+    if ((szPath[0] == L'"' && szPath[oldLen - 1] == L'"') || (szPath[0] == L'\'' && szPath[oldLen - 1] == L'\'')) {
+        return true;
+    }
+
+    return false;
+}
+
+bool PathUtil::PathIsSurroundQuote(const std::wstring& path) {
+    size_t oldLen = path.length();
+    if (oldLen < 2)
+        return false;
+
+    if ((path[0] == L'"' && path[oldLen - 1] == L'"') || (path[0] == L'\'' && path[oldLen - 1] == L'\'')) {
+        return true;
+    }
+    return false;
+}
+
+void PathUtil::PathRemoveQuote(wchar_t* szPath) {
+    if (PathIsSurroundQuote(szPath)) {
+        szPath[wcslen(szPath) - 1] = 0;
+        wcscpy(szPath, szPath + 1);
+    }
+}
+
+std::wstring PathUtil::PathRemoveQuote(const std::wstring& path) {
+    if (PathIsSurroundQuote(path)) {
+        return path.substr(1, path.length() - 2);
+    }
+
+    return path;
+}
+
+bool PathUtil::PathAddQuote(wchar_t* szPath, int buffSize, bool singleQuote) {
+    if (PathIsSurroundQuote(szPath))
+        return true;
+
+    size_t oldLen = wcslen(szPath);
+    if (oldLen + 2 >= buffSize)
+        return false;
+
+    wchar_t quote = singleQuote ? L'\'' : L'"';
+
+    wchar_t* buff = new wchar_t[oldLen + 1];
+    if (!buff)
+        return false;
+
+    wcscpy(buff, szPath);
+    buff[oldLen] = 0;
+
+    szPath[0] = quote;
+    wcscpy(szPath + 1, buff);
+    szPath[oldLen + 1] = quote;
+    szPath[oldLen + 2] = 0;
+
+    delete[] buff;
+
+    return true;
+}
+
+std::wstring PathUtil::PathAddQuote(const std::wstring& path, bool singleQuote) {
+    if (PathIsSurroundQuote(path))
+        return path;
+
+    wchar_t quote = singleQuote ? L'\'' : L'"';
+    return std::wstring(1, quote) + path + std::wstring(1, quote);
+}
+
 }  // namespace ashe
