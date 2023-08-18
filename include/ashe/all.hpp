@@ -66,6 +66,7 @@
 #include "ashe/win_exception_catch.hpp"
 #include "ashe/win_ini.hpp"
 #include "ashe/win_hwnd.hpp"
+#include "ashe/win_firewall.hpp"
 #include "ashe/win_http.hpp"
 #include "ashe/win_http_client.hpp"
 #include "ashe/win_process_finder.hpp"
