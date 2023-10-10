@@ -42,6 +42,9 @@ option(ASHE_BUILD_TESTS "Build tests project" ON)
 option(ASHE_USE_STATIC_CRT "Set to ON to build with static CRT on Windows (/MT)." OFF)
 option(ASHE_BUILD_SHARED_LIBS "Set to ON to build dynamic library." OFF)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Unicode Support
 add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
