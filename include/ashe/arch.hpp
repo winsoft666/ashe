@@ -22,7 +22,7 @@
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #define ASHE_WIN 1
-#ifdef _WIN64
+#if (defined _WIN64) || (defined WIN64)
 #define ASHE_WIN64 1
 #else
 #define ASHE_WIN32 1

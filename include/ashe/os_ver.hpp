@@ -90,6 +90,8 @@ class ASHE_API OSVersion {
     static bool IsWindows11();
 
     static bool IsWin64();
+    static bool IsWow64(HANDLE process, bool& result);
+    static bool Is32BitProcess(HANDLE process, bool& result);
 #endif
 
     static std::string GetOSVersion();

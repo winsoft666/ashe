@@ -48,21 +48,47 @@ bool OSVersion::IsWindows11() {
 }
 
 bool OSVersion::IsWin64() {
-    typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
-    static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;
+#ifdef ASHE_WIN64
+    return true;
+#else
+    bool result = false;
+    IsWow64(GetCurrentProcess(), result);
+    return result;
+#endif
+}
+
+bool OSVersion::IsWow64(HANDLE process, bool& result) {
     BOOL bIsWow64 = FALSE;
 
+    typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
+    LPFN_ISWOW64PROCESS fnIsWow64Process =
+        (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
+
     if (NULL == fnIsWow64Process) {
-        HMODULE h = GetModuleHandleW(L"kernel32");
-        if (h)
-            fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(h, "IsWow64Process");
+        return false;
     }
 
-    if (NULL != fnIsWow64Process) {
-        fnIsWow64Process(GetCurrentProcess(), &bIsWow64);
+    if (!fnIsWow64Process(process, &bIsWow64)) {
+        return false;
     }
 
-    return !!bIsWow64;
+    result = !!bIsWow64;
+    return true;
+}
+
+bool OSVersion::Is32BitProcess(HANDLE process, bool& result) {
+    if (!process)
+        return false;
+
+    bool wow64 = false;
+    if (!IsWow64(process, wow64))
+        return false;
+
+    if (wow64)
+        result = true;
+    else
+        result = !IsWin64();
+    return true;
 }
 #endif
 
