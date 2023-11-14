@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -145,5 +145,7 @@
 
 
 #define STD_ASYNC_IS_RUNNING(x) ((x).valid() && (x).wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
+
+#define ASHE_UNUSED(x) (void)(x)
 
 #endif  // ! ASHE_MACROS_HPP__

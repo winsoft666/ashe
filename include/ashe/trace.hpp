@@ -1,7 +1,7 @@
 /*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
 namespace ashe {
 class ASHE_API Trace {
    public:
-    static void MsgW(const wchar_t* lpFormat, ...);
-    static void MsgA(const char* lpFormat, ...);
+    static void MsgW(const wchar_t* lpFormat, ...) noexcept;
+    static void MsgA(const char* lpFormat, ...) noexcept;
 };
 }  // namespace ashe
 

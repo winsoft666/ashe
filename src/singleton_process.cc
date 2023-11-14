@@ -41,14 +41,9 @@ void SingletonProcess::check() {
 #ifdef ASHE_WIN
     const int kSizeOfMap = 1024 * sizeof(wchar_t);
     std::string secondaryStartupEventName, memFileName;
-    if (StringHelper::IsStartsWith(uniqueName_, "Global\\")) {
-        mutex_ = CreateEventA(NULL, TRUE, FALSE, uniqueName_.c_str());
-        secondaryStartupEventName = uniqueName_ + "_secondaryStartupEventName";
-    }
-    else {
-        mutex_ = CreateEventA(NULL, TRUE, FALSE, ("Global\\" + uniqueName_).c_str());
-        secondaryStartupEventName = "Global\\" + uniqueName_ + "_secondaryStartupEventName";
-    }
+    mutex_ = CreateEventA(NULL, TRUE, FALSE, uniqueName_.c_str());
+    secondaryStartupEventName = uniqueName_ + "_secondaryStartupEventName";
+
     memFileName = uniqueName_ + "_memFileName";
 
     const DWORD gle = GetLastError();

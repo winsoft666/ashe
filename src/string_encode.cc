@@ -1,5 +1,6 @@
 #include "ashe/config.hpp"
 #include "ashe/string_encode.hpp"
+#include "ashe/macros.hpp"
 
 #include <codecvt>
 #include <locale>
@@ -19,7 +20,7 @@
 
 namespace ashe {
 #ifdef ASHE_WIN
-std::string StringEncode::UnicodeToAnsi(const std::wstring& str, unsigned int code_page) {
+std::string StringEncode::UnicodeToAnsi(const std::wstring& str, unsigned int code_page) noexcept {
     std::string strRes;
     int iSize = ::WideCharToMultiByte(code_page, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
 
@@ -41,7 +42,7 @@ std::string StringEncode::UnicodeToAnsi(const std::wstring& str, unsigned int co
     return strRes;
 }
 
-std::wstring StringEncode::AnsiToUnicode(const std::string& str, unsigned int code_page) {
+std::wstring StringEncode::AnsiToUnicode(const std::string& str, unsigned int code_page) noexcept {
     std::wstring strRes;
 
     int iSize = ::MultiByteToWideChar(code_page, 0, str.c_str(), -1, NULL, 0);
@@ -66,9 +67,10 @@ std::wstring StringEncode::AnsiToUnicode(const std::string& str, unsigned int co
 
 #endif
 
-std::string StringEncode::UnicodeToUtf8(const std::wstring& str) {
-#ifdef ASHE_WIN
+std::string StringEncode::UnicodeToUtf8(const std::wstring& str) noexcept {
     std::string strRes;
+#ifdef ASHE_WIN
+
     int iSize = ::WideCharToMultiByte(CP_UTF8, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
 
     if (iSize == 0)
@@ -87,12 +89,18 @@ std::string StringEncode::UnicodeToUtf8(const std::wstring& str) {
     delete[] szBuf;
     return strRes;
 #else
-    std::wstring_convert<std::codecvt_utf8<wchar_t> > converter;
-    return converter.to_bytes(str);
+    try {
+        std::wstring_convert<std::codecvt_utf8<wchar_t> > converter;
+        strRes = converter.to_bytes(str);
+    } catch (std::exception& e) {
+        ASHE_UNUSED(e);
+        strRes.clear();
+    }
+    return strRes;
 #endif
 }
 
-std::string StringEncode::UnicodeToUtf8BOM(const std::wstring& str) {
+std::string StringEncode::UnicodeToUtf8BOM(const std::wstring& str) noexcept {
 #ifdef ASHE_WIN
     std::string strRes;
 
@@ -118,19 +126,27 @@ std::string StringEncode::UnicodeToUtf8BOM(const std::wstring& str) {
 
     return strRes;
 #else
-    std::wstring_convert<std::codecvt_utf8<wchar_t> > converter;
-    const std::string stru8 = converter.to_bytes(str);
-    std::string strRes(3, (const char)0);
-    strRes[0] = (char)0xef;
-    strRes[1] = (char)0xbb;
-    strRes[2] = (char)0xbf;
-    strRes += stru8;
+    std::string strRes;
 
+    try {
+        std::wstring_convert<std::codecvt_utf8<wchar_t> > converter;
+        const std::string stru8 = converter.to_bytes(str);
+
+        strRes.resize(3);
+        strRes[0] = (char)0xef;
+        strRes[1] = (char)0xbb;
+        strRes[2] = (char)0xbf;
+
+        strRes += stru8;
+    } catch (std::exception& e) {
+        ASHE_UNUSED(e);
+        strRes.clear();
+    }
     return strRes;
 #endif
 }
 
-std::wstring StringEncode::Utf8ToUnicode(const std::string& str) {
+std::wstring StringEncode::Utf8ToUnicode(const std::string& str) noexcept {
 #ifdef ASHE_WIN
     std::wstring strRes;
     const int iSize = ::MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
@@ -151,21 +167,30 @@ std::wstring StringEncode::Utf8ToUnicode(const std::string& str) {
 
     return strRes;
 #else
-    std::wstring_convert<std::codecvt_utf8<wchar_t> > converter;
-    return converter.from_bytes(str);
+    std::wstring strRes;
+
+    try {
+        std::wstring_convert<std::codecvt_utf8<wchar_t> > converter;
+        strRes = converter.from_bytes(str);
+    } catch (std::exception& e) {
+        ASHE_UNUSED(e);
+        strRes.clear();
+    }
+
+    return strRes;
 #endif
 }
 
 #ifdef ASHE_WIN
-std::string StringEncode::AnsiToUtf8(const std::string& str, unsigned int code_page) {
+std::string StringEncode::AnsiToUtf8(const std::string& str, unsigned int code_page) noexcept {
     return UnicodeToUtf8(AnsiToUnicode(str, code_page));
 }
 
-std::string StringEncode::AnsiToUtf8BOM(const std::string& str, unsigned int code_page) {
+std::string StringEncode::AnsiToUtf8BOM(const std::string& str, unsigned int code_page) noexcept {
     return UnicodeToUtf8BOM(AnsiToUnicode(str, code_page));
 }
 
-std::string StringEncode::Utf8ToAnsi(const std::string& str, unsigned int code_page) {
+std::string StringEncode::Utf8ToAnsi(const std::string& str, unsigned int code_page) noexcept {
     return UnicodeToAnsi(Utf8ToUnicode(str), code_page);
 }
 #endif

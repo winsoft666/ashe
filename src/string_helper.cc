@@ -1,5 +1,6 @@
 #include "ashe/config.hpp"
 #include "ashe/string_helper.hpp"
+#include "ashe/macros.hpp"
 #include <algorithm>
 #include <cctype>
 #include <cstdarg>
@@ -499,179 +500,213 @@ bool StringHelper::IsEqual(const std::wstring& s1, const std::wstring& s2, bool 
 }
 
 // format a string
-bool StringHelper::StringPrintfV(const char* format, va_list argList, std::string& output) {
+bool StringHelper::StringPrintfV(const char* format, va_list argList, std::string& output) noexcept {
     if (!format)
         return false;
 
+    bool ret = false;
 #ifdef ASHE_WIN
     char* pMsgBuffer = NULL;
     size_t iMsgBufCount = 0;
 
     HRESULT hr = STRSAFE_E_INSUFFICIENT_BUFFER;
-    while (hr == STRSAFE_E_INSUFFICIENT_BUFFER) {
-        iMsgBufCount += 1024;
+    try {
+        while (hr == STRSAFE_E_INSUFFICIENT_BUFFER) {
+            iMsgBufCount += 1024;
+            if (pMsgBuffer) {
+                free(pMsgBuffer);
+                pMsgBuffer = NULL;
+            }
+
+            pMsgBuffer = (char*)malloc(iMsgBufCount * sizeof(char));
+            if (!pMsgBuffer) {
+                break;
+            }
+            hr = StringCchVPrintfA(pMsgBuffer, iMsgBufCount, format, argList);
+        }
+
+        if (hr == S_OK && pMsgBuffer) {
+            output.assign(pMsgBuffer);
+        }
+
         if (pMsgBuffer) {
             free(pMsgBuffer);
             pMsgBuffer = NULL;
         }
 
-        pMsgBuffer = (char*)malloc(iMsgBufCount * sizeof(char));
-        if (!pMsgBuffer) {
-            break;
-        }
-        hr = StringCchVPrintfA(pMsgBuffer, iMsgBufCount, format, argList);
+        ret = (hr == S_OK);
+    } catch (std::exception& e) {
+        ASHE_UNUSED(e);
+        ret = false;
     }
 
-    if (hr == S_OK && pMsgBuffer) {
-        output.assign(pMsgBuffer);
-    }
-
-    if (pMsgBuffer) {
-        free(pMsgBuffer);
-        pMsgBuffer = NULL;
-    }
-
-    return (hr == S_OK);
+    return ret;
 #else
-    bool result = false;
     char* msgBuf = nullptr;
     size_t msgBufSize = 1024;
 
-    do {
+    try {
+        do {
+            if (msgBuf) {
+                free(msgBuf);
+                msgBuf = nullptr;
+            }
+            msgBuf = (char*)malloc(msgBufSize * sizeof(char));
+            if (!msgBuf) {
+                break;
+            }
+            memset(msgBuf, 0, msgBufSize * sizeof(char));
+
+            va_list va_copy;
+            VA_COPY(va_copy, argList);
+            const int err = vsnprintf(msgBuf, msgBufSize, format, va_copy);
+            if (err >= 0 && err < msgBufSize) {
+                ret = true;
+                break;
+            }
+
+            msgBufSize *= 2;
+        } while (true);
+
+        if (result && msgBuf) {
+            output.assign(msgBuf);
+        }
+
         if (msgBuf) {
             free(msgBuf);
             msgBuf = nullptr;
         }
-        msgBuf = (char*)malloc(msgBufSize * sizeof(char));
-        if (!msgBuf) {
-            break;
-        }
-        memset(msgBuf, 0, msgBufSize * sizeof(char));
-
-        va_list va_copy;
-        VA_COPY(va_copy, argList);
-        const int err = vsnprintf(msgBuf, msgBufSize, format, va_copy);
-        if (err >= 0 && err < msgBufSize) {
-            result = true;
-            break;
-        }
-
-        msgBufSize *= 2;
-    } while (true);
-
-    if (result && msgBuf) {
-        output.assign(msgBuf);
+    } catch (std::exception& e) {
+        ASHE_UNUSED(e);
+        ret = false;
     }
 
-    if (msgBuf) {
-        free(msgBuf);
-        msgBuf = nullptr;
-    }
-
-    return result;
+    return ret;
 #endif
 }
 
-bool StringHelper::StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) {
+bool StringHelper::StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) noexcept {
     if (!format)
         return false;
 
+    bool ret = false;
 #ifdef ASHE_WIN
     wchar_t* pMsgBuffer = NULL;
     size_t iMsgBufCount = 0;
 
     HRESULT hr = STRSAFE_E_INSUFFICIENT_BUFFER;
-    while (hr == STRSAFE_E_INSUFFICIENT_BUFFER) {
-        iMsgBufCount += 1024;
+    try {
+        while (hr == STRSAFE_E_INSUFFICIENT_BUFFER) {
+            iMsgBufCount += 1024;
+            if (pMsgBuffer) {
+                free(pMsgBuffer);
+                pMsgBuffer = NULL;
+            }
+
+            pMsgBuffer = (wchar_t*)malloc(iMsgBufCount * sizeof(wchar_t));
+            if (!pMsgBuffer) {
+                break;
+            }
+            hr = StringCchVPrintfW(pMsgBuffer, iMsgBufCount, format, argList);
+        }
+
+        if (hr == S_OK && pMsgBuffer) {
+            output.assign(pMsgBuffer);
+        }
+
         if (pMsgBuffer) {
             free(pMsgBuffer);
             pMsgBuffer = NULL;
         }
 
-        pMsgBuffer = (wchar_t*)malloc(iMsgBufCount * sizeof(wchar_t));
-        if (!pMsgBuffer) {
-            break;
-        }
-        hr = StringCchVPrintfW(pMsgBuffer, iMsgBufCount, format, argList);
+        ret = (hr == S_OK);
+    } catch (std::exception& e) {
+        ASHE_UNUSED(e);
+        ret = false;
     }
 
-    if (hr == S_OK && pMsgBuffer) {
-        output.assign(pMsgBuffer);
-    }
-
-    if (pMsgBuffer) {
-        free(pMsgBuffer);
-        pMsgBuffer = NULL;
-    }
-
-    return (hr == S_OK);
+    return ret;
 #else
-    bool result = false;
     wchar_t* msgBuf = nullptr;
     size_t msgBufSize = 1024;
 
-    do {
+    try {
+        do {
+            if (msgBuf) {
+                free(msgBuf);
+                msgBuf = nullptr;
+            }
+            msgBuf = (wchar_t*)malloc(msgBufSize * sizeof(wchar_t));
+            if (!msgBuf) {
+                break;
+            }
+            memset(msgBuf, 0, msgBufSize * sizeof(wchar_t));
+
+            va_list va_copy;
+            VA_COPY(va_copy, argList);
+            const int err = vswprintf(msgBuf, msgBufSize, format, va_copy);
+            if (err >= 0 && err < msgBufSize) {
+                ret = true;
+                break;
+            }
+
+            msgBufSize *= 2;
+        } while (true);
+
+        if (result && msgBuf) {
+            output.assign(msgBuf);
+        }
+
         if (msgBuf) {
             free(msgBuf);
             msgBuf = nullptr;
         }
-        msgBuf = (wchar_t*)malloc(msgBufSize * sizeof(wchar_t));
-        if (!msgBuf) {
-            break;
-        }
-        memset(msgBuf, 0, msgBufSize * sizeof(wchar_t));
-
-        va_list va_copy;
-        VA_COPY(va_copy, argList);
-        const int err = vswprintf(msgBuf, msgBufSize, format, va_copy);
-        if (err >= 0 && err < msgBufSize) {
-            result = true;
-            break;
-        }
-
-        msgBufSize *= 2;
-    } while (true);
-
-    if (result && msgBuf) {
-        output.assign(msgBuf);
+    } catch (std::exception& e) {
+        ASHE_UNUSED(e);
+        ret = false;
     }
 
-    if (msgBuf) {
-        free(msgBuf);
-        msgBuf = nullptr;
-    }
-
-    return result;
+    return ret;
 #endif
 }
 
-std::string StringHelper::StringPrintf(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
+std::string StringHelper::StringPrintf(const char* format, ...) noexcept {
     std::string output;
-    StringPrintfV(format, args, output);
-    va_end(args);
+    try {
+        va_list args;
+        va_start(args, format);
+
+        StringPrintfV(format, args, output);
+        va_end(args);
+    } catch (std::exception& e) {
+        ASHE_UNUSED(e);
+        output.clear();
+    }
 
     return output;
 }
 
-std::wstring StringHelper::StringPrintf(const wchar_t* format, ...) {
-    va_list args;
-    va_start(args, format);
+std::wstring StringHelper::StringPrintf(const wchar_t* format, ...) noexcept {
     std::wstring output;
-    StringPrintfV(format, args, output);
-    va_end(args);
-
+    try {
+        va_list args;
+        va_start(args, format);
+        StringPrintfV(format, args, output);
+        va_end(args);
+    } catch (std::exception& e) {
+        ASHE_UNUSED(e);
+        output.clear();
+    }
     return output;
 }
 
-std::string StringHelper::StringPrintfV(const char* format, va_list argList) {
+std::string StringHelper::StringPrintfV(const char* format, va_list argList) noexcept {
     std::string output;
     StringPrintfV(format, argList, output);
     return output;
 }
 
-std::wstring StringHelper::StringPrintfV(const wchar_t* format, va_list argList) {
+std::wstring StringHelper::StringPrintfV(const wchar_t* format, va_list argList) noexcept {
     std::wstring output;
     StringPrintfV(format, argList, output);
     return output;

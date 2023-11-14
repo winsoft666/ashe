@@ -1,7 +1,7 @@
 /*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -32,8 +32,11 @@ class ASHE_API Timer {
    public:
     using handler_t = std::function<void(std::size_t)>;
 
-    Timer();
+    Timer() noexcept;
     ~Timer();
+
+    void init() noexcept;
+    void destory() noexcept;
 
     /**
 	 * Add a new timer.

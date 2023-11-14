@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -91,14 +91,14 @@ class ASHE_API StringHelper {
     static bool IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase = false);
 
     // format a string
-    static bool StringPrintfV(const char* format, va_list argList, std::string& output);
-    static bool StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output);
+    static bool StringPrintfV(const char* format, va_list argList, std::string& output) noexcept;
+    static bool StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) noexcept;
 
-    static std::string StringPrintf(const char* format, ...);
-    static std::wstring StringPrintf(const wchar_t* format, ...);
+    static std::string StringPrintf(const char* format, ...) noexcept;
+    static std::wstring StringPrintf(const wchar_t* format, ...) noexcept;
 
-    static std::string StringPrintfV(const char* format, va_list argList);
-    static std::wstring StringPrintfV(const wchar_t* format, va_list argList);
+    static std::string StringPrintfV(const char* format, va_list argList) noexcept;
+    static std::wstring StringPrintfV(const wchar_t* format, va_list argList) noexcept;
 };
 }  // namespace ashe
 #endif  // !ASHE_STRING_HELPER_HPP__

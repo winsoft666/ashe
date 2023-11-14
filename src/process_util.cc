@@ -13,12 +13,13 @@
 #include "ashe/string_encode.hpp"
 #include "ashe/filesystem.hpp"
 #include "ashe/path_util.hpp"
+#include "ashe/os_ver.hpp"
 
 #pragma warning(disable : 4996)
 
 namespace ashe {
 #ifdef ASHE_WIN
-bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) {
+bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) noexcept {
     BOOL fRet = FALSE;
     HANDLE hToken = NULL;
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
@@ -36,7 +37,7 @@ bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) {
     return !!fRet;
 }
 
-bool ProcessUtil::IsRunAsAdminPrivilege(DWORD dwPid) {
+bool ProcessUtil::IsRunAsAdminPrivilege(DWORD dwPid) noexcept {
     HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwPid);
     if (!hProcess)
         return false;
@@ -45,7 +46,7 @@ bool ProcessUtil::IsRunAsAdminPrivilege(DWORD dwPid) {
     return ret;
 }
 
-bool ProcessUtil::SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) {
+bool ProcessUtil::SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) noexcept {
     OSVERSIONINFO VersionTmp;
     VersionTmp.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&VersionTmp);
@@ -79,6 +80,7 @@ bool ProcessUtil::SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAll
             }
 
             FreeLibrary(hlib);
+            hlib = NULL;
         }
     }
     else {
@@ -137,6 +139,21 @@ bool ProcessUtil::RunAsAdmin(const std::wstring& path, const std::wstring& param
                       szDir,
                       nShowCmd)) > 31;
     return result;
+}
+
+bool ProcessUtil::Is32BitProcess(HANDLE process, bool& result) noexcept {
+    if (!process)
+        return false;
+
+    bool wow64 = false;
+    if (!OSVersion::IsWow64(process, wow64))
+        return false;
+
+    if (wow64)
+        result = true;
+    else
+        result = !OSVersion::IsWin64();
+    return true;
 }
 
 #endif

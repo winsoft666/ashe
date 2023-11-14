@@ -1,5 +1,6 @@
 #include "ashe/config.hpp"
 #include "ashe/timer.hpp"
+#include "ashe/macros.hpp"
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -17,7 +18,7 @@ struct Event {
     std::chrono::microseconds period;
     Timer::handler_t handler;
     bool valid;
-    Event() :
+    Event() noexcept :
         id(0),
         start(std::chrono::microseconds::zero()),
         period(std::chrono::microseconds::zero()),
@@ -66,26 +67,45 @@ class Timer::Private {
     std::stack<std::size_t> free_ids_;
 };
 
-Timer::Timer() :
+Timer::Timer() noexcept :
     p_(new Private()) {
-    std::unique_lock<std::mutex> lock(p_->m_);
-    p_->worker_ = std::thread([this] { run(); });
 }
 
 Timer::~Timer() {
-    std::unique_lock<std::mutex> lock(p_->m_);
-    p_->done_ = true;
-    lock.unlock();
-    p_->cond_.notify_all();
-    p_->worker_.join();
-    p_->events_.clear();
-    p_->time_events_.clear();
-    while (!p_->free_ids_.empty()) {
-        p_->free_ids_.pop();
-    }
+}
 
-    delete p_;
-    p_ = nullptr;
+void Timer::init() noexcept {
+    std::unique_lock<std::mutex> lock(p_->m_);
+    p_->worker_ = std::thread([this] {
+        try {
+            run();
+        } catch (std::exception& e) {
+            ASHE_UNUSED(e);
+        }
+    });
+}
+
+void Timer::destory() noexcept {
+    if (p_) {
+        std::unique_lock<std::mutex> lock(p_->m_);
+        p_->done_ = true;
+        lock.unlock();
+        p_->cond_.notify_all();
+        try {
+            if (p_->worker_.joinable())
+                p_->worker_.join();
+        } catch (std::exception& e) {
+            ASHE_UNUSED(e);
+        }
+        p_->events_.clear();
+        p_->time_events_.clear();
+        while (!p_->free_ids_.empty()) {
+            p_->free_ids_.pop();
+        }
+
+        delete p_;
+        p_ = nullptr;
+    }
 }
 
 std::size_t Timer::add(
@@ -150,7 +170,11 @@ void Timer::run() {
 
                 // Invoke the handler
                 lock.unlock();
-                p_->events_[te.ref].handler(te.ref);
+                try {
+                    p_->events_[te.ref].handler(te.ref);
+                } catch (std::exception& e) {
+                    ASHE_UNUSED(e);
+                }
                 lock.lock();
 
                 if (p_->events_[te.ref].valid && p_->events_[te.ref].period.count() > 0) {

@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -83,15 +83,15 @@ typedef struct _WinVerInfo {
 class ASHE_API OSVersion {
    public:
 #ifdef ASHE_WIN
-    static WinVerInfo GetWinVer();
+    static WinVerInfo GetWinVer() noexcept;
 
-    static bool IsWindowsVistaOrHigher();
+    static bool IsWindowsVistaOrHigher() noexcept;
 
-    static bool IsWindows11();
+    static bool IsWindows11() noexcept;
 
-    static bool IsWin64();
-    static bool IsWow64(HANDLE process, bool& result);
-    static bool Is32BitProcess(HANDLE process, bool& result);
+    static bool IsWin64() noexcept;
+
+    static bool IsWow64(HANDLE process, bool& result) noexcept;
 #endif
 
     static std::string GetOSVersion();

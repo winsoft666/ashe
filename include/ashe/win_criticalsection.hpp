@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -33,11 +33,11 @@ class ASHE_API WinCriticalSection {
    public:
     ASHE_DISALLOW_COPY_MOVE(WinCriticalSection);
 
-    WinCriticalSection();
-    ~WinCriticalSection();
-    void enter() const;
-    void leave() const;
-    bool tryEnter() const;
+    WinCriticalSection() noexcept;
+    ~WinCriticalSection() noexcept;
+    void enter() const noexcept;
+    void leave() const noexcept;
+    bool tryEnter() const noexcept;
 
    private:
     class Private;
@@ -48,9 +48,18 @@ class ASHE_API ScopedWinCriticalSection {
    public:
     ASHE_DISALLOW_COPY_MOVE(ScopedWinCriticalSection);
 
-    explicit ScopedWinCriticalSection(const WinCriticalSection* pCS) :
-        crit_(pCS) { crit_->enter(); }
-    ~ScopedWinCriticalSection() { crit_->leave(); }
+    explicit ScopedWinCriticalSection(const WinCriticalSection* pCS) noexcept :
+        crit_(pCS) {
+        if (crit_) {
+            crit_->enter();
+        }
+    }
+
+    ~ScopedWinCriticalSection() noexcept {
+        if (crit_) {
+            crit_->leave();
+        }
+    }
 
    private:
     const WinCriticalSection* const crit_;

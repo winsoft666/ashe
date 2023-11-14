@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -49,9 +49,9 @@ class ASHE_API WinRegistry {
     // HKEY_LOCAL_MACHINE
     // HKEY_USERS
     //
-    WinRegistry(HKEY hkeyRoot, const std::wstring& subKey);
+    WinRegistry(HKEY hkeyRoot, const std::wstring& subKey) noexcept;
 
-    ~WinRegistry();
+    ~WinRegistry() noexcept;
 
     // samDesired:
     // https://docs.microsoft.com/zh-cn/windows/desktop/SysInfo/registry-key-security-and-access-rights
@@ -64,63 +64,63 @@ class ASHE_API WinRegistry {
     // KEY_WOW64_64KEY
     // and so on.
     //
-    LSTATUS open(REGSAM samDesired, bool bCreate);
+    HRESULT open(REGSAM samDesired, bool bCreate) noexcept;
 
-    bool isOpen(void) const;
+    bool isOpen(void) const noexcept;
 
-    HKEY getHandle(void) const;
+    HKEY getHandle(void) const noexcept;
 
-    void attach(HKEY hkey);
+    void attach(HKEY hkey) noexcept;
 
-    void detach();
+    void detach() noexcept;
 
-    void close();
+    void close() noexcept;
 
-    HRESULT watchForChange(DWORD dwChangeFilter, bool bWatchSubtree);
+    bool watchForChange(DWORD dwChangeFilter, bool bWatchSubtree) noexcept;
 
-    HRESULT waitForChange(DWORD dwChangeFilter, bool bWatchSubtree);
+    HRESULT waitForChange(DWORD dwChangeFilter, bool bWatchSubtree) noexcept;
 
-    static bool DeleteKey(HKEY hKey, LPCWSTR pszSubKey, LPCWSTR pszValName, bool bPrefer64View);
+    static bool DeleteKey(HKEY hKey, LPCWSTR pszSubKey, LPCWSTR pszValName, bool bPrefer64View) noexcept;
 
-    static bool DeleteSubKeys(HKEY hKeyRoot, LPCTSTR lpSubKey, bool bPrefer64View);
+    static bool DeleteSubKeys(HKEY hKeyRoot, LPCTSTR lpSubKey, bool bPrefer64View) noexcept;
 
-    HRESULT getDWORDValue(LPCWSTR pszValueName, OUT DWORD& pdwDataOut) const;
+    HRESULT getDWORDValue(LPCWSTR pszValueName, OUT DWORD& pdwDataOut) const noexcept;
 
-    HRESULT getBINARYValue(LPCWSTR pszValueName, LPBYTE pbDataOut, int cbDataOut) const;
+    HRESULT getBINARYValue(LPCWSTR pszValueName, LPBYTE pbDataOut, int cbDataOut) const noexcept;
 
-    HRESULT getSZValue(LPCWSTR pszValueName, OUT std::wstring& strValue) const;
+    HRESULT getSZValue(LPCWSTR pszValueName, OUT std::wstring& strValue) const noexcept;
 
     HRESULT getExpandSZValue(LPCWSTR pszValueName,
                              bool bRetrieveExpandedString,
-                             OUT std::wstring& strValue) const;
+                             OUT std::wstring& strValue) const noexcept;
 
-    HRESULT getMultiSZValue(LPCWSTR pszValueName, OUT std::vector<std::wstring>& vStrValues) const;
+    HRESULT getMultiSZValue(LPCWSTR pszValueName, OUT std::vector<std::wstring>& vStrValues) const noexcept;
 
-    DWORD getValueBufferSize(LPCWSTR pszValueName) const;
+    HRESULT getValueBufferSize(LPCWSTR pszValueName, DWORD& dwSize) const noexcept;
 
-    HRESULT setDWORDValue(LPCWSTR pszValueName, DWORD dwData);
+    HRESULT setDWORDValue(LPCWSTR pszValueName, DWORD dwData) noexcept;
 
-    HRESULT setBINARYValue(LPCWSTR pszValueName, const LPBYTE pbData, int cbData);
-    HRESULT setSZValue(LPCWSTR pszValueName, const std::wstring& strData);
+    HRESULT setBINARYValue(LPCWSTR pszValueName, const LPBYTE pbData, int cbData) noexcept;
+    HRESULT setSZValue(LPCWSTR pszValueName, const std::wstring& strData) noexcept;
 
-    HRESULT setExpandSZValue(LPCWSTR pszValueName, const std::wstring& strData);
+    HRESULT setExpandSZValue(LPCWSTR pszValueName, const std::wstring& strData) noexcept;
 
-    HRESULT setMultiSZValue(LPCWSTR pszValueName, const std::vector<std::wstring>& vStrValues);
+    HRESULT setMultiSZValue(LPCWSTR pszValueName, const std::vector<std::wstring>& vStrValues) noexcept;
 
-    HRESULT getSubKeys(std::vector<std::wstring>& subKeys);
+    HRESULT getSubKeys(std::vector<std::wstring>& subKeys) noexcept;
 
    protected:
-    void OnChange(HKEY hkey);
+    void OnChange(HKEY hkey) noexcept;
 
    private:
-    HRESULT getValue(LPCWSTR pszValueName, DWORD dwTypeExpected, LPBYTE pbData, DWORD cbData) const;
-    HRESULT setValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, DWORD cbData);
-    LPWSTR createDoubleNulTermList(const std::vector<std::wstring>& vStrValues) const;
+    HRESULT getValue(LPCWSTR pszValueName, DWORD dwTypeExpected, LPBYTE pbData, DWORD cbData) const noexcept;
+    HRESULT setValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, DWORD cbData) noexcept;
+    LPWSTR createDoubleNulTermList(const std::vector<std::wstring>& vStrValues) const noexcept;
 
     static unsigned int _stdcall NotifyWaitThreadProc(LPVOID pvParam);
-    static bool regDeleteKey32_64(HKEY hKey, LPCWSTR pszSubKey, bool bPrefer64View);
-    static bool regDeleteSubKeys(HKEY hKey, bool bPrefer64View);
-    static BOOL regDelSubKeysRecurse(HKEY hKeyRoot, LPTSTR lpSubKey, bool bPrefer64View);
+    static bool regDeleteKey32_64(HKEY hKey, LPCWSTR pszSubKey, bool bPrefer64View) noexcept;
+    static bool regDeleteSubKeys(HKEY hKey, bool bPrefer64View) noexcept;
+    static BOOL regDelSubKeysRecurse(HKEY hKeyRoot, LPTSTR lpSubKey, bool bPrefer64View) noexcept;
 
    private:
     HKEY m_hkeyRoot;

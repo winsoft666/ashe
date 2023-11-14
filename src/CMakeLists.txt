@@ -1,7 +1,7 @@
 #################################################################################
 #    C++ Common Library
 #    ---------------------------------------------------------------------------
-#    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+#    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #################################################################################
 
-
+set (PACKAGE_VERSION 1.6)
 configure_file("${PROJECT_SOURCE_DIR}/include/ashe/config.hpp.in" "${PROJECT_SOURCE_DIR}/include/ashe/config.hpp")
 
 
@@ -95,12 +95,32 @@ if(WIN32)
 	  Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
 endif()
 
-install(DIRECTORY ../include/ashe 	DESTINATION include)
-
 install(TARGETS ${ASHE_LIB_NAME}
+	EXPORT ashe-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     OBJECTS DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
+install(EXPORT ashe-targets
+    NAMESPACE ashe::
+    DESTINATION share/ashe
+)
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ashe-config.cmake.in"
+[[include("${CMAKE_CURRENT_LIST_DIR}/ashe-targets.cmake")
+]])
+configure_file("${CMAKE_CURRENT_BINARY_DIR}/ashe-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/ashe-config.cmake" @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ashe-config.cmake DESTINATION share/ashe)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    asheConfigVersion.cmake
+    VERSION ${PACKAGE_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/asheConfigVersion.cmake
+        DESTINATION share/ashe)
+
+install(DIRECTORY ../include/ashe 	DESTINATION include)

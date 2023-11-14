@@ -2,11 +2,11 @@
 
 namespace ashe {
 #ifdef ASHE_WIN
-WinVerInfo OSVersion::GetWinVer() {
+WinVerInfo OSVersion::GetWinVer() noexcept{
     WinVerInfo wvf;
     LONG(WINAPI * RtlGetVersion)
     (LPOSVERSIONINFOEX);
-    *(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion");
+    *(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll.dll"), "RtlGetVersion");
 
     OSVERSIONINFOEX osversion;
     osversion.dwOSVersionInfoSize = sizeof(osversion);
@@ -37,17 +37,17 @@ WinVerInfo OSVersion::GetWinVer() {
     return wvf;
 }
 
-bool OSVersion::IsWindowsVistaOrHigher() {
+bool OSVersion::IsWindowsVistaOrHigher() noexcept{
     const WinVerInfo wvi = GetWinVer();
     return (wvi.major >= 6);
 }
 
-bool OSVersion::IsWindows11() {
+bool OSVersion::IsWindows11() noexcept{
     const WinVerInfo wvi = GetWinVer();
     return (wvi.major >= 10 && wvi.build >= 22000);
 }
 
-bool OSVersion::IsWin64() {
+bool OSVersion::IsWin64() noexcept{
 #ifdef ASHE_WIN64
     return true;
 #else
@@ -57,7 +57,7 @@ bool OSVersion::IsWin64() {
 #endif
 }
 
-bool OSVersion::IsWow64(HANDLE process, bool& result) {
+bool OSVersion::IsWow64(HANDLE process, bool& result) noexcept {
     BOOL bIsWow64 = FALSE;
 
     typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
@@ -75,28 +75,13 @@ bool OSVersion::IsWow64(HANDLE process, bool& result) {
     result = !!bIsWow64;
     return true;
 }
-
-bool OSVersion::Is32BitProcess(HANDLE process, bool& result) {
-    if (!process)
-        return false;
-
-    bool wow64 = false;
-    if (!IsWow64(process, wow64))
-        return false;
-
-    if (wow64)
-        result = true;
-    else
-        result = !IsWin64();
-    return true;
-}
 #endif
 
 std::string OSVersion::GetOSVersion() {
 #ifdef ASHE_WIN
     const WinVerInfo wvi = GetWinVer();
-    char result[100] = {0};
-    StringCchPrintfA(result, 100, "%d.%d.%d-%d", wvi.major, wvi.minor, wvi.build, wvi.productType);
+    char result[200] = {0};
+    StringCchPrintfA(result, 200, "%d.%d.%d-%d", wvi.major, wvi.minor, wvi.build, wvi.productType);
     return result;
 #elif defined(ASHE_MACOS)
     char result[1024] = {0};

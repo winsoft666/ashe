@@ -1,7 +1,7 @@
 /*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -32,31 +32,31 @@ class ASHE_API Event {
    public:
     using DataType = ashe::variant<bool, int, double, std::string, std::wstring>;
     ASHE_DISALLOW_COPY_MOVE(Event);
-    Event(bool isSet = false);
+    Event(bool isSet = false) noexcept;
 
     ~Event() = default;
 
-    void set() noexcept;
-    void set(const DataType& d) noexcept;
+    void set();
+    void set(const DataType& d);
 
-    void unset() noexcept;
-    void unset(const DataType& d) noexcept;
+    void unset();
+    void unset(const DataType& d);
 
-    void cancel() noexcept;
+    void cancel();
 
-    void unCancel() noexcept;
+    void unCancel();
 
     // is equal unset() and unCancel().
-    void reset() noexcept;
-    void reset(const DataType& d) noexcept;
+    void reset();
+    void reset(const DataType& d);
 
-    bool isSet() noexcept;
+    bool isSet();
 
-    bool isCancelled() noexcept;
+    bool isCancelled();
 
     // is infinite when millseconds < 0.
-    bool wait(int64_t millseconds = -1) noexcept;
-    bool wait(DataType &d, int64_t millseconds = -1) noexcept;
+    bool wait(int64_t millseconds = -1);
+    bool wait(DataType& d, int64_t millseconds = -1);
 
    protected:
     bool is_set_ = false;

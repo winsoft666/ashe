@@ -18,28 +18,40 @@ class WinCriticalSection::Private {
     CRITICAL_SECTION crit_;
 };
 
-WinCriticalSection::WinCriticalSection() :
-    p_(new WinCriticalSection::Private()) {
-    InitializeCriticalSection(&p_->crit_);
+WinCriticalSection::WinCriticalSection() noexcept :
+    p_(new(std::nothrow) WinCriticalSection::Private()) {
+    if (p_) {
+        InitializeCriticalSection(&p_->crit_);
+    }
 }
 
-WinCriticalSection::~WinCriticalSection() {
-    DeleteCriticalSection(&p_->crit_);
+WinCriticalSection::~WinCriticalSection() noexcept {
+    if (p_) {
+        DeleteCriticalSection(&p_->crit_);
 
-    delete p_;
-    p_ = nullptr;
+        delete p_;
+        p_ = nullptr;
+    }
 }
 
-void WinCriticalSection::enter() const {
-    EnterCriticalSection(&p_->crit_);
+void WinCriticalSection::enter() const noexcept {
+    if (p_) {
+        EnterCriticalSection(&p_->crit_);
+    }
 }
 
-void WinCriticalSection::leave() const {
-    LeaveCriticalSection(&p_->crit_);
+void WinCriticalSection::leave() const noexcept {
+    if (p_) {
+        LeaveCriticalSection(&p_->crit_);
+    }
 }
 
-bool WinCriticalSection::tryEnter() const {
-    return TryEnterCriticalSection(&p_->crit_) != FALSE;
+bool WinCriticalSection::tryEnter() const noexcept {
+    bool ret = false;
+    if (p_) {
+        ret = TryEnterCriticalSection(&p_->crit_) != FALSE;
+    }
+    return ret;
 }
 }  // namespace ashe
 #endif

@@ -1,7 +1,7 @@
 /*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -40,15 +40,17 @@ namespace ashe {
 class ASHE_API ProcessUtil {
    public:
 #ifdef ASHE_WIN
-    static bool IsRunAsAdminPrivilege(HANDLE hProcess);
+    static bool IsRunAsAdminPrivilege(HANDLE hProcess) noexcept;
 
-    static bool IsRunAsAdminPrivilege(DWORD dwPid);
+    static bool IsRunAsAdminPrivilege(DWORD dwPid) noexcept;
 
-    static bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow);
+    static bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) noexcept;
 
     static bool CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD *dwPID, HANDLE* pProcess);
 
     static bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd = SW_SHOWDEFAULT);
+
+    static bool Is32BitProcess(HANDLE process, bool& result) noexcept;
 #endif
 
     // On windows, path is encoded by ANSI, otherwise, is UTF8.

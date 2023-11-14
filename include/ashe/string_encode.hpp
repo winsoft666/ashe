@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -27,24 +27,24 @@ namespace ashe {
 class ASHE_API StringEncode {
    public:
 #ifdef ASHE_WIN
-    static std::string UnicodeToAnsi(const std::wstring& str, unsigned int code_page = 0);
+    static std::string UnicodeToAnsi(const std::wstring& str, unsigned int code_page = 0) noexcept;
 
-    static std::wstring AnsiToUnicode(const std::string& str, unsigned int code_page = 0);
+    static std::wstring AnsiToUnicode(const std::string& str, unsigned int code_page = 0) noexcept;
 
 #endif
 
-    static std::string UnicodeToUtf8(const std::wstring& str);
+    static std::string UnicodeToUtf8(const std::wstring& str) noexcept;
 
-    static std::string UnicodeToUtf8BOM(const std::wstring& str);
+    static std::string UnicodeToUtf8BOM(const std::wstring& str) noexcept;
 
-    static std::wstring Utf8ToUnicode(const std::string& str);
+    static std::wstring Utf8ToUnicode(const std::string& str) noexcept;
 
 #ifdef ASHE_WIN
-    static std::string AnsiToUtf8(const std::string& str, unsigned int code_page = 0);
+    static std::string AnsiToUtf8(const std::string& str, unsigned int code_page = 0) noexcept;
 
-    static std::string AnsiToUtf8BOM(const std::string& str, unsigned int code_page = 0);
+    static std::string AnsiToUtf8BOM(const std::string& str, unsigned int code_page = 0) noexcept;
 
-    static std::string Utf8ToAnsi(const std::string& str, unsigned int code_page = 0);
+    static std::string Utf8ToAnsi(const std::string& str, unsigned int code_page = 0) noexcept;
 #endif
 };
 

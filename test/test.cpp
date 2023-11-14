@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -859,6 +859,27 @@ TEST_CASE("SingletonClass", "1") {
     SingletonTest::Instance()->value = 2;
 
     SingletonTest::Release();
+}
+
+TEST_CASE("Event1", "wait_after_set_1") {
+    bool b = ashe::OSVersion::IsWin64();
+    ashe::Event event;
+
+    std::thread t = std::thread([&event]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        event.set(true);
+    });
+    t.detach();
+
+    std::thread t2 = std::thread([&event]() {
+        ashe::Event::DataType ret;
+        bool waitRet = event.wait(ret, 2000);
+        REQUIRE(waitRet);
+        REQUIRE(ashe::get<bool>(ret));
+    });
+    t2.detach();
+
+    getchar();
 }
 
 int main(int argc, char* argv[]) {
