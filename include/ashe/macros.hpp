@@ -135,7 +135,6 @@
 #define ASHE_FAIL_MESSAGE(message)          \
     {                                       \
         assert(false && message); \
-        abort();                            \
     }
 
 #define ASHE_ASSERT_MESSAGE(condition, message) \
