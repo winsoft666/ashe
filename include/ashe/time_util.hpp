@@ -100,11 +100,14 @@ class ASHE_API TimeMeter {
     void Restart() { lStartTime_ = std::clock(); }
 
     // ms
-    long Elapsed() const { return std::clock() - lStartTime_; }
+    inline int64_t Elapsed() const {
+        double duration = (std::clock() - lStartTime_) / (double)CLOCKS_PER_SEC * 1000.0;
+        return (int64_t)duration;
+    }
 
-    long ElapsedMax() const { return (std::numeric_limits<std::clock_t>::max)() - lStartTime_; }
+    inline int64_t ElapsedMax() const { return (std::numeric_limits<std::clock_t>::max)() - lStartTime_; }
 
-    long ElapsedMin() const { return 1L; }
+    inline int64_t ElapsedMin() const { return 1L; }
 
    private:
     std::clock_t lStartTime_;
