@@ -30,6 +30,7 @@
 #include <string>
 #include <sstream>
 #include <limits>
+#include <chrono>
 
 namespace ashe {
 class ASHE_API Time {
@@ -95,22 +96,23 @@ class ASHE_API TimeUtil {
 
 class ASHE_API TimeMeter {
    public:
-    TimeMeter() { lStartTime_ = std::clock(); }
-
-    void Restart() { lStartTime_ = std::clock(); }
-
-    // ms
-    inline int64_t Elapsed() const {
-        double duration = (std::clock() - lStartTime_) / (double)CLOCKS_PER_SEC * 1000.0;
-        return (int64_t)duration;
+    inline TimeMeter() {
+        restart();
     }
 
-    inline int64_t ElapsedMax() const { return (std::numeric_limits<std::clock_t>::max)() - lStartTime_; }
+    inline void restart() {
+        lStartTime_ = std::chrono::high_resolution_clock::now();
+    }
 
-    inline int64_t ElapsedMin() const { return 1L; }
+    // microseconds
+    inline int64_t elapsed() const {
+        auto now = std::chrono::high_resolution_clock::now();
+        int64_t duration = std::chrono::duration_cast<std::chrono::microseconds>(now - lStartTime_).count();
+        return duration;
+    }
 
    private:
-    std::clock_t lStartTime_;
+    std::chrono::high_resolution_clock::time_point lStartTime_;
 };
 }  // namespace ashe
 #endif  // !ASHE_TIMEUTIL_HPP_
