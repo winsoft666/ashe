@@ -24,6 +24,7 @@
 #include "ashe/config.hpp"
 #include "ashe/arch.hpp"
 #ifdef ASHE_WIN
+#include "ashe/windows_lite.hpp"
 
 namespace ashe {
 class ASHE_API WinServiceHelper {
@@ -73,7 +74,10 @@ class ASHE_API WinServiceHelper {
     //
     static bool Uninstall(const wchar_t* pszServiceName);
 
-    static bool IsInstall(const wchar_t* pszServiceName, bool &bInstalled);
+    static bool IsInstall(const wchar_t* pszServiceName, bool& bInstalled);
+
+    // Caller use LocalFree(*ppCfg) to feee memory if return true.
+    static bool QueryConfig(const wchar_t* pszServiceName, LPQUERY_SERVICE_CONFIGW* ppCfg);
 
     static bool Start(const wchar_t* pszServiceName);
 

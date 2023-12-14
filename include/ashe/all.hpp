@@ -73,6 +73,7 @@
 #include "ashe/win_registry.hpp"
 #include "ashe/win_schedule_task.hpp"
 #include "ashe/win_service_base.hpp"
+#include "ashe/win_service_helper.hpp"
 #include "ashe/win_shellink_creator.hpp"
 #include "ashe/win_shellink_parser.hpp"
 #include "ashe/win_env_variable.hpp"

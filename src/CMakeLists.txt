@@ -24,10 +24,6 @@ configure_file("${PROJECT_SOURCE_DIR}/include/ashe/config.hpp.in" "${PROJECT_SOU
 set(DEBUG_LIBNAME_SUFFIX "-d" CACHE STRING "Optional suffix to append to the library name for a debug build")
 mark_as_advanced(DEBUG_LIBNAME_SUFFIX)
 
-include_directories(
-  ../include
-)
-
 if (MSVC)
   add_definitions(
     -D_WIN32
@@ -88,6 +84,11 @@ endif()
 
 set_target_properties(${ASHE_LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
+target_include_directories(${ASHE_LIB_NAME} PUBLIC
+	"$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:include>"
+)
+
 if(WIN32)
   set_target_properties(${ASHE_LIB_NAME} PROPERTIES COMPILE_FLAGS "/wd4251")
 
@@ -101,6 +102,7 @@ install(TARGETS ${ASHE_LIB_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     OBJECTS DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	INCLUDES DESTINATION include
 )
 
 install(EXPORT ashe-targets

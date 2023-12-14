@@ -171,6 +171,55 @@ bool WinServiceHelper::IsInstall(const wchar_t* pszServiceName, bool& bInstalled
     return result;
 }
 
+bool WinServiceHelper::QueryConfig(const wchar_t* pszServiceName, LPQUERY_SERVICE_CONFIGW* ppCfg) {
+    if (!ppCfg) {
+        return false;
+    }
+
+    SC_HANDLE schSCManager = NULL;
+    SC_HANDLE schService = NULL;
+    SERVICE_STATUS ssSvcStatus = {};
+
+    // Open the local default service control manager database
+    schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
+    if (schSCManager == NULL) {
+        return false;
+    }
+
+    bool result = false;
+    // Open the service with delete, stop, and query status permissions
+    schService = OpenServiceW(schSCManager, pszServiceName, SERVICE_QUERY_CONFIG);
+    if (schService) {
+        DWORD dwBufSize = 0;
+        DWORD dwNeed = 0;
+        if (!QueryServiceConfigW(schService, NULL,0, &dwNeed)) {
+            DWORD dwGLE = GetLastError();
+            if (ERROR_INSUFFICIENT_BUFFER == dwGLE) {
+                dwBufSize = dwNeed;
+                *ppCfg = (LPQUERY_SERVICE_CONFIGW) LocalAlloc(LMEM_FIXED, dwBufSize);
+                if (*ppCfg) {
+                    dwNeed = 0;
+                    if (QueryServiceConfigW(schService, *ppCfg, dwBufSize, &dwNeed)) {
+                        result = true;
+                    }
+                    else {
+                        LocalFree(*ppCfg);
+                        *ppCfg = NULL;
+                    }
+                }
+            }
+        }
+    }
+
+    if (schSCManager)
+        CloseServiceHandle(schSCManager);
+
+    if (schService)
+        CloseServiceHandle(schService);
+
+    return result;
+}
+
 bool WinServiceHelper::Start(const wchar_t* pszServiceName) {
     bool result = false;
     if (pszServiceName) {
