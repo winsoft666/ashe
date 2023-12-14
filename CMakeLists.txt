@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #################################################################################
 
-cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 
 project(ashe CXX)
@@ -36,11 +36,14 @@ function(group_sources)
 endfunction(group_sources)
 
 
-configure_file("${PROJECT_SOURCE_DIR}/include/ashe/config.hpp.in" "${PROJECT_SOURCE_DIR}/include/ashe/config.hpp")
+configure_file("${CMAKE_SOURCE_DIR}/include/ashe/config.hpp.in" "${CMAKE_SOURCE_DIR}/include/ashe/config.hpp")
 
 option(ASHE_BUILD_TESTS "Build tests project" ON)
 option(ASHE_USE_STATIC_CRT "Set to ON to build with static CRT on Windows (/MT)." OFF)
 option(ASHE_BUILD_SHARED_LIBS "Set to ON to build dynamic library." OFF)
+
+set(DEBUG_LIBNAME_SUFFIX "-d" CACHE STRING "Optional suffix to append to the library name for a debug build")
+mark_as_advanced(DEBUG_LIBNAME_SUFFIX)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -61,6 +64,7 @@ else()
 endif()
 
 add_subdirectory(src)
+
 if(ASHE_BUILD_TESTS)
     add_subdirectory(test)
     enable_testing()

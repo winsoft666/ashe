@@ -18,11 +18,6 @@
 #################################################################################
 
 set (PACKAGE_VERSION 1.6)
-configure_file("${PROJECT_SOURCE_DIR}/include/ashe/config.hpp.in" "${PROJECT_SOURCE_DIR}/include/ashe/config.hpp")
-
-
-set(DEBUG_LIBNAME_SUFFIX "-d" CACHE STRING "Optional suffix to append to the library name for a debug build")
-mark_as_advanced(DEBUG_LIBNAME_SUFFIX)
 
 if (MSVC)
   add_definitions(
