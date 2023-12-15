@@ -24,8 +24,8 @@ TEST_CASE("Http2", "download") {
     REQUIRE(http.openRequest());
     REQUIRE(http.sendRequest());
     REQUIRE(http.receiveResponse());
-    REQUIRE(http.saveResponseBodyToFile(L"D:\\sogou_explorer_11.0.1.34700_0000.exe"));
-    REQUIRE(ashe::MD5::GetFileMD5(L"D:\\sogou_explorer_11.0.1.34700_0000.exe") == "73a0e33385b7fd3c2ce6279f35ef0c0b");
+    REQUIRE(http.saveResponseBodyToFile(L".\\sogou_explorer_11.0.1.34700_0000.exe"));
+    REQUIRE(ashe::MD5::GetFileMD5(L".\\sogou_explorer_11.0.1.34700_0000.exe") == "73a0e33385b7fd3c2ce6279f35ef0c0b");
 }
 
 TEST_CASE("HttpClient1", "get") {
@@ -65,12 +65,12 @@ TEST_CASE("HttpClient3", "download") {
     std::shared_ptr<HttpReqDatagram> req = std::make_shared<HttpReqDatagram>();
     req->setMethod(HttpReqDatagram::METHOD::GET);
     req->setUrl("https://dlie.sogoucdn.com/se/sogou_explorer_11.0.1.34700_0000.exe");
-    req->setSaveFilePath("D:\\sogou_explorer_11.0.1.34700_0000.exe");
+    req->setSaveFilePath(".\\sogou_explorer_11.0.1.34700_0000.exe");
 
     WinHttpClient client;
     client.request(req, [](long code, unsigned long usedMill, const HttpRspDatagram& rspDg) {
         CHECK(code == 0);
-        CHECK(ashe::MD5::GetFileMD5(L"D:\\sogou_explorer_11.0.1.34700_0000.exe") == "73a0e33385b7fd3c2ce6279f35ef0c0b");
+        CHECK(ashe::MD5::GetFileMD5(L".\\sogou_explorer_11.0.1.34700_0000.exe") == "73a0e33385b7fd3c2ce6279f35ef0c0b");
     });
     CHECK(client.wait(-1));
 }
@@ -81,7 +81,7 @@ TEST_CASE("HttpClient4", "download") {
     std::shared_ptr<HttpReqDatagram> req = std::make_shared<HttpReqDatagram>();
     req->setMethod(HttpReqDatagram::METHOD::GET);
     req->setUrl("https://dlie.sogoucdn.com/se/sogou_explorer_11.0.1.34700_0000.exe");
-    req->setSaveFilePath("D:\\sogou_explorer_11.0.1.34700_0000.exe");
+    req->setSaveFilePath(".\\sogou_explorer_11.0.1.34700_0000.exe");
 
     WinHttpClient client;
     client.request(req, [](long code, unsigned long usedMill, const HttpRspDatagram& rspDg) {

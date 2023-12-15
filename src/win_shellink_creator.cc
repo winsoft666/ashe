@@ -14,38 +14,51 @@
 
 namespace ashe {
 namespace {
-void InitializeShortcutInterfaces(const wchar_t* shortcut,
-                                  IShellLink** i_shell_link,
-                                  IPersistFile** i_persist_file) {
-    if ((*i_shell_link))
+HRESULT InitializeShortcutInterfaces(const wchar_t* shortcut,
+                                     IShellLink** i_shell_link,
+                                     IPersistFile** i_persist_file) {
+    if ((*i_shell_link)) {
         (*i_shell_link)->Release();
-    if ((*i_persist_file))
+        *i_shell_link = NULL;
+    }
+    if ((*i_persist_file)) {
         (*i_persist_file)->Release();
+        *i_persist_file = NULL;
+    }
 
     HRESULT hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink,
                                     (void**)i_shell_link);
     if (FAILED(hres)) {
-        return;
+        return hres;
     }
 
     hres = (*i_shell_link)->QueryInterface(IID_IPersistFile, (void**)i_persist_file);
     if (FAILED(hres)) {
         (*i_shell_link)->Release();
-        return;
+        *i_shell_link = NULL;
+        return hres;
     }
 
     if (shortcut) {
-        if (FAILED((*i_persist_file)->Load(shortcut, STGM_READWRITE))) {
+        hres = (*i_persist_file)->Load(shortcut, STGM_READWRITE);
+        if (FAILED(hres)) {
             (*i_shell_link)->Release();
+            *i_shell_link = NULL;
+
             (*i_persist_file)->Release();
+            *i_persist_file = NULL;
+
+            return hres;
         }
     }
+
+    return S_OK;
 }
 }  // namespace
 
 bool WinShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
-                                                    const ShellLinkProperties& properties,
-                                                    OperationOption operation) {
+                                         const ShellLinkProperties& properties,
+                                         OperationOption operation) {
     ashe::ScopedComInitialize comInit;
 
     // A target is required unless |operation| is SHORTCUT_UPDATE_EXISTING.
@@ -55,7 +68,7 @@ bool WinShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
     }
 
     std::error_code ec;
-    bool shortcut_existed = fs::exists(shellLinkPath, ec);
+    bool alreadyExisted = fs::exists(shellLinkPath, ec);
 
     // Interfaces to the old shortcut when replacing an existing shortcut.
     IShellLink* oldShellLink = NULL;
@@ -64,28 +77,34 @@ bool WinShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
     // Interfaces to the shortcut being created/updated.
     IShellLink* iShellLink = NULL;
     IPersistFile* iPersistFile = NULL;
+    HRESULT hr = E_FAIL;
     switch (operation) {
         case OperationOption::SHORTCUT_CREATE_ALWAYS:
-            InitializeShortcutInterfaces(NULL, &iShellLink, &iPersistFile);
+            hr = InitializeShortcutInterfaces(NULL, &iShellLink, &iPersistFile);
             break;
         case OperationOption::SHORTCUT_UPDATE_EXISTING:
-            InitializeShortcutInterfaces(shellLinkPath.c_str(), &iShellLink, &iPersistFile);
+            hr = InitializeShortcutInterfaces(shellLinkPath.c_str(), &iShellLink, &iPersistFile);
             break;
         case OperationOption::SHORTCUT_REPLACE_EXISTING:
-            InitializeShortcutInterfaces(shellLinkPath.c_str(), &oldShellLink, &oldPersistFile);
+            hr = InitializeShortcutInterfaces(shellLinkPath.c_str(), &oldShellLink, &oldPersistFile);
             // Confirm |shortcut_path| exists and is a shortcut by verifying
             // |old_i_persist_file| was successfully initialized in the call above. If
             // so, initialize the interfaces to begin writing a new shortcut (to
             // overwrite the current one if successful).
-            if (oldPersistFile)
-                InitializeShortcutInterfaces(NULL, &iShellLink, &iPersistFile);
+            if (SUCCEEDED(hr) && oldPersistFile)
+                hr = InitializeShortcutInterfaces(NULL, &iShellLink, &iPersistFile);
             break;
         default:
             assert(false);
     }
 
     // Return false immediately upon failure to initialize shortcut interfaces.
-    if (!iPersistFile)
+    if (FAILED(hr)) {
+        return false;
+    }
+
+    assert(iPersistFile && iShellLink);
+    if (!iPersistFile || !iShellLink)
         return false;
 
     if ((properties.options & ShellLinkProperties::PROPERTIES_TARGET) &&
@@ -137,7 +156,7 @@ bool WinShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
     // done so.
     const bool succeeded = SUCCEEDED(result);
     if (succeeded) {
-        if (shortcut_existed) {
+        if (alreadyExisted) {
             // TODO(gab): SHCNE_UPDATEITEM might be sufficient here; further testing
             // required.
             SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);

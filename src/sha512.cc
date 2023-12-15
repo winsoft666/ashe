@@ -194,7 +194,7 @@ std::string SHA512::GetFileSHA512(const fs::path& filePath) {
     char buf[2 * SHA512::DIGEST_SIZE + 1];
     buf[2 * SHA512::DIGEST_SIZE] = 0;
     for (int i = 0; i < SHA512::DIGEST_SIZE; i++)
-        sprintf_s(buf + i * 2, 2, "%02x", digest[i]);
+        sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
 
     return std::string(buf);
 }
@@ -208,7 +208,7 @@ std::string SHA512::GetDataSHA512(const unsigned char* data, size_t dataSize) {
 
     char buf[2 * SHA512::DIGEST_SIZE + 1] = {0};
     for (unsigned int i = 0; i < SHA512::DIGEST_SIZE; i++) {
-        sprintf_s(buf + i * 2, 3, "%02x", digest[i]);
+        sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
     }
     return std::string(buf);
 }

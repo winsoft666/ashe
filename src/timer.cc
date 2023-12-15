@@ -72,6 +72,7 @@ Timer::Timer() noexcept :
 }
 
 Timer::~Timer() {
+    destory();
 }
 
 void Timer::init() noexcept {
