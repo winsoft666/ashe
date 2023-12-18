@@ -66,13 +66,9 @@ class ASHE_API WinRegistry {
     //
     HRESULT open(REGSAM samDesired, bool bCreate) noexcept;
 
-    bool isOpen(void) const noexcept;
+    bool isOpen() const noexcept;
 
-    HKEY getHandle(void) const noexcept;
-
-    void attach(HKEY hkey) noexcept;
-
-    void detach() noexcept;
+    HKEY getHandle() const noexcept;
 
     void close() noexcept;
 

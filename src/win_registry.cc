@@ -40,27 +40,15 @@ HRESULT WinRegistry::open(REGSAM samDesired, bool bCreate) noexcept {
     return HRESULT_FROM_WIN32(dwResult);
 }
 
-bool WinRegistry::isOpen(void) const noexcept {
+bool WinRegistry::isOpen() const noexcept {
     return NULL != m_hkey;
 }
 
-HKEY WinRegistry::getHandle(void) const noexcept {
+HKEY WinRegistry::getHandle() const noexcept {
     return m_hkey;
 }
 
-void WinRegistry::attach(HKEY hkey) noexcept {
-    close();
-    m_strSubKey.clear();
-
-    m_hkeyRoot = NULL;
-    m_hkey = hkey;
-}
-
-void WinRegistry::detach(void) noexcept {
-    m_hkey = NULL;
-}
-
-void WinRegistry::close(void) noexcept {
+void WinRegistry::close() noexcept {
     if (NULL != m_hkey) {
         HKEY hkeyTemp = m_hkey;
         m_hkey = NULL;
@@ -328,6 +316,8 @@ HRESULT WinRegistry::getSubKeys(std::vector<std::wstring>& subKeys) noexcept {
     DWORD cbMaxValueData;            // longest value data
     DWORD cbSecurityDescriptor;      // size of security descriptor
     FILETIME ftLastWriteTime;        // last write time
+
+    subKeys.clear();
 
     LSTATUS ls = RegQueryInfoKeyW(m_hkey,                 // key handle
                                   achClass,               // buffer for class name
