@@ -113,7 +113,7 @@ class ASHE_API WinIcon {
     //           If all exceed the color depth, the one with the lowest color depth is chosen.
     //
     // You should call DestroyIcon for icon.
-    static HICON GetExeIcon(const std::wstring& filePath, int preferSize) noexcept;
+    static HICON GetExeIcon(const std::wstring& filePath, int desiredSize, int &actualSize) noexcept;
 
     static bool SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& filePath) noexcept;
 };

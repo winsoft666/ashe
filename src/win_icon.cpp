@@ -406,7 +406,7 @@ bool WinIcon::EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup
     return true;
 }
 
-HICON WinIcon::GetExeIcon(const std::wstring& filePath, int preferSize) noexcept {
+HICON WinIcon::GetExeIcon(const std::wstring& filePath, int desiredSize, int &actualSize) noexcept {
     std::vector<IconGroup> iconGroups;
     if (!EnumIconGroups(filePath, iconGroups)) {
         return NULL;
@@ -420,7 +420,7 @@ HICON WinIcon::GetExeIcon(const std::wstring& filePath, int preferSize) noexcept
     size_t idx = -1;
     for (size_t i = 0; i < iconGroups[0].icons.size(); i++) {
         if (iconGroups[0].icons[i]) {
-            int v = abs(preferSize - iconGroups[0].icons[i]->cx);
+            int v = abs(desiredSize - iconGroups[0].icons[i]->cx);
             if (idx == -1) {
                 idx = i;
                 closestValue = v;
@@ -436,6 +436,7 @@ HICON WinIcon::GetExeIcon(const std::wstring& filePath, int preferSize) noexcept
         return NULL;
     }
 
+    actualSize = iconGroups[0].icons[idx]->cx;
     HICON hCopy = CopyIcon(iconGroups[0].icons[idx]->hIcon);
     return hCopy;
 }
