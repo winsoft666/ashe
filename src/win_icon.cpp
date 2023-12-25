@@ -311,104 +311,12 @@ bool WinIcon::ParseShell32IconInfo(const std::wstring& shell32Path, int shellIco
 }
 
 bool WinIcon::EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup>& iconGroups) {
-    if (filePath.empty()) {
-        return false;
-    }
-
-    HMODULE hMod = LoadLibraryExW(filePath.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_WITH_ALTERED_SEARCH_PATH);
-    if (!hMod) {
-        return false;
-    }
-
-    std::vector<WCHAR*> resourceList;
-    if (!EnumResourceNamesW(hMod, RT_GROUP_ICON, __EnumIconGroupCallback__, (LONG_PTR)&resourceList)) {
-        return false;
-    }
-
-    iconGroups.clear();
-    for (size_t i = 0; i < resourceList.size(); i++) {
-        IconGroup iconGroup;
-
-        WCHAR* resName = resourceList[i];
-        if (IS_INTRESOURCE(resName)) {
-            iconGroup.name = std::to_wstring((long long)resName);
-        }
-        else {
-            iconGroup.name = resName;
-        }
-
-        HRSRC hResource = FindResourceW(hMod, resName, RT_GROUP_ICON);
-        if (!hResource) {
-            if (!IS_INTRESOURCE(resName)) {
-                delete[] resName;
-            }
-            continue;
-        }
-
-        HGLOBAL hMem = LoadResource(hMod, hResource);
-        if (!hMem) {
-            if (!IS_INTRESOURCE(resName)) {
-                delete[] resName;
-            }
-            continue;
-        }
-
-        PBYTE lpResource = (PBYTE)LockResource(hMem);
-        if (!lpResource) {
-            if (!IS_INTRESOURCE(resName)) {
-                delete[] resName;
-            }
-            continue;
-        }
-
-        const std::vector<int> standardIconSize = {16, 32, 48, 64, 128, 256};
-        for (const int iconSize : standardIconSize) {
-            const int iconId = LookupIconIdFromDirectoryEx(lpResource, TRUE, iconSize, iconSize, LR_DEFAULTCOLOR);
-            if (iconId == 0)
-                continue;
-
-            HRSRC hRes2 = FindResourceW(hMod, MAKEINTRESOURCE(iconId), MAKEINTRESOURCE(RT_ICON));
-            if (!hRes2)
-                continue;
-
-            HGLOBAL hMemory2 = LoadResource(hMod, hRes2);
-            if (!hMemory2)
-                continue;
-
-            PBYTE lpRes2 = (PBYTE)LockResource(hMemory2);
-            if (!lpRes2)
-                continue;
-
-            DWORD dwResSize = SizeofResource(hMod, hRes2);
-            HICON hIcon = CreateIconFromResourceEx(lpRes2, dwResSize, TRUE, 0x00030000, iconSize, iconSize, LR_DEFAULTCOLOR);
-            if (!hIcon)
-                continue;
-
-            std::shared_ptr<IconInfo> iconInfo = std::make_shared<IconInfo>();
-            iconInfo->hIcon = CopyIcon(hIcon);
-            iconInfo->cx = iconSize;
-            iconInfo->cy = iconSize;
-
-            DestroyIcon(hIcon);
-
-            iconGroup.icons.push_back(iconInfo);
-        }
-
-        iconGroups.push_back(iconGroup);
-
-        if (!IS_INTRESOURCE(resName)) {
-            delete[] resName;
-        }
-    }
-
-    FreeLibrary(hMod);
-
-    return true;
+    return DoEnumIconGroups(filePath, false, iconGroups);
 }
 
-HICON WinIcon::GetExeIcon(const std::wstring& filePath, int desiredSize, int &actualSize) noexcept {
+HICON WinIcon::GetExeIcon(const std::wstring& filePath, int desiredSize, int& actualSize) noexcept {
     std::vector<IconGroup> iconGroups;
-    if (!EnumIconGroups(filePath, iconGroups)) {
+    if (!DoEnumIconGroups(filePath, true, iconGroups)) {
         return NULL;
     }
 
@@ -540,6 +448,109 @@ bool WinIcon::SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& f
 
     free(pImageOffset);
     CloseHandle(hFile);
+
+    return true;
+}
+
+bool WinIcon::DoEnumIconGroups(const std::wstring& filePath, bool onlyFirstGroup, std::vector<IconGroup>& iconGroups) noexcept {
+    if (filePath.empty()) {
+        return false;
+    }
+
+    HMODULE hMod = LoadLibraryExW(filePath.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_WITH_ALTERED_SEARCH_PATH);
+    if (!hMod) {
+        return false;
+    }
+
+    std::vector<WCHAR*> resourceList;
+    if (!EnumResourceNamesW(hMod, RT_GROUP_ICON, __EnumIconGroupCallback__, (LONG_PTR)&resourceList)) {
+        return false;
+    }
+
+    iconGroups.clear();
+    for (size_t i = 0; i < resourceList.size(); i++) {
+        IconGroup iconGroup;
+        WCHAR* resName = resourceList[i];
+
+        if (onlyFirstGroup && iconGroups.size() > 0) {
+            if (!IS_INTRESOURCE(resName)) {
+                delete[] resName;
+            }
+            continue;
+        }
+
+        if (IS_INTRESOURCE(resName)) {
+            iconGroup.name = std::to_wstring((long long)resName);
+        }
+        else {
+            iconGroup.name = resName;
+        }
+
+        HRSRC hResource = FindResourceW(hMod, resName, RT_GROUP_ICON);
+        if (!hResource) {
+            if (!IS_INTRESOURCE(resName)) {
+                delete[] resName;
+            }
+            continue;
+        }
+
+        HGLOBAL hMem = LoadResource(hMod, hResource);
+        if (!hMem) {
+            if (!IS_INTRESOURCE(resName)) {
+                delete[] resName;
+            }
+            continue;
+        }
+
+        PBYTE lpResource = (PBYTE)LockResource(hMem);
+        if (!lpResource) {
+            if (!IS_INTRESOURCE(resName)) {
+                delete[] resName;
+            }
+            continue;
+        }
+
+        const std::vector<int> standardIconSize = {16, 32, 48, 64, 128, 256};
+        for (const int iconSize : standardIconSize) {
+            const int iconId = LookupIconIdFromDirectoryEx(lpResource, TRUE, iconSize, iconSize, LR_DEFAULTCOLOR);
+            if (iconId == 0)
+                continue;
+
+            HRSRC hRes2 = FindResourceW(hMod, MAKEINTRESOURCE(iconId), MAKEINTRESOURCE(RT_ICON));
+            if (!hRes2)
+                continue;
+
+            HGLOBAL hMemory2 = LoadResource(hMod, hRes2);
+            if (!hMemory2)
+                continue;
+
+            PBYTE lpRes2 = (PBYTE)LockResource(hMemory2);
+            if (!lpRes2)
+                continue;
+
+            DWORD dwResSize = SizeofResource(hMod, hRes2);
+            HICON hIcon = CreateIconFromResourceEx(lpRes2, dwResSize, TRUE, 0x00030000, iconSize, iconSize, LR_DEFAULTCOLOR);
+            if (!hIcon)
+                continue;
+
+            std::shared_ptr<IconInfo> iconInfo = std::make_shared<IconInfo>();
+            iconInfo->hIcon = CopyIcon(hIcon);
+            iconInfo->cx = iconSize;
+            iconInfo->cy = iconSize;
+
+            DestroyIcon(hIcon);
+
+            iconGroup.icons.push_back(iconInfo);
+        }
+
+        iconGroups.push_back(iconGroup);
+
+        if (!IS_INTRESOURCE(resName)) {
+            delete[] resName;
+        }
+    }
+
+    FreeLibrary(hMod);
 
     return true;
 }

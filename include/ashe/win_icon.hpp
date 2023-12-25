@@ -100,22 +100,24 @@ class ASHE_API WinIcon {
     // Do not need call DestroyIcon for icon.
     static bool EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup>& iconGroups);
 
-   
     // The function uses the following steps to select the icon image:
-    // Select the RT_GROUP_ICON resource. If more than one such resource exists, 
+    // Select the RT_GROUP_ICON resource. If more than one such resource exists,
     //    the system uses the first resource listed in the resource script.
-    // Select the appropriate RT_ICON image from the RT_GROUP_ICON resource. If more than one image exists, 
+    // Select the appropriate RT_ICON image from the RT_GROUP_ICON resource. If more than one image exists,
     //    the system uses the following criteria to choose an image:
     //        - The image closest in size to the requested size is chosen.
     //       - If two or more images of that size are present, the one that matches the color depth of the display is chosen.
-    //       - If no images exactly match the color depth of the display, the image with the greatest color depth that 
-    //           does not exceed the color depth of the display is chosen. 
+    //       - If no images exactly match the color depth of the display, the image with the greatest color depth that
+    //           does not exceed the color depth of the display is chosen.
     //           If all exceed the color depth, the one with the lowest color depth is chosen.
     //
     // You should call DestroyIcon for icon.
-    static HICON GetExeIcon(const std::wstring& filePath, int desiredSize, int &actualSize) noexcept;
+    static HICON GetExeIcon(const std::wstring& filePath, int desiredSize, int& actualSize) noexcept;
 
     static bool SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& filePath) noexcept;
+
+   private:
+    static bool DoEnumIconGroups(const std::wstring& filePath, bool onlyFirstGroup, std::vector<IconGroup>& iconGroups) noexcept;
 };
 }  // namespace ashe
 
