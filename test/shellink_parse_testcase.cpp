@@ -19,6 +19,9 @@ TEST_CASE("shellink-parse", "") {
         std::wstring iconPath = wsl.getIconPath();
         CHECK(iconPath == LR"()");
 
+        int32_t iconIndex = wsl.getIconIndex();
+        CHECK(iconIndex == 0);
+
         bool isRunAsAdmin = wsl.isRunAsAdmin();
         CHECK(isRunAsAdmin == false);
     }

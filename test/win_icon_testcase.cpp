@@ -26,7 +26,7 @@ TEST_CASE("IconTest-load-from-exe", "") {
 
 TEST_CASE("IconTest-enum-icons", "") {
     using namespace ashe;
-    std::wstring exePath = LR"(%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe)";
+    std::wstring exePath = LR"(C:\SysinternalsSuite\Dbgview.exe)";
 
     if (!exePath.empty()) {
         std::vector<WinIcon::IconGroup> iconGroups;
@@ -45,29 +45,41 @@ TEST_CASE("IconTest-get-exe-icon", "") {
     std::wstring exePath = LR"()";
 
     if (!exePath.empty()) {
-        HICON hIcon1 = WinIcon::GetExeIcon(exePath, 128, actualSize);
+        HICON hIcon1 = WinIcon::GetExeDisplayIcon(exePath, 128, &actualSize);
         CHECK(hIcon1);
         CHECK(actualSize == 128);
         CHECK(WinIcon::SaveToFile({hIcon1}, L"exe_128.ico"));
         CHECK(DestroyIcon(hIcon1));
 
-        HICON hIcon2 = WinIcon::GetExeIcon(exePath, 64, actualSize);
+        HICON hIcon2 = WinIcon::GetExeDisplayIcon(exePath, 64, &actualSize);
         CHECK(hIcon2);
         CHECK(actualSize == 64);
         CHECK(WinIcon::SaveToFile({hIcon2}, L"exe_64.ico"));
         CHECK(DestroyIcon(hIcon2));
 
-        HICON hIcon3 = WinIcon::GetExeIcon(exePath, 35, actualSize);
+        HICON hIcon3 = WinIcon::GetExeDisplayIcon(exePath, 35, &actualSize);
         CHECK(hIcon3);
         CHECK(actualSize == 32);
         CHECK(WinIcon::SaveToFile({hIcon3}, L"exe_35.ico"));
         CHECK(DestroyIcon(hIcon3));
 
-        HICON hIcon4 = WinIcon::GetExeIcon(exePath, 98, actualSize);
+        HICON hIcon4 = WinIcon::GetExeDisplayIcon(exePath, 98, &actualSize);
         CHECK(hIcon4);
         CHECK(actualSize == 128);
         CHECK(WinIcon::SaveToFile({hIcon4}, L"exe_98.ico"));
         CHECK(DestroyIcon(hIcon4));
+    }
+}
+
+TEST_CASE("IconTest-load-file-icon", "") {
+    using namespace ashe;
+
+    std::wstring filePath = LR"(C:\Program Files (x86)\Fontlab\FontLab 8\FontLab 8.exe)";
+
+    if (!filePath.empty()) {
+        HICON hIcon = WinIcon::LoadFromFile(filePath, 0, 256);
+        CHECK(hIcon);
+        CHECK(WinIcon::SaveToFile({hIcon}, L"file_icon.ico"));
     }
 }
 #endif

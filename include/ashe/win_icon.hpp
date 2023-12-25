@@ -73,15 +73,9 @@ class ASHE_API WinIcon {
         std::wstring name;
         std::vector<std::shared_ptr<IconInfo>> icons;
 
-        inline std::vector<HICON> iconHandleList() const noexcept {
-            std::vector<HICON> list;
-            for (const auto& ii : icons) {
-                if (ii) {
-                    list.push_back(ii->hIcon);
-                }
-            }
-            return list;
-        }
+        std::vector<HICON> iconHandleList() const noexcept;
+
+        std::shared_ptr<IconInfo> getClosestSize(int desiredSize) noexcept;
     };
 
     // Load icon from resource of process.
@@ -101,7 +95,11 @@ class ASHE_API WinIcon {
 
     // It is best to first use PathUtil::ExpandEnvString to expand environment variables in filePath.
     // Do not need call DestroyIcon for icon.
-    static bool EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup>& iconGroups);
+    static bool EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup>& iconGroups) noexcept;
+
+    // It is best to first use PathUtil::ExpandEnvString to expand environment variables in filePath.
+    // You should call DestroyIcon for icon.
+    static HICON LoadFromFile(const std::wstring& filePath, uint32_t iconIndex, int desiredSize = 256, int* actualSize = nullptr) noexcept;
 
     // The function uses the following steps to select the icon image:
     // Select the RT_GROUP_ICON resource. If more than one such resource exists,
@@ -116,7 +114,7 @@ class ASHE_API WinIcon {
     //
     // It is best to first use PathUtil::ExpandEnvString to expand environment variables in filePath.
     // You should call DestroyIcon for icon.
-    static HICON GetExeIcon(const std::wstring& filePath, int desiredSize, int& actualSize) noexcept;
+    static HICON GetExeDisplayIcon(const std::wstring& filePath, int desiredSize, int* actualSize = nullptr) noexcept;
 
     static bool SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& filePath) noexcept;
 

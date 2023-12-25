@@ -246,7 +246,43 @@ static UINT WriteIconData(HANDLE hFile, HBITMAP hBitmap) {
 
     return nBitmapBytes;
 }
+
 }  // namespace
+
+std::vector<HICON> WinIcon::IconGroup::iconHandleList() const noexcept {
+    std::vector<HICON> list;
+    for (const auto& ii : icons) {
+        if (ii) {
+            list.push_back(ii->hIcon);
+        }
+    }
+    return list;
+}
+
+std::shared_ptr<WinIcon::IconInfo> WinIcon::IconGroup::getClosestSize(int desiredSize) noexcept {
+    int closestValue = 0;
+    size_t idx = -1;
+
+    for (size_t i = 0; i < icons.size(); i++) {
+        if (icons[i]) {
+            int v = abs(desiredSize - icons[i]->cx);
+            if (idx == -1) {
+                idx = i;
+                closestValue = v;
+            }
+            else if (closestValue > v) {
+                idx = i;
+                closestValue = v;
+            }
+        }
+    }
+
+    if (idx == -1) {
+        return nullptr;
+    }
+
+    return icons[idx];
+}
 
 HICON WinIcon::LoadFromProcessRes(HINSTANCE hInst, LPCWSTR resPath, int cxDesired, int cyDesired) noexcept {
     HANDLE h = LoadImageW(hInst, resPath, IMAGE_ICON, cxDesired, cyDesired, LR_DEFAULTCOLOR);
@@ -312,11 +348,34 @@ bool WinIcon::ParseShell32IconInfo(const std::wstring& shell32Path, int shellIco
     return true;
 }
 
-bool WinIcon::EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup>& iconGroups) {
+bool WinIcon::EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup>& iconGroups) noexcept {
     return DoEnumIconGroups(filePath, false, iconGroups);
 }
 
-HICON WinIcon::GetExeIcon(const std::wstring& filePath, int desiredSize, int& actualSize) noexcept {
+HICON WinIcon::LoadFromFile(const std::wstring& filePath, uint32_t iconIndex, int desiredSize /*= 256*/, int* actualSize) noexcept {
+    std::vector<IconGroup> iconGroups;
+    if (!EnumIconGroups(filePath, iconGroups)) {
+        return NULL;
+    }
+
+    if (iconGroups.size() <= iconIndex) {
+        return NULL;
+    }
+
+    std::shared_ptr<IconInfo> ii = iconGroups[iconIndex].getClosestSize(desiredSize);
+    if (!ii) {
+        return NULL;
+    }
+
+    if (actualSize) {
+        *actualSize = ii->cx;
+    }
+
+    HICON hCopy = CopyIcon(ii->hIcon);
+    return hCopy;
+}
+
+HICON WinIcon::GetExeDisplayIcon(const std::wstring& filePath, int desiredSize, int* actualSize) noexcept {
     std::vector<IconGroup> iconGroups;
     if (!DoEnumIconGroups(filePath, true, iconGroups)) {
         return NULL;
@@ -326,28 +385,16 @@ HICON WinIcon::GetExeIcon(const std::wstring& filePath, int desiredSize, int& ac
         return NULL;
     }
 
-    int closestValue = 0;
-    size_t idx = -1;
-    for (size_t i = 0; i < iconGroups[0].icons.size(); i++) {
-        if (iconGroups[0].icons[i]) {
-            int v = abs(desiredSize - iconGroups[0].icons[i]->cx);
-            if (idx == -1) {
-                idx = i;
-                closestValue = v;
-            }
-            else if (closestValue > v) {
-                idx = i;
-                closestValue = v;
-            }
-        }
-    }
-
-    if (idx == -1) {
+    std::shared_ptr<WinIcon::IconInfo> ii = iconGroups[0].getClosestSize(desiredSize);
+    if (!ii) {
         return NULL;
     }
 
-    actualSize = iconGroups[0].icons[idx]->cx;
-    HICON hCopy = CopyIcon(iconGroups[0].icons[idx]->hIcon);
+    if (actualSize) {
+        *actualSize = ii->cx;
+    }
+
+    HICON hCopy = CopyIcon(ii->hIcon);
     return hCopy;
 }
 
