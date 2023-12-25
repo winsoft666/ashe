@@ -54,8 +54,8 @@ class ASHE_API PathUtil {
     static std::string ReplaceKnownEnvToWow6432(const std::string& src);
     static std::wstring ReplaceKnownEnvToWow6432(const std::wstring& src);
 
-    static std::string ExpandEnvString(const std::string& src, bool disableWow64FsRedirection = true);
-    static std::wstring ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection = true);
+    static std::string ExpandEnvString(const std::string& src, bool disableWow64FsRedirection = false) noexcept;
+    static std::wstring ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection = false) noexcept;
 
 #endif
 
@@ -66,7 +66,7 @@ class ASHE_API PathUtil {
     static void PathRemoveQuote(wchar_t* szPath) noexcept;
     static std::wstring PathRemoveQuote(const std::wstring& path) noexcept;
 
-    static bool PathAddQuote(wchar_t* szPath, int buffSize, bool singleQuote = false) noexcept;
+    static bool PathAddQuote(wchar_t* szPath, size_t buffSize, bool singleQuote = false) noexcept;
     static std::wstring PathAddQuote(const std::wstring& path, bool singleQuote = false) noexcept;
 };
 }  // namespace ashe

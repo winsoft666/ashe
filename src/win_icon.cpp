@@ -29,10 +29,12 @@ BOOL CALLBACK __EnumIconGroupCallback__(HMODULE hModule, LPCWSTR lpszType, LPWST
                 pResList->push_back(lpszName);
             }
             else {
-                int len = wcslen(lpszName);
+                size_t len = wcslen(lpszName);
                 WCHAR* pBuf = new WCHAR[len + 1];
-                StringCchCopyW(pBuf, len + 1, lpszName);
-                pResList->push_back(pBuf);
+                if (pBuf) {
+                    StringCchCopyW(pBuf, len + 1, lpszName);
+                    pResList->push_back(pBuf);
+                }
             }
         }
     }

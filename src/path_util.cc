@@ -202,7 +202,11 @@ std::wstring PathUtil::ReplaceKnownEnvToWow6432(const std::wstring& src) {
     return sl;
 }
 
-std::string PathUtil::ExpandEnvString(const std::string& src, bool disableWow64FsRedirection) {
+std::string PathUtil::ExpandEnvString(const std::string& src, bool disableWow64FsRedirection) noexcept {
+    if (src.empty()) {
+        return "";
+    }
+
     std::string srcCopy;
     PVOID OldValue = NULL;
     if (disableWow64FsRedirection) {
@@ -214,6 +218,12 @@ std::string PathUtil::ExpandEnvString(const std::string& src, bool disableWow64F
     }
 
     DWORD dwCount = ExpandEnvironmentStringsA(srcCopy.c_str(), NULL, 0);
+    if (dwCount == 0) {
+        if (disableWow64FsRedirection)
+            Wow64RevertWow64FsRedirection(OldValue);
+        return "";
+    }
+
     std::vector<char> buf(dwCount + 1);
     ExpandEnvironmentStringsA(srcCopy.c_str(), &buf[0], dwCount);
 
@@ -223,7 +233,11 @@ std::string PathUtil::ExpandEnvString(const std::string& src, bool disableWow64F
     return std::string(&buf[0]);
 }
 
-std::wstring PathUtil::ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection) {
+std::wstring PathUtil::ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection) noexcept {
+    if (src.empty()) {
+        return L"";
+    }
+
     std::wstring srcCopy;
     PVOID OldValue = NULL;
     if (disableWow64FsRedirection) {
@@ -235,6 +249,12 @@ std::wstring PathUtil::ExpandEnvString(const std::wstring& src, bool disableWow6
     }
 
     DWORD dwCount = ExpandEnvironmentStringsW(srcCopy.c_str(), NULL, 0);
+    if (dwCount == 0) {
+        if (disableWow64FsRedirection)
+            Wow64RevertWow64FsRedirection(OldValue);
+        return L"";
+    }
+
     std::vector<wchar_t> buf(dwCount + 1);
     ExpandEnvironmentStringsW(srcCopy.c_str(), &buf[0], dwCount);
 
@@ -287,7 +307,7 @@ std::wstring PathUtil::PathRemoveQuote(const std::wstring& path) noexcept {
     return path;
 }
 
-bool PathUtil::PathAddQuote(wchar_t* szPath, int buffSize, bool singleQuote) noexcept {
+bool PathUtil::PathAddQuote(wchar_t* szPath, size_t buffSize, bool singleQuote) noexcept {
     if (PathIsSurroundQuote(szPath))
         return true;
 

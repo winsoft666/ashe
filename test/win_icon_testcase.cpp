@@ -26,7 +26,7 @@ TEST_CASE("IconTest-load-from-exe", "") {
 
 TEST_CASE("IconTest-enum-icons", "") {
     using namespace ashe;
-    std::wstring exePath = LR"()";
+    std::wstring exePath = LR"(%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe)";
 
     if (!exePath.empty()) {
         std::vector<WinIcon::IconGroup> iconGroups;
