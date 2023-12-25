@@ -116,6 +116,9 @@ class ASHE_API WinIcon {
     // You should call DestroyIcon for icon.
     static HICON GetExeDisplayIcon(const std::wstring& filePath, int desiredSize, int* actualSize = nullptr) noexcept;
 
+    // You should call DestroyIcon for icon.
+    static HICON RunPrivateExtractIconsW(const std::wstring& filePath, int iconIndex, int desiredSize) noexcept;
+
     static bool SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& filePath) noexcept;
 
    private:

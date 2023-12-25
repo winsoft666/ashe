@@ -398,6 +398,42 @@ HICON WinIcon::GetExeDisplayIcon(const std::wstring& filePath, int desiredSize, 
     return hCopy;
 }
 
+HICON WinIcon::RunPrivateExtractIconsW(const std::wstring& filePath, int iconIndex, int desiredSize) noexcept {
+    typedef UINT(WINAPI * fPrivateExtractIconsW)(
+        IN LPCWSTR szFileName,
+        IN int nIconIndex,
+        IN int cxIcon,
+        IN int cyIcon,
+        OUT HICON* phicon,
+        OUT UINT* piconid,
+        IN UINT nIcons,
+        IN UINT flags);
+
+    HMODULE user32 = LoadLibrary(TEXT("user32.dll"));
+    if (!user32) {
+        return NULL;
+    }
+
+    fPrivateExtractIconsW pei = (fPrivateExtractIconsW)GetProcAddress(user32, "PrivateExtractIconsW");
+    if (!pei) {
+        FreeLibrary(user32);
+        return NULL;
+    }
+
+    HICON hIcon = NULL;
+    UINT iconId = 0;
+    if (0xFFFFFFFF == pei(filePath.c_str(),
+                          iconIndex, desiredSize, desiredSize, &hIcon, &iconId, 1,
+                          LR_DEFAULTCOLOR | LR_LOADFROMFILE)) {
+        FreeLibrary(user32);
+        return NULL;
+    }
+
+    FreeLibrary(user32);
+
+    return hIcon;
+}
+
 bool WinIcon::SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& filePath) noexcept {
     HANDLE hFile = INVALID_HANDLE_VALUE;
     int* pImageOffset = NULL;

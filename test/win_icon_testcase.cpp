@@ -26,15 +26,28 @@ TEST_CASE("IconTest-load-from-exe", "") {
 
 TEST_CASE("IconTest-enum-icons", "") {
     using namespace ashe;
-    std::wstring exePath = LR"(C:\SysinternalsSuite\Dbgview.exe)";
+    std::wstring exePath = LR"()";
 
     if (!exePath.empty()) {
         std::vector<WinIcon::IconGroup> iconGroups;
         CHECK(WinIcon::EnumIconGroups(exePath, iconGroups));
+        DWORD dwGLE = GetLastError();
 
         for (size_t i = 0; i < iconGroups.size(); i++) {
             CHECK(WinIcon::SaveToFile(iconGroups[i].iconHandleList(), std::to_wstring(i) + L".ico"));
         }
+    }
+}
+
+TEST_CASE("IconTest-get-icon-by-private-api", "") {
+    using namespace ashe;
+    std::wstring exePath = LR"()";
+
+    if (!exePath.empty()) {
+        HICON h = WinIcon::RunPrivateExtractIconsW(exePath, 0, 128);
+        CHECK(h);
+        CHECK(WinIcon::SaveToFile({h}, L"private.ico"));
+        DestroyIcon(h);
     }
 }
 
@@ -74,7 +87,7 @@ TEST_CASE("IconTest-get-exe-icon", "") {
 TEST_CASE("IconTest-load-file-icon", "") {
     using namespace ashe;
 
-    std::wstring filePath = LR"(C:\Program Files (x86)\Fontlab\FontLab 8\FontLab 8.exe)";
+    std::wstring filePath = LR"()";
 
     if (!filePath.empty()) {
         HICON hIcon = WinIcon::LoadFromFile(filePath, 0, 256);
