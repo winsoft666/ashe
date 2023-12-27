@@ -99,6 +99,14 @@ class ASHE_API StringHelper {
 
     static std::string StringPrintfV(const char* format, va_list argList) noexcept;
     static std::wstring StringPrintfV(const wchar_t* format, va_list argList) noexcept;
+
+#ifdef ASHE_WIN
+    // such as @%SystemRoot%\\system32\\%SystemRoot%.dll,-10113
+    static bool IsResourceString(const std::wstring& s);
+
+    // Notice: 32bit program can not load 64bit dll
+    static bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result);
+#endif
 };
 }  // namespace ashe
 #endif  // !ASHE_STRING_HELPER_HPP__

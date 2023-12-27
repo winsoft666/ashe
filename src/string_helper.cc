@@ -1,6 +1,7 @@
 #include "ashe/config.hpp"
 #include "ashe/string_helper.hpp"
 #include "ashe/macros.hpp"
+#include "ashe/path_util.hpp"
 #include <algorithm>
 #include <cctype>
 #include <cstdarg>
@@ -711,4 +712,59 @@ std::wstring StringHelper::StringPrintfV(const wchar_t* format, va_list argList)
     StringPrintfV(format, argList, output);
     return output;
 }
+
+#ifdef ASHE_WIN
+bool StringHelper::IsResourceString(const std::wstring& s) {
+    std::wstring s2 = Trim(s, L" \"");
+    return IsStartsWith(s2, L"@");
+}
+
+bool StringHelper::LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
+    std::wstring resStrFormat = Trim(resStr, L" \"");
+    resStrFormat = resStrFormat.substr(1);  // @
+
+    if (resStrFormat.empty())
+        return false;
+
+    std::vector<std::wstring> v = Split(resStrFormat, L",", true);
+    if (v.size() < 2)
+        return false;
+
+    if (v[0].empty() || v[1].empty())
+        return false;
+
+    std::wstring envExpanded = PathUtil::ExpandEnvString(v[0]);
+    DWORD dwBinType = 0;
+    if (GetBinaryTypeW(envExpanded.c_str(), &dwBinType)) {
+#ifdef ASHE_WIN32
+        if (dwBinType == SCS_64BIT_BINARY) {
+            return false;
+        }
+#endif
+    }
+
+    HMODULE hDll = LoadLibraryW(envExpanded.c_str());
+    if (!hDll) {
+        return false;
+    }
+
+    if (StringHelper::IsStartsWith(v[1], L"-"))
+        v[1] = v[1].substr(1);
+
+    UINT id = _wtoi(v[1].c_str());
+
+    wchar_t szBuf[MAX_PATH + 1] = {0};
+    int numberOfBytes = LoadStringW(hDll, id, szBuf, MAX_PATH);
+    if (numberOfBytes <= 0) {
+        FreeLibrary(hDll);
+        return false;
+    }
+
+    result = szBuf;
+    FreeLibrary(hDll);
+
+    return true;
+}
+
+#endif
 }  // namespace ashe
