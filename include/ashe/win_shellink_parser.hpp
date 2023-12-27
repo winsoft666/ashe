@@ -877,12 +877,6 @@ class ASHE_API WinShellinkParser {
     int32_t getIconIndex() const;
     bool isRunAsAdmin();
 
-    // such as @%SystemRoot%\\system32\\%SystemRoot%.dll,-10113
-    static bool IsResourceString(const std::wstring& s);
-
-    // Notice: 32bit program can not load 64bit dll
-    static bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result);
-
    private:
     WinShellinkParser::ShellinkErr readEConsoleDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
     WinShellinkParser::ShellinkErr readEConsoleFEDataBlock(uint32_t blockSize, uint32_t blockSignature, FILE* fp);
@@ -911,6 +905,7 @@ class ASHE_API WinShellinkParser {
 
    private:
     std::wstring linkPath_;
+    mutable int iconIndex_ = 0;
     LinkHeader header_;
     LinkTargetIDList targetIdList_;
     LinkInfo linkInfo_;

@@ -12,6 +12,8 @@
 
 #define STRICT_TYPED_ITEMIDS
 #include <shlobj.h>
+#include <strsafe.h>
+#include <Shlwapi.h>
 
 #pragma comment(lib, "Shell32.lib")
 
@@ -833,59 +835,6 @@ void WinShellinkParser::toBigEndian(void* inp, size_t size) {
     }
 }
 
-bool WinShellinkParser::IsResourceString(const std::wstring& s) {
-    std::wstring s2 = StringHelper::Trim(s, L" \"");
-    return StringHelper::IsStartsWith(s2, L"@");
-}
-
-bool WinShellinkParser::LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
-    std::wstring resStrFormat = StringHelper::Trim(resStr, L" \"");
-    resStrFormat = resStrFormat.substr(1);  // @
-
-    if (resStrFormat.empty())
-        return false;
-
-    std::vector<std::wstring> v = StringHelper::Split(resStrFormat, L",", true);
-    if (v.size() < 2)
-        return false;
-
-    if (v[0].empty() || v[1].empty())
-        return false;
-
-    std::wstring envExpanded = PathUtil::ExpandEnvString(v[0]);
-    DWORD dwBinType = 0;
-    if (GetBinaryTypeW(envExpanded.c_str(), &dwBinType)) {
-#ifdef ASHE_WIN32
-        if (dwBinType == SCS_64BIT_BINARY) {
-            return false;
-        }
-#endif
-    }
-
-    HMODULE hDll = LoadLibraryW(envExpanded.c_str());
-    if (!hDll) {
-        DWORD dwGLE = GetLastError();
-        return false;
-    }
-
-    if (StringHelper::IsStartsWith(v[1], L"-"))
-        v[1] = v[1].substr(1);
-
-    UINT id = _wtoi(v[1].c_str());
-
-    wchar_t szBuf[MAX_PATH + 1] = {0};
-    int numberOfBytes = LoadStringW(hDll, id, szBuf, MAX_PATH);
-    if (numberOfBytes <= 0) {
-        FreeLibrary(hDll);
-        return false;
-    }
-
-    result = szBuf;
-    FreeLibrary(hDll);
-
-    return true;
-}
-
 std::wstring WinShellinkParser::getDisplayName() const {
     std::wstring result;
     if (linkPath_.empty())
@@ -1033,6 +982,8 @@ std::wstring WinShellinkParser::getArguments() const {
 
 std::wstring WinShellinkParser::getIconPath() const {
     std::wstring result;
+    iconIndex_ = 0;
+
     if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasIconLocation)) {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
             result = stringData_.IconLocationW;
@@ -1040,21 +991,32 @@ std::wstring WinShellinkParser::getIconPath() const {
             result = StringEncode::AnsiToUnicode(stringData_.IconLocationA);
     }
 
-    if (!result.empty())
-        return result;
+    if (result.empty()) {
+        if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasExpIcon)) {
+            if (!extraData_.iconEnvDB.TargetUnicode.empty())
+                result = extraData_.iconEnvDB.TargetUnicode;
+            else if (!extraData_.iconEnvDB.TargetAnsi.empty())
+                result = StringEncode::AnsiToUnicode(extraData_.iconEnvDB.TargetAnsi);
+        }
+    }
 
-    if (IS_FLAG_SET(header_.LinkFlags, ShllinkLinkFlag::LF_HasExpIcon)) {
-        if (!extraData_.iconEnvDB.TargetUnicode.empty())
-            result = extraData_.iconEnvDB.TargetUnicode;
-        else if (!extraData_.iconEnvDB.TargetAnsi.empty())
-            result = StringEncode::AnsiToUnicode(extraData_.iconEnvDB.TargetAnsi);
+    if (!result.empty()) {
+        WCHAR icFile[MAX_PATH] = {0};
+        StringCchCopyW(icFile, MAX_PATH, result.c_str());
+        iconIndex_ = PathParseIconLocationW(icFile);
+
+        result = icFile;
     }
 
     return result;
 }
 
 int32_t WinShellinkParser::getIconIndex() const {
-    return header_.IconIndex;
+    if (header_.IconIndex != 0)
+        return header_.IconIndex;
+
+    getIconPath();
+    return iconIndex_;
 }
 
 bool WinShellinkParser::isRunAsAdmin() {
