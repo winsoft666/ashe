@@ -537,6 +537,26 @@ bool WinIcon::SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& f
     return true;
 }
 
+HICON WinIcon::GetFileAssociatedIcon(const std::wstring& filePath, int iconIndex, int* gotIconIndex /*= NULL*/, std::wstring* associatedExePath /*= NULL*/) {
+    if (filePath.empty())
+        return NULL;
+
+    WCHAR szPath = { 0 };
+    StringCchCopyW(szPath, MAX_PATH, filePath.c_str());
+
+    DWORD dwIconIndex = iconIndex;
+    HICON h = ExtractAssociatedIconW(NULL, szPath, &dwIconIndex);
+    if (h) {
+        if (gotIconIndex)
+            *gotIconIndex = dwIconIndex;
+
+        if (associatedExePath)
+            *associatedExePath = szPath;
+    }
+
+    return h;
+}
+
 bool WinIcon::DoEnumIconGroups(const std::wstring& filePath, bool onlyFirstGroup, std::vector<IconGroup>& iconGroups) noexcept {
     if (filePath.empty()) {
         return false;

@@ -121,6 +121,12 @@ class ASHE_API WinIcon {
 
     static bool SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& filePath) noexcept;
 
+    // You should call DestroyIcon for icon.
+    static HICON GetFileAssociatedIcon(const std::wstring& filePath,
+                                       int iconIndex,
+                                       int* gotIconIndex = NULL,
+                                       std::wstring* associatedExePath = NULL) noexcept;
+
    private:
     static bool DoEnumIconGroups(const std::wstring& filePath, bool onlyFirstGroup, std::vector<IconGroup>& iconGroups) noexcept;
 };
