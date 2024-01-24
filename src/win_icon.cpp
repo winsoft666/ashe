@@ -3,6 +3,7 @@
 #ifdef ASHE_WIN
 #include <strsafe.h>
 #include <Shlwapi.h>
+#include <shellapi.h>
 
 namespace ashe {
 namespace {
@@ -537,14 +538,14 @@ bool WinIcon::SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& f
     return true;
 }
 
-HICON WinIcon::GetFileAssociatedIcon(const std::wstring& filePath, int iconIndex, int* gotIconIndex /*= NULL*/, std::wstring* associatedExePath /*= NULL*/) {
+HICON WinIcon::GetFileAssociatedIcon(const std::wstring& filePath, int iconIndex, int* gotIconIndex /*= NULL*/, std::wstring* associatedExePath /*= NULL*/) noexcept {
     if (filePath.empty())
         return NULL;
 
-    WCHAR szPath = { 0 };
+    WCHAR szPath[MAX_PATH] = {0};
     StringCchCopyW(szPath, MAX_PATH, filePath.c_str());
 
-    DWORD dwIconIndex = iconIndex;
+    WORD dwIconIndex = (WORD)iconIndex;
     HICON h = ExtractAssociatedIconW(NULL, szPath, &dwIconIndex);
     if (h) {
         if (gotIconIndex)

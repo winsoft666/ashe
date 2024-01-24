@@ -128,23 +128,43 @@
 #define ASHE_DEPRECATED(message)
 #endif  // ! ASHE_DEPRECATED
 
+#ifndef ASHE_ASSERT
 #define ASHE_ASSERT(condition) assert(condition)
+#endif
 
+#ifndef ASHE_NODISCARD
+#if __cplusplus >= 201703L
+#define ASHE_NODISCARD [[nodiscard]]
+#elif defined(_MSC_VER) && _MSC_VER >= 1700
+#define ASHE_NODISCARD _Check_return_
+#elif defined(__clang__)
+#define ASHE_NODISCARD __attribute__((warn_unused_result))
+#else
+#define ASHE_NODISCARD
+#endif
+#endif
+
+#ifndef ASHE_FAIL_MESSAGE
 // The call to assert() will show the failure message in debug builds.
-// In release builds we abort, for a core-dump or debugger.
-#define ASHE_FAIL_MESSAGE(message)          \
-    {                                       \
-        assert(false && message); \
+#define ASHE_FAIL_MESSAGE(message) \
+    {                              \
+        assert(false && message);  \
     }
+#endif
 
+#ifndef ASHE_ASSERT_MESSAGE
 #define ASHE_ASSERT_MESSAGE(condition, message) \
     if (!(condition)) {                         \
         ASHE_FAIL_MESSAGE(message);             \
     }
+#endif
 
-
+#ifndef STD_ASYNC_IS_RUNNING
 #define STD_ASYNC_IS_RUNNING(x) ((x).valid() && (x).wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
+#endif
 
+#ifndef ASHE_UNUSED
 #define ASHE_UNUSED(x) (void)(x)
+#endif
 
 #endif  // ! ASHE_MACROS_HPP__

@@ -43,26 +43,26 @@ class ASHE_API WinIni {
 
     bool readInt(const std::wstring& item, const std::wstring& sub_item, unsigned int& result) noexcept;
 
-    unsigned int readInt(const std::wstring& item,
-                         const std::wstring& sub_item,
-                         unsigned int default_value) noexcept;
+    unsigned int readIntWithDefault(const std::wstring& item,
+                                    const std::wstring& subItem,
+                                    unsigned int defaultValue) noexcept;
 
-    std::wstring readString(const std::wstring& item,
-                            const std::wstring& sub_item,
-                            const std::wstring& default_value) noexcept;
+    std::wstring readStringWithDefault(const std::wstring& item,
+                                       const std::wstring& subItem,
+                                       const std::wstring& defaultValue) noexcept;
 
     bool readString(const std::wstring& item,
-                    const std::wstring& sub_item,
+                    const std::wstring& subItem,
                     std::wstring& result) noexcept;
 
-    bool writeInt(const std::wstring& item, const std::wstring& sub_item, unsigned int value) noexcept;
+    bool writeInt(const std::wstring& item, const std::wstring& subItem, unsigned int value) noexcept;
 
     bool writeString(const std::wstring& item,
-                     const std::wstring& sub_item,
+                     const std::wstring& subItem,
                      const std::wstring& value) noexcept;
 
    protected:
-    std::wstring ini_file_path_;
+    std::wstring iniFilePath_;
 };
 }  // namespace ashe
 #endif  // !ASHE_WIN

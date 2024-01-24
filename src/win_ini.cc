@@ -17,26 +17,26 @@
 
 namespace ashe {
 WinIni::WinIni(const std::wstring& file_path) :
-    ini_file_path_(file_path) {}
+    iniFilePath_(file_path) {}
 
 WinIni::WinIni(std::wstring&& file_path) :
-    ini_file_path_(std::move(file_path)) {}
+    iniFilePath_(std::move(file_path)) {}
 
 void WinIni::setIniFilePath(const std::wstring& file_path) noexcept {
-    ini_file_path_ = file_path;
+    iniFilePath_ = file_path;
 }
 
 std::wstring WinIni::iniFilePath() const noexcept {
-    return ini_file_path_;
+    return iniFilePath_;
 }
 
 bool WinIni::readInt(const std::wstring& item, const std::wstring& sub_item, unsigned int& result) noexcept {
-    if (ini_file_path_.length() == 0)
+    if (iniFilePath_.length() == 0)
         return false;
     INT iDefault = 0;
     SetLastError(0);
     UINT ret =
-        GetPrivateProfileIntW(item.c_str(), sub_item.c_str(), iDefault, ini_file_path_.c_str());
+        GetPrivateProfileIntW(item.c_str(), sub_item.c_str(), iDefault, iniFilePath_.c_str());
     DWORD dwGLE = GetLastError();
     if (dwGLE == 0) {
         result = ret;
@@ -45,37 +45,32 @@ bool WinIni::readInt(const std::wstring& item, const std::wstring& sub_item, uns
     return false;
 }
 
-UINT WinIni::readInt(const std::wstring& item,
-                             const std::wstring& sub_item,
-                             UINT default_value) noexcept {
-    if (ini_file_path_.length() == 0)
-        return default_value;
+UINT WinIni::readIntWithDefault(const std::wstring& item,
+                                const std::wstring& subItem,
+                                UINT defaultValue) noexcept {
+    if (iniFilePath_.length() == 0)
+        return defaultValue;
 
     SetLastError(0);
-    return GetPrivateProfileIntW(item.c_str(), sub_item.c_str(), default_value,
-                                 ini_file_path_.c_str());
+    return GetPrivateProfileIntW(item.c_str(), subItem.c_str(), defaultValue,
+                                 iniFilePath_.c_str());
 }
 
-std::wstring WinIni::readString(const std::wstring& item,
-                                        const std::wstring& sub_item,
-                                        const std::wstring& default_value) noexcept {
-    if (ini_file_path_.length() == 0)
-        return default_value;
-
-    std::vector<wchar_t> buf(1024, 0);
-    DWORD read = GetPrivateProfileStringW(item.c_str(), sub_item.c_str(), default_value.c_str(),
-                                          buf.data(), 1024, ini_file_path_.c_str());
-
+std::wstring WinIni::readStringWithDefault(const std::wstring& item,
+                                           const std::wstring& subItem,
+                                           const std::wstring& defaultValue) noexcept {
     std::wstring result;
-    result.assign(buf.data(), read);
+    if (!readString(item, subItem, result)) {
+        result = defaultValue;
+    }
 
     return result;
 }
 
 bool WinIni::readString(const std::wstring& item,
-                                const std::wstring& sub_item,
-                                std::wstring& result) noexcept {
-    if (ini_file_path_.length() == 0)
+                        const std::wstring& subItem,
+                        std::wstring& result) noexcept {
+    if (iniFilePath_.length() == 0)
         return false;
 
     bool ret = false;
@@ -88,8 +83,8 @@ bool WinIni::readString(const std::wstring& item,
         }
         memset(pBuf, 0, iBufSize * sizeof(WCHAR));
         SetLastError(0);
-        DWORD dwRet = GetPrivateProfileStringW(item.c_str(), sub_item.c_str(), L"", pBuf, iBufSize,
-                                               ini_file_path_.c_str());
+        DWORD dwRet = GetPrivateProfileStringW(item.c_str(), subItem.c_str(), L"", pBuf, iBufSize,
+                                               iniFilePath_.c_str());
         DWORD dwGLE = GetLastError();
         if (dwRet == 0) {
             ret = (dwGLE == 0);
@@ -115,7 +110,7 @@ bool WinIni::readString(const std::wstring& item,
 }
 
 bool WinIni::writeInt(const std::wstring& item, const std::wstring& sub_item, unsigned int value) noexcept {
-    if (ini_file_path_.length() == 0)
+    if (iniFilePath_.length() == 0)
         return false;
 
     WCHAR szValue[50];
@@ -124,13 +119,13 @@ bool WinIni::writeInt(const std::wstring& item, const std::wstring& sub_item, un
 }
 
 bool WinIni::writeString(const std::wstring& item,
-                                 const std::wstring& sub_item,
-                                 const std::wstring& value) noexcept {
-    if (ini_file_path_.length() == 0)
+                         const std::wstring& sub_item,
+                         const std::wstring& value) noexcept {
+    if (iniFilePath_.length() == 0)
         return false;
 
     return !!WritePrivateProfileStringW(item.c_str(), sub_item.c_str(), value.c_str(),
-                                        ini_file_path_.c_str());
+                                        iniFilePath_.c_str());
 }
 }  // namespace ashe
 #endif
