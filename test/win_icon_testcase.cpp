@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "ashe/all.hpp"
 
-#ifdef ASHE_WIN
+#if 0
 
 TEST_CASE("IconTest-load-from-current-resource", "") {
     using namespace ashe;

@@ -276,12 +276,12 @@ HRESULT WinRegistry::setBINARYValue(LPCWSTR pszValueName, const LPBYTE pbData, i
 
 HRESULT WinRegistry::setSZValue(LPCWSTR pszValueName, const std::wstring& strData) noexcept {
     return setValue(pszValueName, REG_SZ, (const LPBYTE)strData.c_str(),
-                    ((DWORD)strData.length()) * sizeof(WCHAR));
+                    ((DWORD)strData.length() + 1) * sizeof(WCHAR));
 }
 
 HRESULT WinRegistry::setExpandSZValue(LPCWSTR pszValueName, const std::wstring& strData) noexcept {
     return setValue(pszValueName, REG_EXPAND_SZ, (const LPBYTE)strData.c_str(),
-                    ((DWORD)strData.length()) * sizeof(WCHAR));
+                    ((DWORD)strData.length() + 1) * sizeof(WCHAR));
 }
 
 HRESULT WinRegistry::setMultiSZValue(LPCWSTR pszValueName, const std::vector<std::wstring>& vStrValues) noexcept {

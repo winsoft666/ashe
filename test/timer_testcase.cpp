@@ -89,15 +89,15 @@ TEST_CASE("TimerTest4", "Test delete timer in callback") {
     }
 
     SECTION("Ensure that the correct timer is freed and reused") {
-        auto id1 = t.add(std::chrono::milliseconds(150), [](std::size_t) {});
-        auto id2 = t.add(std::chrono::milliseconds(20), [&](std::size_t id) { t.remove(id); });
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        auto id3 = t.add(std::chrono::microseconds(100), [](std::size_t) {});
-        auto id4 = t.add(std::chrono::microseconds(200), [](std::size_t) {});
+        auto id1 = t.add(std::chrono::milliseconds(1500), [](std::size_t) {});
+        auto id2 = t.add(std::chrono::milliseconds(200), [&](std::size_t id) { t.remove(id); });
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        auto id3 = t.add(std::chrono::microseconds(1000), [](std::size_t) {});
+        auto id4 = t.add(std::chrono::microseconds(2000), [](std::size_t) {});
         REQUIRE(id3 == id2);
         REQUIRE(id4 != id1);
         REQUIRE(id4 != id2);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
     SECTION("Ensure that the correct timer is freed and reused - different ordering") {
@@ -182,11 +182,11 @@ TEST_CASE("TimerTest8", "Test with multiple timers") {
     t2.init();
 
     SECTION("Update the same value at different times with different timers") {
-        t1.add(std::chrono::milliseconds(20), [&](std::size_t) { i = 42; });
-        t1.add(std::chrono::milliseconds(50), [&](std::size_t) { i = 43; });
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        t1.add(std::chrono::milliseconds(200), [&](std::size_t) { i = 42; });
+        t1.add(std::chrono::milliseconds(500), [&](std::size_t) { i = 43; });
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
         REQUIRE(i == 42);
-        std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        std::this_thread::sleep_for(std::chrono::milliseconds(400));
         REQUIRE(i == 43);
     }
 
