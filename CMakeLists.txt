@@ -1,7 +1,7 @@
 #################################################################################
 #    C++ Common Library
 #    ---------------------------------------------------------------------------
-#    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
+#    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ function(group_sources)
 endfunction(group_sources)
 
 
-configure_file("${CMAKE_SOURCE_DIR}/include/ashe/config.hpp.in" "${CMAKE_SOURCE_DIR}/include/ashe/config.hpp")
+configure_file("${CMAKE_SOURCE_DIR}/include/ashe/config.h.in" "${CMAKE_SOURCE_DIR}/include/ashe/config.h")
 
 option(ASHE_BUILD_TESTS "Build tests project" ON)
 option(ASHE_USE_STATIC_CRT "Set to ON to build with static CRT on Windows (/MT)." OFF)

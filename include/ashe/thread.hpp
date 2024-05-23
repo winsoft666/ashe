@@ -1,7 +1,7 @@
 /*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@
 #define ASHE_THREAD_HPP__
 #pragma once
 
-#include "ashe/arch.hpp"
+#include "ashe/arch.h"
 
 #if defined ASHE_WIN || defined ASHE_LINUX
-#include "ashe/config.hpp"
+#include "ashe/config.h"
 #include <atomic>
 #include <condition_variable>
 #include <functional>
@@ -33,7 +33,7 @@
 #include <mutex>
 #include <queue>
 #include <string>
-#include "ashe/macros.hpp"
+#include "ashe/macros.h"
 
 namespace ashe {
 class ASHE_API Thread {

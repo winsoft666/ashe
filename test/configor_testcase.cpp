@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ashe/configor.hpp"
+#include "ashe/configor.h"
 #include <thread>
 #include <sstream>
 

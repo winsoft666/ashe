@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "ashe/all.hpp"
-#include "ashe/os_ver.hpp"
-#include "ashe/process_util.hpp"
+#include "ashe/os_ver.h"
+#include "ashe/process_util.h"
 
 #ifdef ASHE_WIN
 TEST_CASE("PathUtil-ExpandEnvString", "") {

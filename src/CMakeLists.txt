@@ -1,7 +1,7 @@
 #################################################################################
 #    C++ Common Library
 #    ---------------------------------------------------------------------------
-#    Copyright (C) 2022~2023 winsoft666 <winsoft666@outlook.com>.
+#    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -19,40 +19,18 @@
 
 set (PACKAGE_VERSION 1.6)
 
-if (MSVC)
-  add_definitions(
-    -D_WIN32
-  )
-endif()
-
-if (MSVC AND ASHE_USE_STATIC_CRT)
-	set(CompilerFlags
-		CMAKE_CXX_FLAGS
-		CMAKE_CXX_FLAGS_DEBUG
-		CMAKE_CXX_FLAGS_RELEASE
-		CMAKE_C_FLAGS
-		CMAKE_C_FLAGS_DEBUG
-		CMAKE_C_FLAGS_RELEASE
-		)
-	foreach(CompilerFlag ${CompilerFlags})
-		string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-	endforeach()
-endif()
-
 file(GLOB_RECURSE HEADER_FILES 			../include/*.hpp ../include/*.h)
-file(GLOB_RECURSE SOURCE_FILES 			../src/*.cc ../src/*.cpp)
-
-group_sources(${HEADER_FILES} ${SOURCE_FILES})
+file(GLOB_RECURSE SOURCE_FILES 			../src/*.cpp)
 
 if(ASHE_BUILD_SHARED_LIBS)
-	add_definitions(-DASHE_EXPORTS)
-	
 	add_library(
 		${ASHE_LIB_NAME}
 		SHARED
 		${HEADER_FILES}
 		${SOURCE_FILES}
 	)
+
+	target_compile_definitions(${ASHE_LIB_NAME} PRIVATE ASHE_EXPORTS)
 	
 	# set output name prefix/suffix
 	set_target_properties(${ASHE_LIB_NAME} PROPERTIES 
@@ -69,13 +47,33 @@ else()
 	)
 	
 	# set output name prefix/suffix
-  set_target_properties(${ASHE_LIB_NAME} PROPERTIES 
-		OUTPUT_NAME ${ASHE_LIB_NAME}
+  	set_target_properties(${ASHE_LIB_NAME} PROPERTIES 
+		OUTPUT_NAME ${ASHE_LIB_NAME} 
 		DEBUG_OUTPUT_NAME ${ASHE_LIB_NAME}${DEBUG_LIBNAME_SUFFIX})
-		
+
 	set_target_properties(${ASHE_LIB_NAME} PROPERTIES 
 		INTERFACE_COMPILE_DEFINITIONS ASHE_STATIC)
 endif()
+
+if (MSVC)
+  target_compile_definitions(${ASHE_LIB_NAME} PRIVATE _WIN32)
+endif()
+
+if (MSVC AND ASHE_USE_STATIC_CRT)
+	set(CompilerFlags
+		CMAKE_CXX_FLAGS
+		CMAKE_CXX_FLAGS_DEBUG
+		CMAKE_CXX_FLAGS_RELEASE
+		CMAKE_C_FLAGS
+		CMAKE_C_FLAGS_DEBUG
+		CMAKE_C_FLAGS_RELEASE
+		)
+	foreach(CompilerFlag ${CompilerFlags})
+		string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+	endforeach()
+endif()
+
+group_sources(${HEADER_FILES} ${SOURCE_FILES})
 
 set_target_properties(${ASHE_LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
