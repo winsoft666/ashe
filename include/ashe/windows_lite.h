@@ -21,6 +21,8 @@
 #define ASHE_WINDOWS_LITE_HPP_
 #pragma once
 
+#include "ashe/arch.h"
+#ifdef ASHE_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -32,5 +34,5 @@
 #endif  // !_WINSOCKAPI_
 
 #include <Windows.h>
-
+#endif  // ASHE_WIN
 #endif  // !ASHE_WINDOWS_LITE_HPP_

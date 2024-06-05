@@ -1,10 +1,10 @@
 #include "catch.hpp"
-#include "ashe/http.h"
+#include "ashe/win_http.h"
 #include "ashe/md5.h"
-#include "ashe/http_client.h"
+#include "ashe/win_http_client.h"
 
 TEST_CASE("Http1", "get") {
-    ashe::Http http;
+    ashe::WinHttp http;
     REQUIRE(http.openSession());
     REQUIRE(http.openConnect(L"https://www.baidu.com"));
     REQUIRE(http.openRequest());
@@ -18,7 +18,7 @@ TEST_CASE("Http1", "get") {
 }
 
 TEST_CASE("Http2", "download") {
-    ashe::Http http;
+    ashe::WinHttp http;
     REQUIRE(http.openSession());
     REQUIRE(http.openConnect(L"https://dlie.sogoucdn.com/se/sogou_explorer_11.0.1.34700_0000.exe"));
     REQUIRE(http.openRequest());
@@ -35,7 +35,7 @@ TEST_CASE("HttpClient1", "get") {
     req->setMethod(HttpReqDatagram::METHOD::GET);
     req->setUrl("https://www.baidu.com");
 
-    HttpClient client;
+    WinHttpClient client;
     client.request(req, [](long code, unsigned long usedMill, const HttpRspDatagram& rspDg) {
         REQUIRE(code == 0);
         REQUIRE(rspDg.body().size() > 0);
@@ -50,9 +50,9 @@ TEST_CASE("HttpClient2", "get_cancel") {
     req->setMethod(HttpReqDatagram::METHOD::GET);
     req->setUrl("https://www.baidu.com");
 
-    HttpClient client;
+    WinHttpClient client;
     client.request(req, [](long code, unsigned long usedMill, const HttpRspDatagram& rspDg) {
-        CHECK(code == HttpClient::USER_ABORT);
+        CHECK(code == WinHttpClient::USER_ABORT);
     });
     CHECK(client.wait(10) == false);
     client.abort();
@@ -67,7 +67,7 @@ TEST_CASE("HttpClient3", "download") {
     req->setUrl("https://dlie.sogoucdn.com/se/sogou_explorer_11.0.1.34700_0000.exe");
     req->setSaveFilePath(".\\sogou_explorer_11.0.1.34700_0000.exe");
 
-    HttpClient client;
+    WinHttpClient client;
     client.request(req, [](long code, unsigned long usedMill, const HttpRspDatagram& rspDg) {
         CHECK(code == 0);
         CHECK(ashe::MD5::GetFileMD5(L".\\sogou_explorer_11.0.1.34700_0000.exe") == "73a0e33385b7fd3c2ce6279f35ef0c0b");
@@ -83,9 +83,9 @@ TEST_CASE("HttpClient4", "download") {
     req->setUrl("https://dlie.sogoucdn.com/se/sogou_explorer_11.0.1.34700_0000.exe");
     req->setSaveFilePath(".\\sogou_explorer_11.0.1.34700_0000.exe");
 
-    HttpClient client;
+    WinHttpClient client;
     client.request(req, [](long code, unsigned long usedMill, const HttpRspDatagram& rspDg) {
-        CHECK(code == (long)HttpClient::USER_ABORT);
+        CHECK(code == (long)WinHttpClient::USER_ABORT);
     });
 
     CHECK(client.wait(100) == false);
