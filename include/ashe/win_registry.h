@@ -38,9 +38,9 @@
 #include "ashe/macros.h"
 
 namespace ashe {
-class ASHE_API Registry {
+class ASHE_API WinRegistry {
    public:
-    ASHE_DISALLOW_COPY_MOVE(Registry);
+    ASHE_DISALLOW_COPY_MOVE(WinRegistry);
 
     // hkeyRoot can be one of :
     // HKEY_CLASSES_ROOT
@@ -49,9 +49,9 @@ class ASHE_API Registry {
     // HKEY_LOCAL_MACHINE
     // HKEY_USERS
     //
-    Registry(HKEY hkeyRoot, const std::wstring& subKey) noexcept;
+    WinRegistry(HKEY hkeyRoot, const std::wstring& subKey) noexcept;
 
-    ~Registry() noexcept;
+    ~WinRegistry() noexcept;
 
     // samDesired:
     // https://docs.microsoft.com/zh-cn/windows/desktop/SysInfo/registry-key-security-and-access-rights
@@ -64,7 +64,7 @@ class ASHE_API Registry {
     // KEY_WOW64_64KEY
     // and so on.
     //
-    HRESULT open(REGSAM samDesired, bool bCreate) noexcept;
+    LSTATUS open(REGSAM samDesired, bool bCreate) noexcept;
 
     bool isOpen() const noexcept;
 
@@ -74,59 +74,59 @@ class ASHE_API Registry {
 
     bool watchForChange(DWORD dwChangeFilter, bool bWatchSubtree) noexcept;
 
-    HRESULT waitForChange(DWORD dwChangeFilter, bool bWatchSubtree) noexcept;
+    LSTATUS waitForChange(DWORD dwChangeFilter, bool bWatchSubtree) noexcept;
 
-    static bool DeleteKey(HKEY hKey, LPCWSTR pszSubKey, LPCWSTR pszValName, bool bPrefer64View) noexcept;
+    static LSTATUS DeleteKey(HKEY hKey, LPCWSTR pszSubKey, LPCWSTR pszValName, bool bPrefer64View) noexcept;
 
-    static bool DeleteSubKeys(HKEY hKeyRoot, LPCTSTR lpSubKey, bool bPrefer64View) noexcept;
+    static LSTATUS DeleteSubKeys(HKEY hKeyRoot, LPCWSTR lpSubKey, bool bPrefer64View) noexcept;
 
-    HRESULT getDWORDValue(LPCWSTR pszValueName, OUT DWORD& pdwDataOut) const noexcept;
+    LSTATUS getDWORDValue(LPCWSTR pszValueName, OUT DWORD& pdwDataOut) const noexcept;
 
-    HRESULT getBINARYValue(LPCWSTR pszValueName, LPBYTE pbDataOut, int cbDataOut) const noexcept;
+    LSTATUS getBINARYValue(LPCWSTR pszValueName, LPBYTE pbDataOut, int cbDataOut) const noexcept;
 
-    HRESULT getSZValue(LPCWSTR pszValueName, OUT std::wstring& strValue) const noexcept;
+    LSTATUS getSZValue(LPCWSTR pszValueName, OUT std::wstring& strValue) const noexcept;
 
-    HRESULT getExpandSZValue(LPCWSTR pszValueName,
+    LSTATUS getExpandSZValue(LPCWSTR pszValueName,
                              bool bRetrieveExpandedString,
                              OUT std::wstring& strValue) const noexcept;
 
-    HRESULT getMultiSZValue(LPCWSTR pszValueName, OUT std::vector<std::wstring>& vStrValues) const noexcept;
+    LSTATUS getMultiSZValue(LPCWSTR pszValueName, OUT std::vector<std::wstring>& vStrValues) const noexcept;
 
-    HRESULT getValueBufferSize(LPCWSTR pszValueName, DWORD& dwSize) const noexcept;
+    LSTATUS getValueBufferSize(LPCWSTR pszValueName, DWORD& dwSize) const noexcept;
 
-    HRESULT setDWORDValue(LPCWSTR pszValueName, DWORD dwData) noexcept;
+    LSTATUS setDWORDValue(LPCWSTR pszValueName, DWORD dwData) noexcept;
 
-    HRESULT setBINARYValue(LPCWSTR pszValueName, const LPBYTE pbData, int cbData) noexcept;
-    HRESULT setSZValue(LPCWSTR pszValueName, const std::wstring& strData) noexcept;
+    LSTATUS setBINARYValue(LPCWSTR pszValueName, const LPBYTE pbData, int cbData) noexcept;
+    LSTATUS setSZValue(LPCWSTR pszValueName, const std::wstring& strData) noexcept;
 
-    HRESULT setExpandSZValue(LPCWSTR pszValueName, const std::wstring& strData) noexcept;
+    LSTATUS setExpandSZValue(LPCWSTR pszValueName, const std::wstring& strData) noexcept;
 
-    HRESULT setMultiSZValue(LPCWSTR pszValueName, const std::vector<std::wstring>& vStrValues) noexcept;
+    LSTATUS setMultiSZValue(LPCWSTR pszValueName, const std::vector<std::wstring>& vStrValues) noexcept;
 
-    HRESULT getSubKeys(std::vector<std::wstring>& subKeys) noexcept;
+    LSTATUS getSubKeys(std::vector<std::wstring>& subKeys) noexcept;
 
    protected:
     void OnChange(HKEY hkey) noexcept;
 
    private:
-    HRESULT getValue(LPCWSTR pszValueName, DWORD dwTypeExpected, LPBYTE pbData, DWORD cbData) const noexcept;
-    HRESULT setValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, DWORD cbData) noexcept;
+    LSTATUS getValue(LPCWSTR pszValueName, DWORD dwTypeExpected, LPBYTE pbData, DWORD cbData) const noexcept;
+    LSTATUS setValue(LPCWSTR pszValueName, DWORD dwValueType, const LPBYTE pbData, DWORD cbData) noexcept;
     LPWSTR createDoubleNulTermList(const std::vector<std::wstring>& vStrValues) const noexcept;
 
     static unsigned int _stdcall NotifyWaitThreadProc(LPVOID pvParam);
-    static bool regDeleteKey32_64(HKEY hKey, LPCWSTR pszSubKey, bool bPrefer64View) noexcept;
-    static bool regDeleteSubKeys(HKEY hKey, bool bPrefer64View) noexcept;
-    static BOOL regDelSubKeysRecurse(HKEY hKeyRoot, LPTSTR lpSubKey, bool bPrefer64View) noexcept;
+    static LSTATUS regDeleteKey32_64(HKEY hKey, LPCWSTR pszSubKey, bool bPrefer64View) noexcept;
+    static LSTATUS regDeleteSubKeys(HKEY hKey, bool bPrefer64View) noexcept;
+    static LSTATUS regDelSubKeysRecurse(HKEY hKeyRoot, LPWSTR lpSubKey, bool bPrefer64View) noexcept;
 
    private:
-    HKEY m_hkeyRoot;
-    mutable HKEY m_hkey;
-    HANDLE m_hChangeEvent;
-    HANDLE m_hNotifyThr;
-    DWORD m_dwSamDesired;
-    DWORD m_dwChangeFilter;
-    std::wstring m_strSubKey;
-    bool m_bWatchSubtree;
+    HKEY hkeyRoot_;
+    mutable HKEY hkey_;
+    HANDLE hChangeEvent_;
+    HANDLE hNotifyThread_;
+    DWORD dwSamDesired_;
+    DWORD dwChangeFilter_;
+    std::wstring strSubKey_;
+    bool bWatchSubtree_;
 };
 }  // namespace ashe
 #endif  // !ASHE_WIN

@@ -1,5 +1,5 @@
 #include "ashe/config.h"
-#include "ashe/schedule_task.h"
+#include "ashe/win_schedule_task.h"
 #ifdef ASHE_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
@@ -20,14 +20,14 @@
 #pragma comment(lib, "taskschd.lib")
 
 namespace ashe {
-class ScheduleTask::Private {
+class WinScheduleTask::Private {
    public:
     ITaskService* m_lpITS = NULL;
     ITaskFolder* m_lpRootFolder = NULL;
 };
 
-ScheduleTask::ScheduleTask() :
-    p_(new ScheduleTask::Private()) {
+WinScheduleTask::WinScheduleTask() :
+    p_(new WinScheduleTask::Private()) {
     HRESULT hr = ::CoInitialize(NULL);
     assert(SUCCEEDED(hr));
 
@@ -42,7 +42,7 @@ ScheduleTask::ScheduleTask() :
     }
 }
 
-ScheduleTask::~ScheduleTask() {
+WinScheduleTask::~WinScheduleTask() {
     if (p_->m_lpITS) {
         p_->m_lpITS->Release();
     }
@@ -55,7 +55,7 @@ ScheduleTask::~ScheduleTask() {
     p_ = nullptr;
 }
 
-bool ScheduleTask::deleteTask(const wchar_t* pszTaskName) {
+bool WinScheduleTask::deleteTask(const wchar_t* pszTaskName) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
@@ -69,7 +69,7 @@ bool ScheduleTask::deleteTask(const wchar_t* pszTaskName) {
     return true;
 }
 
-bool ScheduleTask::deleteFolder(const wchar_t* pszFolderName) {
+bool WinScheduleTask::deleteFolder(const wchar_t* pszFolderName) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
@@ -86,7 +86,7 @@ bool ScheduleTask::deleteFolder(const wchar_t* pszFolderName) {
 // ITrigger type is TASK_TRIGGER_LOGON
 // Action number is 1
 //
-bool ScheduleTask::createLoginTriggerTask(const wchar_t* pszTaskName,
+bool WinScheduleTask::createLoginTriggerTask(const wchar_t* pszTaskName,
                                                      const wchar_t* pszProgramPath,
                                                      const wchar_t* pszParameters,
                                                      const wchar_t* pszDescription,
@@ -198,7 +198,7 @@ bool ScheduleTask::createLoginTriggerTask(const wchar_t* pszTaskName,
     return true;
 }
 
-bool ScheduleTask::isExist(const wchar_t* pszTaskName) {
+bool WinScheduleTask::isExist(const wchar_t* pszTaskName) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
@@ -217,7 +217,7 @@ bool ScheduleTask::isExist(const wchar_t* pszTaskName) {
     return true;
 }
 
-bool ScheduleTask::isTaskValid(const wchar_t* pszTaskName) {
+bool WinScheduleTask::isTaskValid(const wchar_t* pszTaskName) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
@@ -247,7 +247,7 @@ bool ScheduleTask::isTaskValid(const wchar_t* pszTaskName) {
     return true;
 }
 
-bool ScheduleTask::run(const wchar_t* pszTaskName, const wchar_t* pszParam) {
+bool WinScheduleTask::run(const wchar_t* pszTaskName, const wchar_t* pszParam) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
@@ -273,7 +273,7 @@ bool ScheduleTask::run(const wchar_t* pszTaskName, const wchar_t* pszParam) {
     return true;
 }
 
-bool ScheduleTask::isEnable(const wchar_t* pszTaskName) {
+bool WinScheduleTask::isEnable(const wchar_t* pszTaskName) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
@@ -297,7 +297,7 @@ bool ScheduleTask::isEnable(const wchar_t* pszTaskName) {
     return true;
 }
 
-bool ScheduleTask::setEnable(const wchar_t* pszTaskName, bool bEnable) {
+bool WinScheduleTask::setEnable(const wchar_t* pszTaskName, bool bEnable) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
@@ -319,7 +319,7 @@ bool ScheduleTask::setEnable(const wchar_t* pszTaskName, bool bEnable) {
     return true;
 }
 
-bool ScheduleTask::getProgramPath(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszProgramPath) {
+bool WinScheduleTask::getProgramPath(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszProgramPath) {
     if (NULL == p_->m_lpRootFolder)
         return false;
 
@@ -381,7 +381,7 @@ bool ScheduleTask::getProgramPath(const wchar_t* pszTaskName, long lActionIndex,
     return bRet;
 }
 
-bool ScheduleTask::getParameters(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszParameters) {
+bool WinScheduleTask::getParameters(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszParameters) {
     if (NULL == p_->m_lpRootFolder)
         return false;
 

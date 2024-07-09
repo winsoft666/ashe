@@ -1,21 +1,21 @@
 #include "ashe/config.h"
-#include "ashe/process_finder.h"
+#include "ashe/win_process_finder.h"
 #include "ashe/string_encode.h"
 
 namespace ashe {
-ProcessFinder::ProcessFinder(DWORD dwFlags, DWORD dwProcessID) {
+WinProcessFinder::WinProcessFinder(DWORD dwFlags, DWORD dwProcessID) {
     m_hSnapShot = INVALID_HANDLE_VALUE;
     createSnapShot(dwFlags, dwProcessID);
 }
 
-ProcessFinder::~ProcessFinder() {
+WinProcessFinder::~WinProcessFinder() {
     if (m_hSnapShot != INVALID_HANDLE_VALUE) {
         CloseHandle(m_hSnapShot);
         m_hSnapShot = INVALID_HANDLE_VALUE;
     }
 }
 
-bool ProcessFinder::createSnapShot(DWORD dwFlag, DWORD dwProcessID) {
+bool WinProcessFinder::createSnapShot(DWORD dwFlag, DWORD dwProcessID) {
     if (m_hSnapShot != INVALID_HANDLE_VALUE)
         CloseHandle(m_hSnapShot);
 
@@ -27,7 +27,7 @@ bool ProcessFinder::createSnapShot(DWORD dwFlag, DWORD dwProcessID) {
     return (m_hSnapShot != INVALID_HANDLE_VALUE);
 }
 
-bool ProcessFinder::processFirst(PPROCESSENTRY32 ppe) const {
+bool WinProcessFinder::processFirst(PPROCESSENTRY32 ppe) const {
     bool fOk = Process32First(m_hSnapShot, ppe);
 
     if (fOk && (ppe->th32ProcessID == 0))
@@ -36,7 +36,7 @@ bool ProcessFinder::processFirst(PPROCESSENTRY32 ppe) const {
     return fOk;
 }
 
-bool ProcessFinder::processNext(PPROCESSENTRY32 ppe) const {
+bool WinProcessFinder::processNext(PPROCESSENTRY32 ppe) const {
     bool fOk = Process32Next(m_hSnapShot, ppe);
 
     if (fOk && (ppe->th32ProcessID == 0))
@@ -46,7 +46,7 @@ bool ProcessFinder::processNext(PPROCESSENTRY32 ppe) const {
 }
 
 // Don't forgot pe.dwSize = sizeof(PROCESSENTRY32);
-bool ProcessFinder::processFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const {
+bool WinProcessFinder::processFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const {
     bool fFound = false;
 
     for (bool fOk = processFirst(ppe); fOk; fOk = processNext(ppe)) {
@@ -59,7 +59,7 @@ bool ProcessFinder::processFind(DWORD dwProcessId, PPROCESSENTRY32 ppe) const {
     return fFound;
 }
 
-bool ProcessFinder::processFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL bExceptSelf) const {
+bool WinProcessFinder::processFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL bExceptSelf) const {
     bool fFound = false;
     const DWORD dwCurrentPID = GetCurrentProcessId();
 
@@ -80,15 +80,15 @@ bool ProcessFinder::processFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL bEx
     return fFound;
 }
 
-bool ProcessFinder::moduleFirst(PMODULEENTRY32 pme) const {
+bool WinProcessFinder::moduleFirst(PMODULEENTRY32 pme) const {
     return (Module32First(m_hSnapShot, pme));
 }
 
-bool ProcessFinder::moduleNext(PMODULEENTRY32 pme) const {
+bool WinProcessFinder::moduleNext(PMODULEENTRY32 pme) const {
     return (Module32Next(m_hSnapShot, pme));
 }
 
-bool ProcessFinder::moduleFind(PVOID pvBaseAddr, PMODULEENTRY32 pme) const {
+bool WinProcessFinder::moduleFind(PVOID pvBaseAddr, PMODULEENTRY32 pme) const {
     bool fFound = FALSE;
 
     for (bool fOk = moduleFirst(pme); fOk; fOk = moduleNext(pme)) {
@@ -101,7 +101,7 @@ bool ProcessFinder::moduleFind(PVOID pvBaseAddr, PMODULEENTRY32 pme) const {
     return fFound;
 }
 
-bool ProcessFinder::moduleFind(PTSTR pszModName, PMODULEENTRY32 pme) const {
+bool WinProcessFinder::moduleFind(PTSTR pszModName, PMODULEENTRY32 pme) const {
     bool fFound = FALSE;
 
     for (bool fOk = moduleFirst(pme); fOk; fOk = moduleNext(pme)) {
@@ -115,24 +115,24 @@ bool ProcessFinder::moduleFind(PTSTR pszModName, PMODULEENTRY32 pme) const {
     return fFound;
 }
 
-bool ProcessFinder::IsExist(const std::wstring& processName) {
-    ProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
+bool WinProcessFinder::IsExist(const std::wstring& processName) {
+    WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
     const bool b = wpf.processFind(UnicodeToTCHAR(processName).c_str(), &pe32);
     return b;
 }
 
-bool ProcessFinder::IsExist(const std::string& processName) {
-    ProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
+bool WinProcessFinder::IsExist(const std::string& processName) {
+    WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
     const bool b = wpf.processFind(AnsiToTCHAR(processName).c_str(), &pe32);
     return b;
 }
 
-bool ProcessFinder::IsExist(const std::wstring& processName, DWORD* dwPID) {
-    ProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
+bool WinProcessFinder::IsExist(const std::wstring& processName, DWORD* dwPID) {
+    WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
     const bool b = wpf.processFind(UnicodeToTCHAR(processName).c_str(), &pe32);
@@ -143,8 +143,8 @@ bool ProcessFinder::IsExist(const std::wstring& processName, DWORD* dwPID) {
     return b;
 }
 
-bool ProcessFinder::IsExist(const std::string& processName, DWORD* dwPID) {
-    ProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
+bool WinProcessFinder::IsExist(const std::string& processName, DWORD* dwPID) {
+    WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
     const bool b = wpf.processFind(AnsiToTCHAR(processName).c_str(), &pe32);
@@ -155,8 +155,8 @@ bool ProcessFinder::IsExist(const std::string& processName, DWORD* dwPID) {
     return b;
 }
 
-bool ProcessFinder::IsExist(DWORD dwPID) {
-    ProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
+bool WinProcessFinder::IsExist(DWORD dwPID) {
+    WinProcessFinder wpf(TH32CS_SNAPPROCESS, 0);
 
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
     bool b = wpf.processFind(dwPID, &pe32);

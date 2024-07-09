@@ -9,7 +9,7 @@
 #include <netfw.h>
 
 namespace ashe {
-class Firewall {
+class WinFirewall {
    public:
     HRESULT initialize();
     void cleanup();

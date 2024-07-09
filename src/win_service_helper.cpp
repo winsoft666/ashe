@@ -1,5 +1,5 @@
 #include "ashe/config.h"
-#include "ashe/service_helper.h"
+#include "ashe/win_service_helper.h"
 #ifdef ASHE_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
@@ -15,7 +15,7 @@
 #include "ashe/trace.h"
 
 namespace ashe {
-bool ServiceHelper::Install(const wchar_t* pszServiceName,
+bool WinServiceHelper::Install(const wchar_t* pszServiceName,
                                           const wchar_t* pszDisplayName,
                                           const wchar_t* pszDecription,
                                           unsigned int dwStartType,
@@ -80,7 +80,7 @@ bool ServiceHelper::Install(const wchar_t* pszServiceName,
     return result;
 }
 
-bool ServiceHelper::Uninstall(const wchar_t* pszServiceName) {
+bool WinServiceHelper::Uninstall(const wchar_t* pszServiceName) {
     bool result = false;
     SC_HANDLE schSCManager = NULL;
     SC_HANDLE schService = NULL;
@@ -137,7 +137,7 @@ bool ServiceHelper::Uninstall(const wchar_t* pszServiceName) {
     return result;
 }
 
-bool ServiceHelper::IsInstall(const wchar_t* pszServiceName, bool& bInstalled) {
+bool WinServiceHelper::IsInstall(const wchar_t* pszServiceName, bool& bInstalled) {
     SC_HANDLE schSCManager = NULL;
     SC_HANDLE schService = NULL;
     SERVICE_STATUS ssSvcStatus = {};
@@ -171,7 +171,7 @@ bool ServiceHelper::IsInstall(const wchar_t* pszServiceName, bool& bInstalled) {
     return result;
 }
 
-bool ServiceHelper::QueryConfig(const wchar_t* pszServiceName, LPQUERY_SERVICE_CONFIGW* ppCfg) {
+bool WinServiceHelper::QueryConfig(const wchar_t* pszServiceName, LPQUERY_SERVICE_CONFIGW* ppCfg) {
     if (!ppCfg) {
         return false;
     }
@@ -220,7 +220,7 @@ bool ServiceHelper::QueryConfig(const wchar_t* pszServiceName, LPQUERY_SERVICE_C
     return result;
 }
 
-bool ServiceHelper::Start(const wchar_t* pszServiceName) {
+bool WinServiceHelper::Start(const wchar_t* pszServiceName) {
     bool result = false;
     if (pszServiceName) {
         SC_HANDLE schSCManager = OpenSCManager(NULL, NULL, GENERIC_EXECUTE);
@@ -242,7 +242,7 @@ bool ServiceHelper::Start(const wchar_t* pszServiceName) {
     return result;
 }
 
-bool ServiceHelper::Stop(const wchar_t* pszServiceName) {
+bool WinServiceHelper::Stop(const wchar_t* pszServiceName) {
     bool result = false;
     if (pszServiceName) {
         SC_HANDLE schSCManager = OpenSCManager(NULL, NULL, GENERIC_EXECUTE);
@@ -264,7 +264,7 @@ bool ServiceHelper::Stop(const wchar_t* pszServiceName) {
     return result;
 }
 
-bool ServiceHelper::IsRunning(const wchar_t* pszServiceName, bool& bRunning) {
+bool WinServiceHelper::IsRunning(const wchar_t* pszServiceName, bool& bRunning) {
     SC_HANDLE schSCManager = NULL;
     SC_HANDLE schService = NULL;
     SERVICE_STATUS ssSvcStatus = {};

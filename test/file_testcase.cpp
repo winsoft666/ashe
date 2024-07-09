@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/file.h"
 
 // Test: write/read big file.
 //

@@ -1,5 +1,8 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/filesystem.hpp"
+#include <string>
+#include "ashe/file.h"
+#include "ashe/path_util.h"
 
 // Test: path attribute getter/convert
 //

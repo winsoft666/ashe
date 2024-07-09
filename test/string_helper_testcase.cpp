@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/string_helper.h"
 
 // Test: string operate.
 //

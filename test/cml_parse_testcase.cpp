@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/cmd_line_parse.h"
 
 // Test: command line parser.
 //

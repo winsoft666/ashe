@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/win_icon_helper.h"
 
 #if 0
 

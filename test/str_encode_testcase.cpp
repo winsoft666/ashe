@@ -1,5 +1,6 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/string_encode.h"
+#include "ashe/base64.h"
 
 // Test: string encode, utf8/utf16
 //

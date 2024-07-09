@@ -27,15 +27,15 @@
 #include <string>
 
 namespace ashe {
-class ASHE_API Ini {
+class ASHE_API WinIni {
    public:
-    Ini() = default;
+    WinIni() = default;
 
-    Ini(const std::wstring& file_path);
+    WinIni(const std::wstring& file_path);
 
-    Ini(std::wstring&& file_path);
+    WinIni(std::wstring&& file_path);
 
-    ~Ini() = default;
+    ~WinIni() = default;
 
     void setIniFilePath(const std::wstring& file_path) noexcept;
 

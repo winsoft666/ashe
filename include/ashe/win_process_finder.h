@@ -42,9 +42,9 @@
 
 namespace ashe {
 #ifdef ASHE_WIN
-class ASHE_API ProcessFinder {
+class ASHE_API WinProcessFinder {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ProcessFinder);
+    ASHE_DISALLOW_COPY_MOVE(WinProcessFinder);
 
     // dwFlags can be one or more of the following values.
     // TH32CS_SNAPHEAPLIST
@@ -55,9 +55,9 @@ class ASHE_API ProcessFinder {
     // TH32CS_INHERIT
     // TH32CS_SNAPALL = (TH32CS_SNAPHEAPLIST | TH32CS_SNAPPROCESS | TH32CS_SNAPTHREAD | TH32CS_SNAPMODULE)
     //
-    explicit ProcessFinder(DWORD dwFlags = TH32CS_SNAPALL, DWORD dwProcessID = 0);
+    explicit WinProcessFinder(DWORD dwFlags = TH32CS_SNAPALL, DWORD dwProcessID = 0);
 
-    ~ProcessFinder();
+    ~WinProcessFinder();
 
     bool createSnapShot(DWORD dwFlag, DWORD dwProcessID);
 

@@ -1,8 +1,8 @@
-#include "ashe/virtual_key.h"
+#include "ashe/win_virtual_key.h"
 
 #ifdef ASHE_WIN
 namespace ashe {
-std::string VirtualKey::ToString(unsigned int vk) {
+std::string WinVirtualKey::ToString(unsigned int vk) {
     const auto& vkMaps = virtualKeyMaps();
     for (const auto& k : vkMaps) {
         if (k.second == vk) {
@@ -12,7 +12,7 @@ std::string VirtualKey::ToString(unsigned int vk) {
     return "";
 }
 
-unsigned int VirtualKey::ToInteger(const std::string& s) {
+unsigned int WinVirtualKey::ToInteger(const std::string& s) {
     const auto& vkMaps = virtualKeyMaps();
     const auto it = vkMaps.find(s);
     if (it != vkMaps.end())
@@ -20,7 +20,7 @@ unsigned int VirtualKey::ToInteger(const std::string& s) {
     return 0;
 }
 
-const std::unordered_map<std::string, unsigned int>& VirtualKey::virtualKeyMaps() {
+const std::unordered_map<std::string, unsigned int>& WinVirtualKey::virtualKeyMaps() {
     static std::unordered_map<std::string, unsigned int> vkMaps = {
         {"VK_LBUTTON", 0x01},             /*Left MouseButton*/
         {"VK_RBUTTON", 0x02},             /*Right MouseButton*/

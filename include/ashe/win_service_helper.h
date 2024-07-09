@@ -27,7 +27,7 @@
 #include "ashe/windows_lite.h"
 
 namespace ashe {
-class ASHE_API ServiceHelper {
+class ASHE_API WinServiceHelper {
    public:
     //
     //   FUNCTION: InstallService

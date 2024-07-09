@@ -38,7 +38,7 @@
 #include <direct.h>
 
 namespace ashe {
-class ASHE_API DriverInfo {
+class ASHE_API WinDriverInfo {
    public:
     enum { DRIVE_HOST = 7 };
 

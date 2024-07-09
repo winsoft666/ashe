@@ -1,5 +1,6 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/timer.h"
+#include <thread>
 
 TEST_CASE("TimerTest1", "Test start and stop") {
     {

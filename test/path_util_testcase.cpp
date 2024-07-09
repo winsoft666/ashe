@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/path_util.h"
 #include "ashe/os_ver.h"
 #include "ashe/process_util.h"
 

@@ -31,7 +31,7 @@
 #include "ashe/macros.h"
 
 namespace ashe {
-class ASHE_API IconHelper {
+class ASHE_API WinIconHelper {
    public:
     class IconInfo {
         ASHE_DISALLOW_COPY(IconInfo);

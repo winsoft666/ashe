@@ -1,4 +1,4 @@
-#include "ashe/firewall.h"
+#include "ashe/win_firewall.h"
 #ifdef ASHE_WIN
 #include <assert.h>
 #include <objbase.h>
@@ -8,7 +8,7 @@
 #pragma comment(lib, "oleaut32.lib")
 
 namespace ashe {
-HRESULT Firewall::initialize() {
+HRESULT WinFirewall::initialize() {
     HRESULT hr = S_OK;
     INetFwMgr* fwMgr = NULL;
     INetFwPolicy* fwPolicy = NULL;
@@ -52,14 +52,14 @@ HRESULT Firewall::initialize() {
     return hr;
 }
 
-void Firewall::cleanup() {
+void WinFirewall::cleanup() {
     // Release the firewall profile.
     if (fwProfile_ != NULL) {
         fwProfile_->Release();
     }
 }
 
-HRESULT Firewall::isOn(OUT bool* fwOn) {
+HRESULT WinFirewall::isOn(OUT bool* fwOn) {
     HRESULT hr = S_OK;
     VARIANT_BOOL fwEnabled;
 
@@ -87,7 +87,7 @@ HRESULT Firewall::isOn(OUT bool* fwOn) {
     return hr;
 }
 
-HRESULT Firewall::turnOn() {
+HRESULT WinFirewall::turnOn() {
     HRESULT hr = S_OK;
     bool fwOn = false;
 
@@ -115,7 +115,7 @@ HRESULT Firewall::turnOn() {
     return hr;
 }
 
-HRESULT Firewall::turnOff() {
+HRESULT WinFirewall::turnOff() {
     HRESULT hr = S_OK;
     bool fwOn = false;
 
@@ -143,7 +143,7 @@ HRESULT Firewall::turnOff() {
     return hr;
 }
 
-HRESULT Firewall::isAppEnabled(IN const wchar_t* fwProcessImageFileName, OUT bool* fwAppEnabled) {
+HRESULT WinFirewall::isAppEnabled(IN const wchar_t* fwProcessImageFileName, OUT bool* fwAppEnabled) {
     HRESULT hr = S_OK;
     BSTR fwBstrProcessImageFileName = NULL;
     VARIANT_BOOL fwEnabled;
@@ -209,7 +209,7 @@ HRESULT Firewall::isAppEnabled(IN const wchar_t* fwProcessImageFileName, OUT boo
     return hr;
 }
 
-HRESULT Firewall::addApp(
+HRESULT WinFirewall::addApp(
     IN const wchar_t* fwProcessImageFileName,
     IN const wchar_t* fwName) {
     HRESULT hr = S_OK;
@@ -304,7 +304,7 @@ HRESULT Firewall::addApp(
     return hr;
 }
 
-HRESULT Firewall::isPortEnabled(
+HRESULT WinFirewall::isPortEnabled(
     IN long portNumber,
     IN NET_FW_IP_PROTOCOL ipProtocol,
     OUT bool* fwPortEnabled) {
@@ -360,7 +360,7 @@ HRESULT Firewall::isPortEnabled(
     return hr;
 }
 
-HRESULT Firewall::addPort(
+HRESULT WinFirewall::addPort(
     IN long portNumber,
     IN NET_FW_IP_PROTOCOL ipProtocol,
     IN const wchar_t* name) {

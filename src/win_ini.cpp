@@ -1,5 +1,5 @@
 #include "ashe/config.h"
-#include "ashe/ini.h"
+#include "ashe/win_ini.h"
 #ifdef ASHE_WIN
 #include <tchar.h>
 #ifndef _INC_WINDOWS
@@ -16,21 +16,21 @@
 #include <vector>
 
 namespace ashe {
-Ini::Ini(const std::wstring& file_path) :
+WinIni::WinIni(const std::wstring& file_path) :
     iniFilePath_(file_path) {}
 
-Ini::Ini(std::wstring&& file_path) :
+WinIni::WinIni(std::wstring&& file_path) :
     iniFilePath_(std::move(file_path)) {}
 
-void Ini::setIniFilePath(const std::wstring& file_path) noexcept {
+void WinIni::setIniFilePath(const std::wstring& file_path) noexcept {
     iniFilePath_ = file_path;
 }
 
-std::wstring Ini::iniFilePath() const noexcept {
+std::wstring WinIni::iniFilePath() const noexcept {
     return iniFilePath_;
 }
 
-bool Ini::readInt(const std::wstring& item, const std::wstring& sub_item, unsigned int& result) noexcept {
+bool WinIni::readInt(const std::wstring& item, const std::wstring& sub_item, unsigned int& result) noexcept {
     if (iniFilePath_.length() == 0)
         return false;
     INT iDefault = 0;
@@ -45,7 +45,7 @@ bool Ini::readInt(const std::wstring& item, const std::wstring& sub_item, unsign
     return false;
 }
 
-unsigned int Ini::readIntWithDefault(const std::wstring& item,
+unsigned int WinIni::readIntWithDefault(const std::wstring& item,
                                      const std::wstring& subItem,
                                      unsigned int defaultValue) noexcept {
     if (iniFilePath_.length() == 0)
@@ -56,7 +56,7 @@ unsigned int Ini::readIntWithDefault(const std::wstring& item,
                                  iniFilePath_.c_str());
 }
 
-std::wstring Ini::readStringWithDefault(const std::wstring& item,
+std::wstring WinIni::readStringWithDefault(const std::wstring& item,
                                         const std::wstring& subItem,
                                         const std::wstring& defaultValue) noexcept {
     std::wstring result;
@@ -67,7 +67,7 @@ std::wstring Ini::readStringWithDefault(const std::wstring& item,
     return result;
 }
 
-bool Ini::readString(const std::wstring& item,
+bool WinIni::readString(const std::wstring& item,
                      const std::wstring& subItem,
                      std::wstring& result) noexcept {
     if (iniFilePath_.length() == 0)
@@ -109,7 +109,7 @@ bool Ini::readString(const std::wstring& item,
     return ret;
 }
 
-bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsigned int value) noexcept {
+bool WinIni::writeInt(const std::wstring& item, const std::wstring& sub_item, unsigned int value) noexcept {
     if (iniFilePath_.length() == 0)
         return false;
 
@@ -118,7 +118,7 @@ bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsig
     return writeString(item, sub_item, szValue);
 }
 
-bool Ini::writeString(const std::wstring& item,
+bool WinIni::writeString(const std::wstring& item,
                       const std::wstring& sub_item,
                       const std::wstring& value) noexcept {
     if (iniFilePath_.length() == 0)

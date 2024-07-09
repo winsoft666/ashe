@@ -1,5 +1,9 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/sha1.h"
+#include "ashe/sha256.h"
+#include "ashe/sha512.h"
+#include "ashe/crc32.h"
+#include "ashe/md5.h"
 
 // Test: string hash.
 //

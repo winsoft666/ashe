@@ -40,19 +40,19 @@
 #include "ashe/singleton_class.hpp"
 
 namespace ashe {
-class ServiceBase;
+class WinServiceBase;
 class ASHE_API WinServiceHolder : public SingletonClass<WinServiceHolder> {
    public:
-    ServiceBase* service = NULL;
+    WinServiceBase* service = NULL;
 };
 
-class ASHE_API ServiceBase {
+class ASHE_API WinServiceBase {
    public:
     // Register the executable for a service with the Service Control Manager
     // (SCM). After you call Run(ServiceBase), the SCM issues a Start command,
     // which results in a call to the OnStart method in the service. This
     // method blocks until the service has stopped.
-    static BOOL Run(ServiceBase& service) {
+    static BOOL Run(WinServiceBase& service) {
         WinServiceHolder::Instance()->service = &service;
 
         SERVICE_TABLE_ENTRYW serviceTable[] = {{service.m_name, ServiceMain}, {NULL, NULL}};
@@ -68,7 +68,7 @@ class ASHE_API ServiceBase {
     // fCanShutdown and fCanPauseContinue) allow you to specify whether the
     // service can be stopped, paused and continued, or be notified when
     // system shutdown occurs.
-    ServiceBase(LPCWSTR pszServiceName,
+    WinServiceBase(LPCWSTR pszServiceName,
                    BOOL fCanStop = TRUE,
                    BOOL fCanShutdown = TRUE,
                    BOOL fCanPauseContinue = FALSE) {
@@ -101,7 +101,7 @@ class ASHE_API ServiceBase {
     }
 
     // Service object destructor.
-    virtual ~ServiceBase() {}
+    virtual ~WinServiceBase() {}
 
     // Stop the service.
     void Stop() {
@@ -348,7 +348,7 @@ class ASHE_API ServiceBase {
    private:
     // Entry point for the service. It registers the handler function for the service and starts the service.
     static void WINAPI ServiceMain(DWORD dwArgc, LPWSTR* lpszArgv) {
-        ServiceBase* service = WinServiceHolder::Instance()->service;
+        WinServiceBase* service = WinServiceHolder::Instance()->service;
         assert(service);
 
         // Register the handler function for the service
@@ -368,7 +368,7 @@ class ASHE_API ServiceBase {
     // The function is called by the SCM whenever a control code is sent to
     // the service.
     static void WINAPI ServiceCtrlHandler(DWORD dwCtrl) {
-        ServiceBase* service = WinServiceHolder::Instance()->service;
+        WinServiceBase* service = WinServiceHolder::Instance()->service;
         switch (dwCtrl) {
             case SERVICE_CONTROL_STOP:
                 service->Stop();

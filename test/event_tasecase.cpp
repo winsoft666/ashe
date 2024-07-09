@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/event.h"
 
 TEST_CASE("Event1", "wait_after_set_1") {
     ashe::Event event;

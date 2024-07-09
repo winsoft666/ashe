@@ -27,13 +27,13 @@
 #include "ashe/macros.h"
 
 namespace ashe {
-class ASHE_API ScheduleTask {
+class ASHE_API WinScheduleTask {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ScheduleTask);
+    ASHE_DISALLOW_COPY_MOVE(WinScheduleTask);
 
-    ScheduleTask();
+    WinScheduleTask();
 
-    virtual ~ScheduleTask();
+    virtual ~WinScheduleTask();
 
     bool deleteTask(const wchar_t* pszTaskName);
 

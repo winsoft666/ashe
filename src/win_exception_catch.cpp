@@ -1,9 +1,9 @@
 #include "ashe/config.h"
-#include "ashe/exception_catch.h"
+#include "ashe/win_exception_catch.h"
 
 #ifdef ASHE_WIN
 namespace ashe {
-TCHAR* ExceptionCatchInternal::lstrrchr(LPCTSTR string, int ch) {
+TCHAR* WinExceptionCatchInternal::lstrrchr(LPCTSTR string, int ch) {
     TCHAR* start = (TCHAR*)string;
 
     while (*string++)
@@ -18,7 +18,7 @@ TCHAR* ExceptionCatchInternal::lstrrchr(LPCTSTR string, int ch) {
     return NULL;
 }
 
-void ExceptionCatchInternal::DumpMiniDump(HANDLE hFile, PEXCEPTION_POINTERS excpInfo) {
+void WinExceptionCatchInternal::DumpMiniDump(HANDLE hFile, PEXCEPTION_POINTERS excpInfo) {
     if (!excpInfo) {
         static int iTimes = 0;
 
@@ -41,7 +41,7 @@ void ExceptionCatchInternal::DumpMiniDump(HANDLE hFile, PEXCEPTION_POINTERS excp
     }
 }
 
-int __cdecl ExceptionCatchInternal::RecordExceptionInfo(PEXCEPTION_POINTERS pExceptPtrs, const TCHAR* szDumpNamePrefix) {
+int __cdecl WinExceptionCatchInternal::RecordExceptionInfo(PEXCEPTION_POINTERS pExceptPtrs, const TCHAR* szDumpNamePrefix) {
     static bool bFirstTime = true;
 
     if (!bFirstTime)

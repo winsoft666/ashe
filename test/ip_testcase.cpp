@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/ipaddress.h"
 
 // Test: ip address check.
 //

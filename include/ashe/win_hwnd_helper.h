@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -17,54 +17,20 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_WIN_CRITICAL_SECTION_HPP__
-#define ASHE_WIN_CRITICAL_SECTION_HPP__
+#ifndef ASHE_WIN_HWND_HPP_
+#define ASHE_WIN_HWND_HPP_
 #pragma once
-//
-// Windows CriticalSection wrapper.
-//
+
 #include "ashe/config.h"
 #include "ashe/arch.h"
 #ifdef ASHE_WIN
-#include "ashe/macros.h"
+#include "ashe/windows_lite.h"
 
 namespace ashe {
-class ASHE_API CriticalSection {
+class ASHE_API WinHwndHelper {
    public:
-    ASHE_DISALLOW_COPY_MOVE(CriticalSection);
-
-    CriticalSection() noexcept;
-    ~CriticalSection() noexcept;
-    void enter() const noexcept;
-    void leave() const noexcept;
-    bool tryEnter() const noexcept;
-
-   private:
-    class Private;
-    Private* p_ = nullptr;
-};
-
-class ASHE_API ScopedWinCriticalSection {
-   public:
-    ASHE_DISALLOW_COPY_MOVE(ScopedWinCriticalSection);
-
-    explicit ScopedWinCriticalSection(const CriticalSection* pCS) noexcept :
-        crit_(pCS) {
-        if (crit_) {
-            crit_->enter();
-        }
-    }
-
-    ~ScopedWinCriticalSection() noexcept {
-        if (crit_) {
-            crit_->leave();
-        }
-    }
-
-   private:
-    const CriticalSection* const crit_;
+    static bool BelongToSameProcess(HWND hwndA, HWND hwndB);
 };
 }  // namespace ashe
-
-#endif  // !ASHE_WIN
-#endif  // !ASHE_WIN_CRITICAL_SECTION_HPP__
+#endif  // ASHE_WIN
+#endif  // !ASHE_WIN_HWND_HPP_

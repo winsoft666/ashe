@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/singleton_class.hpp"
 
 class SingletonTest : public ashe::SingletonClass<SingletonTest> {
    public:

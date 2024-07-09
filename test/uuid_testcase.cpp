@@ -1,5 +1,6 @@
 #include "catch.hpp"
-#include "ashe/all.hpp"
+#include "ashe/uuid.h"
+#include <map>
 
 // Test: uuid generator.
 //

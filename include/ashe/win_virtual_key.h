@@ -28,7 +28,7 @@
 #include <unordered_map>
 
 namespace ashe {
-class ASHE_API VirtualKey {
+class ASHE_API WinVirtualKey {
    public:
     static std::string ToString(unsigned int vk);
 

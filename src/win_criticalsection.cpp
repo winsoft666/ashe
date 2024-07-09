@@ -1,5 +1,5 @@
 #include "ashe/config.h"
-#include "ashe/criticalsection.h"
+#include "ashe/win_criticalsection.h"
 #ifdef ASHE_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
@@ -13,19 +13,19 @@
 
 namespace ashe {
 
-class CriticalSection::Private {
+class WinCriticalSection::Private {
    public:
     CRITICAL_SECTION crit_;
 };
 
-CriticalSection::CriticalSection() noexcept :
-    p_(new(std::nothrow) CriticalSection::Private()) {
+WinCriticalSection::WinCriticalSection() noexcept :
+    p_(new(std::nothrow) WinCriticalSection::Private()) {
     if (p_) {
         InitializeCriticalSection(&p_->crit_);
     }
 }
 
-CriticalSection::~CriticalSection() noexcept {
+WinCriticalSection::~WinCriticalSection() noexcept {
     if (p_) {
         DeleteCriticalSection(&p_->crit_);
 
@@ -34,19 +34,19 @@ CriticalSection::~CriticalSection() noexcept {
     }
 }
 
-void CriticalSection::enter() const noexcept {
+void WinCriticalSection::enter() const noexcept {
     if (p_) {
         EnterCriticalSection(&p_->crit_);
     }
 }
 
-void CriticalSection::leave() const noexcept {
+void WinCriticalSection::leave() const noexcept {
     if (p_) {
         LeaveCriticalSection(&p_->crit_);
     }
 }
 
-bool CriticalSection::tryEnter() const noexcept {
+bool WinCriticalSection::tryEnter() const noexcept {
     bool ret = false;
     if (p_) {
         ret = TryEnterCriticalSection(&p_->crit_) != FALSE;

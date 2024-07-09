@@ -8,7 +8,7 @@
 #include "ashe/macros.h"
 #include "ashe/byteorder.h"
 #include "ashe/filesystem.hpp"
-#include "ashe/registry.h"
+#include "ashe/win_registry.h"
 
 #define STRICT_TYPED_ITEMIDS
 #include <shlobj.h>
@@ -1031,7 +1031,7 @@ bool ShellinkParser::isRunAsAdmin() {
         return false;
 
     bool runAsAdmin = false;
-    ashe::Registry regKey(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers");
+    ashe::WinRegistry regKey(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers");
     if (regKey.open(KEY_ALL_ACCESS | KEY_WOW64_64KEY, false) == S_OK) {
         std::wstring strValue;
         if (regKey.getSZValue(target.c_str(), strValue) == S_OK) {

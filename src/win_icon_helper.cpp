@@ -1,5 +1,5 @@
 #include "ashe/config.h"
-#include "ashe/icon_helper.h"
+#include "ashe/win_icon_helper.h"
 #ifdef ASHE_WIN
 #include <strsafe.h>
 #include <Shlwapi.h>
@@ -250,7 +250,7 @@ static UINT WriteIconData(HANDLE hFile, HBITMAP hBitmap) {
 
 }  // namespace
 
-std::vector<HICON> IconHelper::IconGroup::iconHandleList() const noexcept {
+std::vector<HICON> WinIconHelper::IconGroup::iconHandleList() const noexcept {
     std::vector<HICON> list;
     for (const auto& ii : icons) {
         if (ii) {
@@ -260,7 +260,7 @@ std::vector<HICON> IconHelper::IconGroup::iconHandleList() const noexcept {
     return list;
 }
 
-std::shared_ptr<IconHelper::IconInfo> IconHelper::IconGroup::getClosestSize(int desiredSize) noexcept {
+std::shared_ptr<WinIconHelper::IconInfo> WinIconHelper::IconGroup::getClosestSize(int desiredSize) noexcept {
     int closestValue = 0;
     size_t idx = -1;
 
@@ -285,7 +285,7 @@ std::shared_ptr<IconHelper::IconInfo> IconHelper::IconGroup::getClosestSize(int 
     return icons[idx];
 }
 
-HICON IconHelper::LoadFromProcessRes(HINSTANCE hInst, LPCWSTR resPath, int cxDesired, int cyDesired) noexcept {
+HICON WinIconHelper::LoadFromProcessRes(HINSTANCE hInst, LPCWSTR resPath, int cxDesired, int cyDesired) noexcept {
     HANDLE h = LoadImageW(hInst, resPath, IMAGE_ICON, cxDesired, cyDesired, LR_DEFAULTCOLOR);
     if (!h) {
         return NULL;
@@ -301,7 +301,7 @@ HICON IconHelper::LoadFromProcessRes(HINSTANCE hInst, LPCWSTR resPath, int cxDes
     return hCopy;
 }
 
-HICON IconHelper::LoadFromProcessRes(const std::wstring& filePath, LPCWSTR resPath, int cxDesired /*= 0*/, int cyDesired /*= 0*/) noexcept {
+HICON WinIconHelper::LoadFromProcessRes(const std::wstring& filePath, LPCWSTR resPath, int cxDesired /*= 0*/, int cyDesired /*= 0*/) noexcept {
     if (filePath.empty())
         return NULL;
 
@@ -316,7 +316,7 @@ HICON IconHelper::LoadFromProcessRes(const std::wstring& filePath, LPCWSTR resPa
     return hIcon;
 }
 
-bool IconHelper::ParseShell32IconInfo(const std::wstring& shell32Path, int shellIconIndex, std::wstring& iconPath, int& iconIndex) noexcept {
+bool WinIconHelper::ParseShell32IconInfo(const std::wstring& shell32Path, int shellIconIndex, std::wstring& iconPath, int& iconIndex) noexcept {
     if (shell32Path.empty()) {
         return false;
     }
@@ -349,11 +349,11 @@ bool IconHelper::ParseShell32IconInfo(const std::wstring& shell32Path, int shell
     return true;
 }
 
-bool IconHelper::EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup>& iconGroups) noexcept {
+bool WinIconHelper::EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup>& iconGroups) noexcept {
     return DoEnumIconGroups(filePath, false, iconGroups);
 }
 
-HICON IconHelper::LoadFromFile(const std::wstring& filePath, uint32_t iconIndex, int desiredSize /*= 256*/, int* actualSize) noexcept {
+HICON WinIconHelper::LoadFromFile(const std::wstring& filePath, uint32_t iconIndex, int desiredSize /*= 256*/, int* actualSize) noexcept {
     std::vector<IconGroup> iconGroups;
     if (!EnumIconGroups(filePath, iconGroups)) {
         return NULL;
@@ -376,7 +376,7 @@ HICON IconHelper::LoadFromFile(const std::wstring& filePath, uint32_t iconIndex,
     return hCopy;
 }
 
-HICON IconHelper::GetExeDisplayIcon(const std::wstring& filePath, int desiredSize, int* actualSize) noexcept {
+HICON WinIconHelper::GetExeDisplayIcon(const std::wstring& filePath, int desiredSize, int* actualSize) noexcept {
     std::vector<IconGroup> iconGroups;
     if (!DoEnumIconGroups(filePath, true, iconGroups)) {
         return NULL;
@@ -386,7 +386,7 @@ HICON IconHelper::GetExeDisplayIcon(const std::wstring& filePath, int desiredSiz
         return NULL;
     }
 
-    std::shared_ptr<IconHelper::IconInfo> ii = iconGroups[0].getClosestSize(desiredSize);
+    std::shared_ptr<WinIconHelper::IconInfo> ii = iconGroups[0].getClosestSize(desiredSize);
     if (!ii) {
         return NULL;
     }
@@ -399,7 +399,7 @@ HICON IconHelper::GetExeDisplayIcon(const std::wstring& filePath, int desiredSiz
     return hCopy;
 }
 
-HICON IconHelper::RunPrivateExtractIconsW(const std::wstring& filePath, int iconIndex, int desiredSize) noexcept {
+HICON WinIconHelper::RunPrivateExtractIconsW(const std::wstring& filePath, int iconIndex, int desiredSize) noexcept {
     typedef UINT(WINAPI * fPrivateExtractIconsW)(
         IN LPCWSTR szFileName,
         IN int nIconIndex,
@@ -435,7 +435,7 @@ HICON IconHelper::RunPrivateExtractIconsW(const std::wstring& filePath, int icon
     return hIcon;
 }
 
-bool IconHelper::SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& filePath) noexcept {
+bool WinIconHelper::SaveToFile(const std::vector<HICON>& hIcons, const std::wstring& filePath) noexcept {
     HANDLE hFile = INVALID_HANDLE_VALUE;
     int* pImageOffset = NULL;
 
@@ -538,7 +538,7 @@ bool IconHelper::SaveToFile(const std::vector<HICON>& hIcons, const std::wstring
     return true;
 }
 
-HICON IconHelper::GetFileAssociatedIcon(const std::wstring& filePath, int iconIndex, int* gotIconIndex /*= NULL*/, std::wstring* associatedExePath /*= NULL*/) noexcept {
+HICON WinIconHelper::GetFileAssociatedIcon(const std::wstring& filePath, int iconIndex, int* gotIconIndex /*= NULL*/, std::wstring* associatedExePath /*= NULL*/) noexcept {
     if (filePath.empty())
         return NULL;
 
@@ -558,7 +558,7 @@ HICON IconHelper::GetFileAssociatedIcon(const std::wstring& filePath, int iconIn
     return h;
 }
 
-bool IconHelper::DoEnumIconGroups(const std::wstring& filePath, bool onlyFirstGroup, std::vector<IconGroup>& iconGroups) noexcept {
+bool WinIconHelper::DoEnumIconGroups(const std::wstring& filePath, bool onlyFirstGroup, std::vector<IconGroup>& iconGroups) noexcept {
     if (filePath.empty()) {
         return false;
     }
