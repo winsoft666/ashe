@@ -15,14 +15,12 @@ void Event::set() {
     setted_cond_var_.notify_all();
 }
 
-#ifdef __cpp_lib_variant
-void Event::set(const DataType& d) {
+void Event::set(int64_t d) {
     std::unique_lock<std::mutex> ul(set_mutex_);
     is_set_ = true;
     data_ = d;
     setted_cond_var_.notify_all();
 }
-#endif
 
 void Event::cancel() {
     std::unique_lock<std::mutex> ul(set_mutex_);
@@ -42,14 +40,12 @@ void Event::unset() {
     setted_cond_var_.notify_all();
 }
 
-#ifdef __cpp_lib_variant
-void Event::unset(const DataType& d) {
+void Event::unset(int64_t d) {
     std::unique_lock<std::mutex> ul(set_mutex_);
     is_set_ = false;
     data_ = d;
     setted_cond_var_.notify_all();
 }
-#endif
 
 void Event::reset() {
     std::unique_lock<std::mutex> ul(set_mutex_);
@@ -58,15 +54,13 @@ void Event::reset() {
     setted_cond_var_.notify_all();
 }
 
-#ifdef __cpp_lib_variant
-void Event::reset(const DataType& d) {
+void Event::reset(int64_t d) {
     std::unique_lock<std::mutex> ul(set_mutex_);
     is_set_ = false;
     is_cancelld_ = false;
     data_ = d;
     setted_cond_var_.notify_all();
 }
-#endif
 
 bool Event::isSet() {
     std::unique_lock<std::mutex> ul(set_mutex_);
@@ -85,13 +79,11 @@ bool Event::wait(int64_t millseconds) {
     return is_set_;
 }
 
-#ifdef __cpp_lib_variant
-bool Event::wait(DataType& d, int64_t millseconds /*= -1*/) {
+bool Event::wait(int64_t& d, int64_t millseconds /*= -1*/) {
     std::unique_lock<std::mutex> ul(set_mutex_);
     int64_t m = (millseconds >= 0 ? millseconds : std::chrono::duration_values<int64_t>::max());
     setted_cond_var_.wait_for(ul, std::chrono::milliseconds(m), [this] { return (is_set_ || is_cancelld_); });
     d = data_;
     return is_set_;
 }
-#endif
 }  // namespace ashe

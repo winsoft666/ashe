@@ -25,30 +25,20 @@
 #include <mutex>
 #include <condition_variable>
 #include "ashe/macros.h"
-#ifdef __cpp_lib_variant
-#include <variant>
-#endif
 
 namespace ashe {
 class ASHE_API Event {
    public:
-#ifdef __cpp_lib_variant
-    using DataType = std::variant<bool, int, double, std::string, std::wstring>;
-#endif
     ASHE_DISALLOW_COPY_MOVE(Event);
     Event(bool isSet = false) noexcept;
 
     ~Event() = default;
 
     void set();
-#ifdef __cpp_lib_variant
-    void set(const DataType& d);
-#endif
+    void set(int64_t d);
 
     void unset();
-#ifdef __cpp_lib_variant
-    void unset(const DataType& d);
-#endif
+    void unset(int64_t d);
 
     void cancel();
 
@@ -56,9 +46,7 @@ class ASHE_API Event {
 
     // is equal unset() and unCancel().
     void reset();
-#ifdef __cpp_lib_variant
-    void reset(const DataType& d);
-#endif
+    void reset(int64_t d);
 
     bool isSet();
 
@@ -66,15 +54,11 @@ class ASHE_API Event {
 
     // is infinite when millseconds < 0.
     bool wait(int64_t millseconds = -1);
-#ifdef __cpp_lib_variant
-    bool wait(DataType& d, int64_t millseconds = -1);
-#endif
+    bool wait(int64_t& d, int64_t millseconds = -1);
    protected:
     bool is_set_ = false;
     bool is_cancelld_ = false;
-#ifdef __cpp_lib_variant
-    DataType data_;
-#endif
+    int64_t data_ = 0;
     std::mutex set_mutex_;
     std::condition_variable setted_cond_var_;
 };
