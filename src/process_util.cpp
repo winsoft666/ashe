@@ -155,13 +155,25 @@ bool ProcessUtil::Is32BitProcess(HANDLE process, bool& result) noexcept {
     return true;
 }
 
-std::wstring ProcessUtil::GetCurrentExePath() {
+std::wstring ProcessUtil::GetCurrentExePathW() {
     wchar_t* buf = nullptr;
     if (!GetCurrentExePath(&buf)) {
         return L"";
     }
 
     std::wstring result = buf;
+    free(buf);
+
+    return result;
+}
+
+std::string ProcessUtil::GetCurrentExePathA() {
+    char* buf = nullptr;
+    if (!GetCurrentExePath(&buf)) {
+        return "";
+    }
+
+    std::string result = buf;
     free(buf);
 
     return result;
@@ -209,7 +221,49 @@ bool ProcessUtil::GetCurrentExePath(wchar_t** buf) {
     return result;
 }
 
-std::wstring ProcessUtil::GetCurrentExeDirectory() {
+bool ProcessUtil::GetCurrentExePath(char** buf) {
+    if (!buf) {
+        return false;
+    }
+
+    bool result = false;
+    char* pBuf = NULL;
+    DWORD dwBufSize = MAX_PATH;
+
+    do {
+        pBuf = (char*)malloc((dwBufSize + 1) * sizeof(char));
+        if (!pBuf)
+            break;
+        memset(pBuf, 0, (dwBufSize + 1) * sizeof(char));
+
+        DWORD dwGot = GetModuleFileNameA(NULL, pBuf, dwBufSize);
+        if (dwGot == 0) {
+            break;
+        }
+
+        if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+            free(pBuf);
+            dwBufSize *= 2;
+        }
+        else {
+            result = true;
+            break;
+        }
+    } while (true);
+
+    if (result) {
+        *buf = pBuf;
+    }
+    else {
+        if (pBuf) {
+            free(pBuf);
+        }
+    }
+
+    return result;
+}
+
+std::wstring ProcessUtil::GetCurrentExeDirectoryW() {
     wchar_t* buf = nullptr;
     if (!GetCurrentExePath(&buf)) {
         return L"";
@@ -221,6 +275,23 @@ std::wstring ProcessUtil::GetCurrentExeDirectory() {
     }
 
     std::wstring result = buf;
+    free(buf);
+
+    return result;
+}
+
+std::string ProcessUtil::GetCurrentExeDirectoryA() {
+    char* buf = nullptr;
+    if (!GetCurrentExePath(&buf)) {
+        return "";
+    }
+
+    if (!PathRemoveFileSpecA(buf)) {
+        free(buf);
+        return "";
+    }
+
+    std::string result = buf;
     free(buf);
 
     return result;

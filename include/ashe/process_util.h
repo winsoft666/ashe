@@ -54,12 +54,16 @@ class ASHE_API ProcessUtil {
 
     static bool Is32BitProcess(HANDLE process, bool& result) noexcept;
 
-    // need call free(buf)
+    // User need call free(buf)
     static bool GetCurrentExePath(wchar_t** buf);
 
-    static std::wstring GetCurrentExePath();
+    static bool GetCurrentExePath(char** buf);
 
-    static std::wstring GetCurrentExeDirectory();
+    static std::wstring GetCurrentExePathW();
+    static std::string GetCurrentExePathA();
+
+    static std::wstring GetCurrentExeDirectoryW();
+    static std::string GetCurrentExeDirectoryA();
 #endif
 
 #ifdef ASHE_WIN

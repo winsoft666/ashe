@@ -551,30 +551,56 @@ void Process::RecursiveKill(const string_type& dir, bool excludeSelf) noexcept {
     FindClose(fhandle);
 }
 
-std::string Process::GetProcessPath(id_type id) noexcept {
-    std::string strPath;
-    char Filename[MAX_PATH] = {0};
+std::wstring Process::GetProcessPathW(id_type id) noexcept {
+    std::wstring strPath;
+    wchar_t szFilename[MAX_PATH] = {0};
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, id);
     if (hProcess == NULL)
         return strPath;
+
     HMODULE hModule = NULL;
     DWORD cbNeeded;
     if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
-        if (GetModuleFileNameExA(hProcess, hModule, Filename, MAX_PATH)) {
-            strPath = Filename;
+        if (GetModuleFileNameExW(hProcess, hModule, szFilename, MAX_PATH)) {
+            strPath = szFilename;
         }
     }
     else {
         DWORD size = MAX_PATH;
-        if (QueryFullProcessImageNameA(hProcess, 0, Filename, &size)) {
-            strPath = Filename;
+        if (QueryFullProcessImageNameW(hProcess, 0, szFilename, &size)) {
+            strPath = szFilename;
         }
     }
     CloseHandle(hProcess);
 
     return strPath;
 }
-#else
+
+std::string Process::GetProcessPathA(id_type id) noexcept {
+    std::string strPath;
+    char szFilename[MAX_PATH] = {0};
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, id);
+    if (hProcess == NULL)
+        return strPath;
+
+    HMODULE hModule = NULL;
+    DWORD cbNeeded;
+    if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
+        if (GetModuleFileNameExA(hProcess, hModule, szFilename, MAX_PATH)) {
+            strPath = szFilename;
+        }
+    }
+    else {
+        DWORD size = MAX_PATH;
+        if (QueryFullProcessImageNameA(hProcess, 0, szFilename, &size)) {
+            strPath = szFilename;
+        }
+    }
+    CloseHandle(hProcess);
+
+    return strPath;
+}
+#else // ASHE_WIN
 Process::Data::Data() noexcept :
     id(-1) {}
 
@@ -958,7 +984,7 @@ bool Process::Kill(id_type id, bool force) noexcept {
     return ::kill(id, SIGINT) == 0;
 }
 
-std::string Process::GetProcessPath(Process::id_type id) noexcept {
+std::string Process::GetProcessPathA(Process::id_type id) noexcept {
     std::string cmdPath = std::string("/proc/") + std::to_string(id) + std::string("/cmdline");
     std::ifstream cmdFile(cmdPath.c_str());
 
@@ -967,6 +993,21 @@ std::string Process::GetProcessPath(Process::id_type id) noexcept {
     if (!cmdLine.empty()) {
         // Keep first cmdline item which contains the program path
         size_t pos = cmdLine.find('\0');
+        if (pos != string_type::npos)
+            cmdLine = cmdLine.substr(0, pos);
+    }
+    return cmdLine;
+}
+
+std::wstring Process::GetProcessPathW(Process::id_type id) noexcept {
+    std::wstring cmdPath = std::wstring(L"/proc/") + std::to_wstring(id) + std::wstring(L"/cmdline");
+    std::wifstream cmdFile(cmdPath.c_str());
+
+    std::wstring cmdLine;
+    std::getline(cmdFile, cmdLine);
+    if (!cmdLine.empty()) {
+        // Keep first cmdline item which contains the program path
+        size_t pos = cmdLine.find(L'\0');
         if (pos != string_type::npos)
             cmdLine = cmdLine.substr(0, pos);
     }

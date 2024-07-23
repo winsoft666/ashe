@@ -77,22 +77,6 @@ if (MSVC AND ASHE_USE_STATIC_CRT)
 	endforeach()
 endif()
 
-# EASTL
-target_compile_definitions(${ASHE_LIB_NAME} 
-	PRIVATE
-	-D_CHAR16T 
-	-D_CRT_SECURE_NO_WARNINGS
-	-D_SCL_SECURE_NO_WARNINGS
-	-DEASTL_OPENSOURCE=1
-)
-
-if (EASTL_STD_ITERATOR_CATEGORY_ENABLED)
-	target_compile_definitions(${ASHE_LIB_NAME} 
-		PRIVATE -DEASTL_STD_ITERATOR_CATEGORY_ENABLED=1
-	)
-endif()
-
-target_compile_features(${ASHE_LIB_NAME} PUBLIC cxx_std_14)
 set_target_properties(${ASHE_LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(${ASHE_LIB_NAME} 

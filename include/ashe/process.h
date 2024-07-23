@@ -172,7 +172,8 @@ class ASHE_API Process {
     static void RecursiveKill(const string_type& dir, bool excludeSelf) noexcept;
 #endif
 
-    static std::string GetProcessPath(id_type id) noexcept;
+    static std::string GetProcessPathA(id_type id) noexcept;
+    static std::wstring GetProcessPathW(id_type id) noexcept;
 
    private:
 #ifdef ASHE_WIN
