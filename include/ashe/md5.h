@@ -25,7 +25,6 @@
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_
 #endif  // !_WINSOCKAPI_
-#include "ashe/filesystem.hpp"
 
 namespace ashe {
 class ASHE_API MD5 {
@@ -39,7 +38,7 @@ class ASHE_API MD5 {
     // Support large memory.
     //
     static std::string GetDataMD5(const unsigned char* buffer, size_t buffer_size);
-    static std::string GetFileMD5(const fs::path& file_path);
+    static std::string GetFileMD5(const std::wstring& file_path);
 
    public:
     /*

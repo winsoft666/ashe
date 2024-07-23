@@ -168,7 +168,7 @@ void SHA512::transform(const unsigned char* message, unsigned int block_nb) {
     }
 }
 
-std::string SHA512::GetFileSHA512(const fs::path& filePath) {
+std::string SHA512::GetFileSHA512(const std::wstring& filePath) {
     std::string result;
 
     File file(filePath);

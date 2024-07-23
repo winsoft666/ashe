@@ -5,13 +5,12 @@
 #include <tchar.h>
 #include <strsafe.h>
 #include <Shlwapi.h>
-#pragma comment(lib, "Shlwapi.lib")
+#include <shellapi.h>
 #elif defined(_GNU_SOURCE)
 #include <errno.h>
 #endif
 #include "ashe/macros.h"
 #include "ashe/string_encode.h"
-#include "ashe/filesystem.hpp"
 #include "ashe/path_util.h"
 #include "ashe/os_ver.h"
 
@@ -156,59 +155,78 @@ bool ProcessUtil::Is32BitProcess(HANDLE process, bool& result) noexcept {
     return true;
 }
 
-#endif
+std::wstring ProcessUtil::GetCurrentExePath() {
+    wchar_t* buf = nullptr;
+    if (!GetCurrentExePath(&buf)) {
+        return L"";
+    }
 
-// On windows, path is encoded by ANSI, otherwise, is UTF8.
-//
-std::string ProcessUtil::GetCurrentExePath() {
-    std::string ret;
-#ifdef ASHE_WIN
-    char* pBuf = NULL;
+    std::wstring result = buf;
+    free(buf);
+
+    return result;
+}
+
+bool ProcessUtil::GetCurrentExePath(wchar_t** buf) {
+    if (!buf) {
+        return false;
+    }
+
+    bool result = false;
+    wchar_t* pBuf = NULL;
     DWORD dwBufSize = MAX_PATH;
 
     do {
-        pBuf = (char*)malloc(dwBufSize);
+        pBuf = (wchar_t*)malloc((dwBufSize + 1) * sizeof(wchar_t));
         if (!pBuf)
             break;
-        memset(pBuf, 0, dwBufSize);
+        memset(pBuf, 0, (dwBufSize + 1) * sizeof(wchar_t));
 
-        DWORD dwGot = GetModuleFileNameA(NULL, pBuf, dwBufSize);
+        DWORD dwGot = GetModuleFileNameW(NULL, pBuf, dwBufSize);
+        if (dwGot == 0) {
+            break;
+        }
+
         if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
             free(pBuf);
             dwBufSize *= 2;
         }
         else {
+            result = true;
             break;
         }
     } while (true);
 
-    if (pBuf) {
-        ret = pBuf;
-        free(pBuf);
+    if (result) {
+        *buf = pBuf;
     }
-#elif defined(ASHE_MACOS)
-    return getprogname();
-#elif defined(_GNU_SOURCE)
-    return program_invocation_name;
-#endif
-    return ret;
+    else {
+        if (pBuf) {
+            free(pBuf);
+        }
+    }
+
+    return result;
 }
 
-// On windows, directory is encoded by ANSI, otherwise, is UTF8.
-//
-std::string ProcessUtil::GetCurrentExeDirectory() {
-    const std::string path = GetCurrentExePath();
-#ifdef ASHE_WIN
-    const std::wstring pathW = StringEncode::AnsiToUnicode(path);
-    fs::path p(pathW);
-    p.remove_filename();
-    return StringEncode::UnicodeToAnsi(p.wstring());
-#else
-    fs::path p(path);
-    p.remove_filename();
-    return p.u8string();
-#endif
+std::wstring ProcessUtil::GetCurrentExeDirectory() {
+    wchar_t* buf = nullptr;
+    if (!GetCurrentExePath(&buf)) {
+        return L"";
+    }
+
+    if (!PathRemoveFileSpecW(buf)) {
+        free(buf);
+        return L"";
+    }
+
+    std::wstring result = buf;
+    free(buf);
+
+    return result;
 }
+
+#endif
 
 #ifdef ASHE_WIN
 BOOL CALLBACK ProcessUtil::EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam) {

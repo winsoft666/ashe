@@ -63,9 +63,9 @@ std::string ashe::CRC32::digest() {
     return szCRC;
 }
 
-std::string ashe::CRC32::GetFileCRC32(const ashe::fs::path& filePath) {
+std::string ashe::CRC32::GetFileCRC32(const std::wstring& filePath) {
     File file(filePath);
-    if (!file.open("rb"))
+    if (!file.open(L"rb"))
         return "";
 
     CRC32 crc32;

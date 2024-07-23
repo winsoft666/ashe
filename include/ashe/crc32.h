@@ -27,7 +27,6 @@
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_
 #endif  // !_WINSOCKAPI_
-#include "ashe/filesystem.hpp"
 
 namespace ashe {
 class ASHE_API CRC32 {
@@ -40,7 +39,7 @@ class ASHE_API CRC32 {
 
     std::string digest();
 
-    static std::string GetFileCRC32(const fs::path& filePath);
+    static std::string GetFileCRC32(const std::wstring& filePath);
     static std::string GetDataCRC32(const unsigned char* data, size_t dataSize);
 
    private:

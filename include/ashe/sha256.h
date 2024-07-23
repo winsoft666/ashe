@@ -27,7 +27,6 @@
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_
 #endif  // !_WINSOCKAPI_
-#include "ashe/filesystem.hpp"
 
 namespace ashe {
 class ASHE_API SHA256 {
@@ -48,7 +47,7 @@ class ASHE_API SHA256 {
 
     std::string digest();
 
-    static std::string GetFileSHA256(const fs::path& filePath);
+    static std::string GetFileSHA256(const std::wstring& filePath);
     static std::string GetDataSHA256(const unsigned char* data, size_t dataSize);
 
    private:

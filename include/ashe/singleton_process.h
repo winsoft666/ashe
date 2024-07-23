@@ -23,7 +23,7 @@
 #include <string>
 #include <future>
 #include "ashe/event.h"
-#include "ashe/singleton_class.hpp"
+#include "ashe/singleton_class.h"
 
 namespace ashe {
 class ASHE_API SingletonProcess : public SingletonClass<SingletonProcess> {

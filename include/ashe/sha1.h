@@ -49,7 +49,7 @@ class ASHE_API SHA1 {
     // Get the raw message digest
     void getHash(unsigned char* uDest);
 
-    static std::string GetFileSHA1(const fs::path& filePath);
+    static std::string GetFileSHA1(const std::wstring& filePath);
 
     static std::string GetDataSHA1(const unsigned char* data, size_t dataSize);
 

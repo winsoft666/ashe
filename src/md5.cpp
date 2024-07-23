@@ -3,9 +3,11 @@
 #include "ashe/arch.h"
 #include "ashe/byteorder.h"
 
+namespace ashe {
+
 // Support large memory.
 //
-std::string ashe::MD5::GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
+std::string MD5::GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
     unsigned char md5Sig[16] = {0};
     char szMd5[33] = {0};
 
@@ -29,12 +31,13 @@ std::string ashe::MD5::GetDataMD5(const unsigned char* buffer, size_t buffer_siz
     return szMd5;
 }
 
-std::string ashe::MD5::GetFileMD5(const ashe::fs::path& file_path) {
+std::string MD5::GetFileMD5(const std::wstring& file_path) {
 #ifdef ASHE_WIN
     FILE* f = nullptr;
-    _wfopen_s(&f, file_path.wstring().c_str(), L"rb");
+    _wfopen_s(&f, file_path.c_str(), L"rb");
 #else
-    FILE* f = fopen(file_path.u8string().c_str(), "rb");
+    std::string pathu8 = StringEncode::UnicodeToUtf8(file_path);
+    FILE* f = fopen(pathu8.c_str(), "rb");
 #endif
 
     if (!f)
@@ -63,10 +66,10 @@ std::string ashe::MD5::GetFileMD5(const ashe::fs::path& file_path) {
 }
 
 /*
-       * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
-       * initialization constants.
-       */
-void ashe::MD5::MD5Init(struct MD5Context* ctx) {
+    * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
+    * initialization constants.
+    */
+void MD5::MD5Init(struct MD5Context* ctx) {
     bigEndian_ = ByteOrder::IsHostBigEndian();
 
     ctx->buf[0] = 0x67452301;
@@ -79,10 +82,10 @@ void ashe::MD5::MD5Init(struct MD5Context* ctx) {
 }
 
 /*
-       * Update context to reflect the concatenation of another buffer full
-       * of bytes.
-       */
-void ashe::MD5::MD5Update(struct MD5Context* ctx, unsigned char const* buf, unsigned len) {
+           * Update context to reflect the concatenation of another buffer full
+           * of bytes.
+           */
+void MD5::MD5Update(struct MD5Context* ctx, unsigned char const* buf, unsigned len) {
     unsigned int t;
 
     /* Update byte count */
@@ -120,10 +123,10 @@ void ashe::MD5::MD5Update(struct MD5Context* ctx, unsigned char const* buf, unsi
 }
 
 /*
-       * Final wrapup - pad to 64-byte boundary with the bit pattern
-       * 1 0* (64-bit count of bits processed, MSB-first)
-       */
-void ashe::MD5::MD5Final(unsigned char digest[16], struct MD5Context* ctx) {
+           * Final wrapup - pad to 64-byte boundary with the bit pattern
+           * 1 0* (64-bit count of bits processed, MSB-first)
+           */
+void MD5::MD5Final(unsigned char digest[16], struct MD5Context* ctx) {
     int count = ctx->bytes[0] & 0x3f; /* Number of bytes in ctx->in */
     unsigned char* p = (unsigned char*)ctx->in + count;
 
@@ -154,14 +157,14 @@ void ashe::MD5::MD5Final(unsigned char digest[16], struct MD5Context* ctx) {
     memset(ctx, 0, sizeof(*ctx)); /* In case it's sensitive */
 }
 
-void ashe::MD5::MD5Buffer(const unsigned char* buf, unsigned int len, unsigned char sig[16]) {
+void MD5::MD5Buffer(const unsigned char* buf, unsigned int len, unsigned char sig[16]) {
     struct MD5Context md5;
     MD5Init(&md5);
     MD5Update(&md5, buf, len);
     MD5Final(sig, &md5);
 }
 
-void ashe::MD5::MD5SigToString(unsigned char signature[16], char* str, int len) {
+void MD5::MD5SigToString(unsigned char signature[16], char* str, int len) {
     unsigned char* sig_p;
     char *str_p, *max_p;
     unsigned int high, low;
@@ -206,7 +209,7 @@ void ashe::MD5::MD5SigToString(unsigned char signature[16], char* str, int len) 
  * reflect the addition of 16 longwords of new data.  MD5Update blocks
  * the data and converts bytes into longwords for this routine.
  */
-void ashe::MD5::MD5Transform(unsigned int buf[4], unsigned int const in[16]) {
+void MD5::MD5Transform(unsigned int buf[4], unsigned int const in[16]) {
     unsigned int a, b, c, d;
 
     a = buf[0];
@@ -290,7 +293,7 @@ void ashe::MD5::MD5Transform(unsigned int buf[4], unsigned int const in[16]) {
 
 #endif
 
-void ashe::MD5::byteSwap(unsigned int* buf, unsigned words) {
+void MD5::byteSwap(unsigned int* buf, unsigned words) {
     unsigned char* p;
 
     if (!bigEndian_)
@@ -303,3 +306,4 @@ void ashe::MD5::byteSwap(unsigned int* buf, unsigned words) {
         p += 4;
     } while (--words);
 }
+}  // namespace ashe

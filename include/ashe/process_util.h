@@ -34,6 +34,8 @@
 #endif  // !_WINSOCKAPI_
 #include <Windows.h>
 #endif  // !_INC_WINDOWS
+
+#pragma comment(lib, "Shlwapi.lib")
 #endif
 
 namespace ashe {
@@ -46,20 +48,19 @@ class ASHE_API ProcessUtil {
 
     static bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) noexcept;
 
-    static bool CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD *dwPID, HANDLE* pProcess);
+    static bool CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD* dwPID, HANDLE* pProcess);
 
     static bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd = SW_SHOWDEFAULT);
 
     static bool Is32BitProcess(HANDLE process, bool& result) noexcept;
+
+    // need call free(buf)
+    static bool GetCurrentExePath(wchar_t** buf);
+
+    static std::wstring GetCurrentExePath();
+
+    static std::wstring GetCurrentExeDirectory();
 #endif
-
-    // On windows, path is encoded by ANSI, otherwise, is UTF8.
-    //
-    static std::string GetCurrentExePath();
-
-    // On windows, directory is encoded by ANSI, otherwise, is UTF8.
-    //
-    static std::string GetCurrentExeDirectory();
 
 #ifdef ASHE_WIN
     static BOOL CALLBACK EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam);

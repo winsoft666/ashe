@@ -37,7 +37,7 @@
 #include <assert.h>
 #include <strsafe.h>
 #include "ashe/string_encode.h"
-#include "ashe/singleton_class.hpp"
+#include "ashe/singleton_class.h"
 
 namespace ashe {
 class WinServiceBase;

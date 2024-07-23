@@ -21,7 +21,6 @@
 #define ASHE_SHA512_HPP__
 #include "ashe/config.h"
 #include <string>
-#include "ashe/filesystem.hpp"
 
 namespace ashe {
 class ASHE_API SHA512 {
@@ -34,7 +33,7 @@ class ASHE_API SHA512 {
 
     void transform(const unsigned char* message, unsigned int block_nb);
 
-    static std::string GetFileSHA512(const fs::path& filePath);
+    static std::string GetFileSHA512(const std::wstring& filePath);
 
     static std::string GetDataSHA512(const unsigned char* data, size_t dataSize);
 

@@ -20,4 +20,5 @@ TEST_CASE("PathUtil-ExpandEnvString", "") {
             CHECK(expand == L"C:\\Program Files");
     }
 }
+
 #endif

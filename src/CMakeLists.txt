@@ -17,17 +17,17 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #################################################################################
 
-set (PACKAGE_VERSION 1.6)
+set (PACKAGE_VERSION 1.7)
 
-file(GLOB_RECURSE HEADER_FILES 			../include/*.hpp ../include/*.h)
-file(GLOB_RECURSE SOURCE_FILES 			../src/*.cpp)
+file(GLOB_RECURSE HEADERS ../include/*.h)
+file(GLOB_RECURSE SOURCES ./*.cpp)
 
 if(ASHE_BUILD_SHARED_LIBS)
 	add_library(
 		${ASHE_LIB_NAME}
 		SHARED
-		${HEADER_FILES}
-		${SOURCE_FILES}
+		${HEADERS}
+		${SOURCES}
 	)
 
 	target_compile_definitions(${ASHE_LIB_NAME} PRIVATE ASHE_EXPORTS)
@@ -42,8 +42,8 @@ else()
 	add_library(
 		${ASHE_LIB_NAME}
 		STATIC
-		${HEADER_FILES}
-		${SOURCE_FILES}
+		${HEADERS}
+		${SOURCES}
 	)
 	
 	# set output name prefix/suffix
@@ -54,6 +54,10 @@ else()
 	set_target_properties(${ASHE_LIB_NAME} PROPERTIES 
 		INTERFACE_COMPILE_DEFINITIONS ASHE_STATIC)
 endif()
+
+# include both source and headers in the files tab in Visual Studio
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../include PREFIX "Header Files" FILES ${HEADERS})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source Files" FILES ${SOURCES})
 
 if (MSVC)
   target_compile_definitions(${ASHE_LIB_NAME} PRIVATE _WIN32)
@@ -73,11 +77,11 @@ if (MSVC AND ASHE_USE_STATIC_CRT)
 	endforeach()
 endif()
 
-group_sources(${HEADER_FILES} ${SOURCE_FILES})
-
+target_compile_features(${ASHE_LIB_NAME} PUBLIC cxx_std_14)
 set_target_properties(${ASHE_LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-target_include_directories(${ASHE_LIB_NAME} PUBLIC
+target_include_directories(${ASHE_LIB_NAME} 
+	PUBLIC 
 	"$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>"
 )

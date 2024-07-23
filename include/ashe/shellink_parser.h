@@ -27,7 +27,8 @@
 #ifdef ASHE_WIN
 #include <vector>
 #include <string>
-#include "ashe/enum_flags.hpp"
+
+#pragma comment(lib, "Shell32.lib")
 
 // This class provides an interface for the MS Shell Link Binary File Format.
 // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/16cb4ca1-9339-4d0c-a68d-bf1d6cc0f943
@@ -86,13 +87,13 @@ class ASHE_API ShellinkParser {
     };
 
 #pragma region LinkHeader
-    enum class ShllinkShowCmd : uint32_t {
+    enum ShllinkShowCmd : uint32_t {
         SC_SHOWNORMAL = 0x1,
         SC_SHOWMAXIMIZED = 0x00000003,
         SC_SHOWMINNOACTIVE = 0x00000007
     };
 
-    enum class ShllinkLinkFlag : uint32_t {
+    enum ShllinkLinkFlag : uint32_t {
         /*
         The shell link is saved with an item ID list (IDList). If this bit is set, a
         LinkTargetIDList structure (section 2.2) MUST follow the ShellLinkHeader.
@@ -243,9 +244,8 @@ class ASHE_API ShellinkParser {
         LF_KeepLocalIDListForUNCTarget = 1 << 26
         // 5 bits 0
     };
-    ALLOW_FLAGS_FOR_ENUM_IN_CLASS(ShllinkLinkFlag);
 
-    enum class FileAttribute : uint32_t {
+    enum FileAttribute : uint32_t {
         /*
         The file or directory is read-only. For a file, if this bit is set,
         applications can read the file but cannot write to it or delete
@@ -317,7 +317,6 @@ class ASHE_API ShellinkParser {
         FA_ENCRYPTED = 1 << 14,
         // 16 bit 0
     };
-    ALLOW_FLAGS_FOR_ENUM_IN_CLASS(FileAttribute);
 
     enum ShllinkHotKey : uint8_t {
         HOTK_NONE = 0x00,
@@ -397,10 +396,10 @@ class ASHE_API ShellinkParser {
         uint64_t LinkCLSID_H = 0;
 
         // A LinkFlags structure (section 2.1.1) that specifies information about the shell link and the presence of optional portions of the structure
-        ShllinkLinkFlags LinkFlags;
+        uint64_t LinkFlags;
 
         // A FileAttributesFlags structure (section 2.1.2) that specifies information about the link target
-        FileAttributes TargetFileAttributes;
+        uint64_t TargetFileAttributes;
 
         // A FILETIME structure ([MS-DTYP] section 2.3.3) that specifies the creation time of the link target in UTC (Coordinated Universal Time). If the value is zero, there is no creation time set on the link target
         uint64_t CreationTime = 0;
@@ -448,7 +447,7 @@ class ASHE_API ShellinkParser {
 #pragma endregion LinkTargetIDList
 
 #pragma region LinkInfo
-    enum class LinkInfoFlag : uint32_t {
+    enum LinkInfoFlag : uint32_t {
         /*
         If set, the VolumeID and LocalBasePath fields are present,
         and their locations are specified by the values of the
@@ -477,7 +476,6 @@ class ASHE_API ShellinkParser {
         LIF_CommonNetworkRelativeLinkAndPathSuffix = 1 << 1
         // 30 bit 0
     };
-    ALLOW_FLAGS_FOR_ENUM_IN_CLASS(LinkInfoFlag);
 
     struct VolumeID {
         // A 32-bit, unsigned integer that specifies the size, in bytes, of this structure. This value MUST be greater than 0x00000010. All offsets specified in this structure MUST be less than this value, and all strings contained in this structure MUST fit within the extent defined by this size
@@ -503,17 +501,16 @@ class ASHE_API ShellinkParser {
         std::vector<char> Data;
     };
 
-    enum class CommonNetworkRelativeLinkFlag : uint32_t {
+    enum CommonNetworkRelativeLinkFlag : uint32_t {
         CNETRLNK_ValidDevice = 1 << 0,
         CNETRLNK_ValidNetType = 1 << 1
     };
-    ALLOW_FLAGS_FOR_ENUM_IN_CLASS(CommonNetworkRelativeLinkFlag);
 
     struct CommonNetworkRelativeLink {
         // A 32-bit, unsigned integer that specifies the size, in bytes, of the CommonNetworkRelativeLink structure. This value MUST be greater than or equal to 0x00000014. All offsets specified in this structure MUST be less than this value, and all strings contained in this structure MUST fit within the extent defined by this size
         uint32_t CommonNetworkRelativeSize = 0;
         // Flags that specify the contents of the DeviceNameOffset and NetProviderType fields
-        CommonNetworkRelativeLinkFlags ComNetRelLnkFlags;
+        uint64_t ComNetRelLnkFlags;
         // A 32-bit, unsigned integer that specifies the location of the NetName field. This value is an offset, in bytes, from the start of the CommonNetworkRelativeLink structure
         uint32_t NetNameOffset = 0;
         // A 32-bit, unsigned integer that specifies the location of the DeviceName field. If the ValidDevice flag is set, this value is an offset, in bytes, from the start of the CommonNetworkRelativeLink structure; otherwise, this value MUST be zero
@@ -548,7 +545,8 @@ class ASHE_API ShellinkParser {
         uint32_t LinkInfoHeaderSize = 0;
 
         // Flags that specify whether the VolumeID, LocalBasePath, LocalBasePathUnicode, and CommonNetworkRelativeLink fields are present in this structure
-        LinkInfoFlags LnkInfFlags;
+        // enum LinkInfoFlag
+        uint64_t LnkInfFlags;
 
         // A 32-bit, unsigned integer that specifies the location of the VolumeID field. If the VolumeIDAndLocalBasePath flag is set, this value is an offset, in bytes, from the start of the LinkInfo structure; otherwise, this value MUST be zero
         uint32_t VolumeIDOffset = 0;
@@ -613,7 +611,7 @@ class ASHE_API ShellinkParser {
 #pragma endregion StringData
 
 #pragma region ExtraData
-    enum class ConsoleDataBlockFileAttribute : uint16_t {
+    enum ConsoleDataBlockFileAttribute : uint16_t {
         FILA_FOREGROUND_BLUE = 0x0001,       //The foreground text color contains blue.
         FILA_FOREGROUND_GREEN = 0x0002,      //The foreground text color contains green.
         FILA_FOREGROUND_RED = 0x0004,        //The foreground text color contains red.
@@ -623,9 +621,8 @@ class ASHE_API ShellinkParser {
         FILA_BACKGROUND_RED = 0x0040,        //The background text color contains red.
         FILA_BACKGROUND_INTENSITY = 0x0080   //The background text color is intensified.
     };
-    ALLOW_FLAGS_FOR_ENUM_IN_CLASS(ConsoleDataBlockFileAttribute);
 
-    enum class ConsoleDataBlockFontFamily : uint32_t {
+    enum ConsoleDataBlockFontFamily : uint32_t {
         FONTF_FF_DONTCARE = 0x0000,    //The font family is unknown.
         FONTF_FF_ROMAN = 0x0010,       //The font is variable-width with serifs; for example, "Times New Roman".
         FONTF_FF_SWISS = 0x0020,       //The font is variable-width without serifs; for example, "Arial".
@@ -639,7 +636,6 @@ class ASHE_API ShellinkParser {
         FONTP_TMPF_TRUETYPE = 0x0004,     //The font is a true-type font.
         FONTP_TMPF_DEVICE = 0x0008        //The font is specific to the device.
     };
-    ALLOW_FLAGS_FOR_ENUM_IN_CLASS(ConsoleDataBlockFontFamily);
 
     struct ConsoleDataBlock {
         const uint32_t BlockSize = 0x000000CC;
@@ -659,9 +655,9 @@ class ASHE_API ShellinkParser {
                 BACKGROUND_INTENSITY    0x0080      The background text color is intensified.
 
             */
-        ConsoleDataBlockFileAttributes FillAttributes;
+        uint64_t FillAttributes;
         // A 16-bit, unsigned integer that specifies the fill attributes that control the foreground and background text color in the console window popup. The values are the same as for the FillAttributes field
-        ConsoleDataBlockFileAttributes PopupFillAttributes;
+        uint64_t PopupFillAttributes;
         // A 16-bit, signed integer that specifies the horizontal size (X axis), in characters, of the console window buffer
         uint16_t ScreenBufferSizeX = 0;
         // A 16-bit, signed integer that specifies the vertical size (Y axis), in characters, of the console window buffer
@@ -697,7 +693,7 @@ class ASHE_API ShellinkParser {
                 TMPF_TRUETYPE       0x0004      The font is a true-type font.
                 TMPF_DEVICE         0x0008      The font is specific to the device.
             */
-        ConsoleDataBlockFontFamilys FontFamilys;
+        uint64_t FontFamilys;
         // A 32-bit, unsigned integer that specifies the stroke weight of the font used in the console window
         /*
                 700 �� value     A bold font.
@@ -912,7 +908,7 @@ class ASHE_API ShellinkParser {
     StringData stringData_;
     ExtraData extraData_;
 
-    std::wstring targetPath_; // cache this value
+    std::wstring targetPath_;  // cache this value
 
     const int kExtraDataBlockNum = 11;
 };

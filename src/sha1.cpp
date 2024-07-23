@@ -106,11 +106,11 @@ void ashe::SHA1::getHash(unsigned char* uDest) {
         uDest[i] = m_digest[i];
 }
 
-std::string ashe::SHA1::GetFileSHA1(const ashe::fs::path& filePath) {
+std::string ashe::SHA1::GetFileSHA1(const std::wstring& filePath) {
     std::string result;
 
     File file(filePath);
-    if (!file.open("rb")) {
+    if (!file.open(L"rb")) {
         return result;
     }
 

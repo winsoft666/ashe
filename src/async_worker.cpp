@@ -1,5 +1,5 @@
 #include "ashe/config.h"
-#include "ashe/thread.hpp"
+#include "ashe/async_worker.h"
 #if defined ASHE_WIN || defined ASHE_LINUX
 #ifdef ASHE_WIN
 #ifndef _INC_WINDOWS
@@ -18,43 +18,43 @@
 #endif
 
 namespace ashe {
-Thread::Thread() :
+AsyncWorker::AsyncWorker() :
     thread_id_(0), exit_(false) {
     running_.store(false);
 }
 
-Thread::Thread(const std::string& name) :
+AsyncWorker::AsyncWorker(const std::string& name) :
     thread_id_(0), exit_(false), thread_name_(name) {
     running_.store(false);
 }
 
-Thread::~Thread() {
+AsyncWorker::~AsyncWorker() {
     stop(false);
 }
 
-void Thread::setName(const std::string& name) {
+void AsyncWorker::setName(const std::string& name) {
     thread_name_ = name;
 }
 
-std::string Thread::name() const {
+std::string AsyncWorker::name() const {
     return thread_name_;
 }
 
-long Thread::id() {
+long AsyncWorker::id() {
     return thread_id_;
 }
 
-bool Thread::start() {
+bool AsyncWorker::start() {
     if (thread_.valid()) {
         if (thread_.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready) {
             return false;
         }
     }
-    thread_ = std::async(std::launch::async, &Thread::run, this);
+    thread_ = std::async(std::launch::async, &AsyncWorker::run, this);
     return true;
 }
 
-void Thread::stop(bool waitUntilAllTasksFinish) {
+void AsyncWorker::stop(bool waitUntilAllTasksFinish) {
     if (waitUntilAllTasksFinish) {
         do {
             {
@@ -76,15 +76,15 @@ void Thread::stop(bool waitUntilAllTasksFinish) {
         thread_.wait();
 }
 
-bool Thread::isRunning() const {
+bool AsyncWorker::isRunning() const {
     return running_.load();
 }
 
-void Thread::run() {
+void AsyncWorker::run() {
     running_.store(true);
 
     SetCurrentThreadName(thread_name_.c_str());
-    thread_id_ = Thread::GetCurThreadId();
+    thread_id_ = AsyncWorker::GetCurThreadId();
     while (true) {
         std::function<void()> task;
         {
@@ -102,7 +102,7 @@ void Thread::run() {
     }
 }
 
-void Thread::SetCurrentThreadName(const char* name) {
+void AsyncWorker::SetCurrentThreadName(const char* name) {
 #ifdef ASHE_WIN
     struct {
         DWORD dwType;
@@ -121,7 +121,7 @@ void Thread::SetCurrentThreadName(const char* name) {
 #endif
 }
 
-long Thread::GetCurThreadId() {
+long AsyncWorker::GetCurThreadId() {
 #ifdef ASHE_WIN
     return GetCurrentThreadId();
 #elif defined ASHE_LINUX

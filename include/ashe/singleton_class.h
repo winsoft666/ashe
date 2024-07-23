@@ -17,8 +17,9 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_SINGLETON_CLASS_HPP_
-#define ASHE_SINGLETON_CLASS_HPP_
+#ifndef ASHE_SINGLETON_CLASS_H_
+#define ASHE_SINGLETON_CLASS_H_
+#pragma once
 #include <mutex>
 
 namespace ashe {
@@ -62,4 +63,4 @@ T* SingletonClass<T>::this_ = nullptr;
 template <class T>
 std::mutex SingletonClass<T>::m_;
 }  // namespace ashe
-#endif  // !ASHE_SINGLETON_CLASS_HPP_
+#endif  // !ASHE_SINGLETON_CLASS_H_

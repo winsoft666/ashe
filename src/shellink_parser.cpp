@@ -7,15 +7,13 @@
 #include "ashe/path_util.h"
 #include "ashe/macros.h"
 #include "ashe/byteorder.h"
-#include "ashe/filesystem.hpp"
 #include "ashe/win_registry.h"
 
 #define STRICT_TYPED_ITEMIDS
 #include <shlobj.h>
 #include <strsafe.h>
 #include <Shlwapi.h>
-
-#pragma comment(lib, "Shell32.lib")
+#include <shellapi.h>
 
 namespace ashe {
 ShellinkParser::ShellinkErr ShellinkParser::load(const std::wstring& lnkPath) {
@@ -53,13 +51,13 @@ ShellinkParser::ShellinkErr ShellinkParser::load(const std::wstring& lnkPath) {
         uint32_t linkFlagsValue = 0;
         if (fread(&linkFlagsValue, 4, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
-        header_.LinkFlags.set_underlying_value(linkFlagsValue);
+        header_.LinkFlags = linkFlagsValue;
 
         //FileAttributes
         uint32_t fileAttributesValue = 0;
         if (fread(&fileAttributesValue, 4, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
-        header_.TargetFileAttributes.set_underlying_value(fileAttributesValue);
+        header_.TargetFileAttributes = fileAttributesValue;
 
         //CreationTime
         if (fread(&header_.CreationTime, 8, 1, fp) != 1)
@@ -119,7 +117,7 @@ ShellinkParser::ShellinkErr ShellinkParser::load(const std::wstring& lnkPath) {
         uint32_t linkInfoFlagsValue = 0;
         if (fread(&linkInfoFlagsValue, 4, 1, fp) != 1)
             return ShellinkErr::SHLLINK_ERR_FIO;
-        linkInfo_.LnkInfFlags.set_underlying_value(linkInfoFlagsValue);
+        linkInfo_.LnkInfFlags = linkInfoFlagsValue;
 
         //VolumeIDOffset
         if (fread(&linkInfo_.VolumeIDOffset, 4, 1, fp) != 1)
@@ -209,7 +207,7 @@ ShellinkParser::ShellinkErr ShellinkParser::load(const std::wstring& lnkPath) {
             uint32_t commonNetworkRelativeLinkFlagsValue = 0;
             if (fread(&commonNetworkRelativeLinkFlagsValue, 4, 1, fp) != 1)
                 return ShellinkErr::SHLLINK_ERR_FIO;
-            linkInfo_.CommonNetRelLnk.ComNetRelLnkFlags.set_underlying_value(commonNetworkRelativeLinkFlagsValue);
+            linkInfo_.CommonNetRelLnk.ComNetRelLnkFlags = commonNetworkRelativeLinkFlagsValue;
 
             //NetNameOffset
             if (fread(&linkInfo_.CommonNetRelLnk.NetNameOffset, 4, 1, fp) != 1)
@@ -462,13 +460,13 @@ ShellinkParser::ShellinkErr ShellinkParser::readEConsoleDataBlock(uint32_t block
     uint16_t fileAttributesValue = 0;
     if (fread(&fileAttributesValue, 2, 1, fp) != 1)
         return (ShellinkErr::SHLLINK_ERR_FIO);
-    extraData_.consoleDB.FillAttributes.set_underlying_value(fileAttributesValue);
+    extraData_.consoleDB.FillAttributes = fileAttributesValue;
 
     //PopupFillAttributes
     uint16_t popupFileAttributesValue = 0;
     if (fread(&popupFileAttributesValue, 2, 1, fp) != 1)
         return (ShellinkErr::SHLLINK_ERR_FIO);
-    extraData_.consoleDB.PopupFillAttributes.set_underlying_value(popupFileAttributesValue);
+    extraData_.consoleDB.PopupFillAttributes = popupFileAttributesValue;
 
     //ScreenBufferSizeX
     if (fread(&extraData_.consoleDB.ScreenBufferSizeX, 2, 1, fp) != 1)
@@ -504,7 +502,7 @@ ShellinkParser::ShellinkErr ShellinkParser::readEConsoleDataBlock(uint32_t block
     uint32_t fontFamilysValue = 0;
     if (fread(&fontFamilysValue, 4, 1, fp) != 1)
         return (ShellinkErr::SHLLINK_ERR_FIO);
-    extraData_.consoleDB.FontFamilys.set_underlying_value(fontFamilysValue);
+    extraData_.consoleDB.FontFamilys = fontFamilysValue;
 
     //FontWeight
     if (fread(&extraData_.consoleDB.FontWeight, 4, 1, fp) != 1)
@@ -852,11 +850,17 @@ std::wstring ShellinkParser::getDisplayName() const {
     if (!result.empty())
         return result;
 
-    ashe::fs::path p(linkPath_);
-    if (p.has_stem())
-        result = p.stem().wstring();
+    WCHAR szPath[MAX_PATH] = {0};
+    StringCchCopyW(szPath, MAX_PATH, linkPath_.c_str());
 
-    return result;
+    LPWSTR p = PathFindFileNameW(szPath);
+    if (!p) {
+        return result;
+    }
+
+    PathRemoveExtensionW(p);
+
+    return p;
 }
 
 std::wstring ShellinkParser::getDescription() const {

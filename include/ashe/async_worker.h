@@ -17,12 +17,11 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_THREAD_HPP__
-#define ASHE_THREAD_HPP__
+#ifndef ASHE_ASYNC_WORKER_H__
+#define ASHE_ASYNC_WORKER_H__
 #pragma once
 
 #include "ashe/arch.h"
-
 #if defined ASHE_WIN || defined ASHE_LINUX
 #include "ashe/config.h"
 #include <atomic>
@@ -36,14 +35,14 @@
 #include "ashe/macros.h"
 
 namespace ashe {
-class ASHE_API Thread {
+class ASHE_API AsyncWorker {
    public:
-    ASHE_DISALLOW_COPY_MOVE(Thread);
+    ASHE_DISALLOW_COPY_MOVE(AsyncWorker);
 
-    Thread();
-    Thread(const std::string& name);
+    AsyncWorker();
+    AsyncWorker(const std::string& name);
 
-    virtual ~Thread();
+    virtual ~AsyncWorker();
 
     void setName(const std::string& name);
     std::string name() const;
@@ -77,6 +76,7 @@ class ASHE_API Thread {
     static void SetCurrentThreadName(const char* name);
 
     static long GetCurThreadId();
+
    protected:
     std::string thread_name_;
     std::future<void> thread_;
@@ -89,4 +89,4 @@ class ASHE_API Thread {
 };
 }  // namespace ashe
 #endif
-#endif  // !ASHE_THREAD_HPP__
+#endif  // !ASHE_ASYNC_WORKER_H__

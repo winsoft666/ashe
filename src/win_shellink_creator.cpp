@@ -1,5 +1,5 @@
 #include "ashe/config.h"
-#include "ashe/shellink_creator.h"
+#include "ashe/win_shellink_creator.h"
 #ifdef ASHE_WIN
 #include "ashe/windows_lite.h"
 #include <shellapi.h>
@@ -9,7 +9,6 @@
 #include "ashe/os_ver.h"
 #include <assert.h>
 #include "ashe/file.h"
-#include "ashe/filesystem.hpp"
 #include "ashe/scoped_object.h"
 
 namespace ashe {
@@ -56,7 +55,7 @@ HRESULT InitializeShortcutInterfaces(const wchar_t* shortcut,
 }
 }  // namespace
 
-bool ShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
+bool WinShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
                                          const ShellLinkProperties& properties,
                                          OperationOption operation) {
     ashe::ScopedComInitialize comInit;
@@ -67,8 +66,10 @@ bool ShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
         return false;
     }
 
-    std::error_code ec;
-    bool alreadyExisted = fs::exists(shellLinkPath, ec);
+    bool alreadyExisted = true;
+    if (INVALID_FILE_ATTRIBUTES == GetFileAttributesW(shellLinkPath.c_str()) && GetLastError() == ERROR_FILE_NOT_FOUND) {
+        alreadyExisted = false;
+    }
 
     // Interfaces to the old shortcut when replacing an existing shortcut.
     IShellLink* oldShellLink = NULL;
@@ -169,7 +170,7 @@ bool ShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
     return succeeded;
 }
 
-bool ShellinkCreator::ResolveShellLink(const std::wstring& shellLinkPath, ShellLinkProperties& properties) {
+bool WinShellinkCreator::ResolveShellLink(const std::wstring& shellLinkPath, ShellLinkProperties& properties) {
     ashe::ScopedComInitialize comInit;
 
     HRESULT result;
@@ -239,7 +240,7 @@ bool ShellinkCreator::ResolveShellLink(const std::wstring& shellLinkPath, ShellL
     return true;
 }
 
-bool ShellinkCreator::TaskbarPinShellLink(const std::wstring& shellLinkPath) {
+bool WinShellinkCreator::TaskbarPinShellLink(const std::wstring& shellLinkPath) {
     if (!OSVersion::IsWindowsVistaOrHigher())
         return false;
 
@@ -247,7 +248,7 @@ bool ShellinkCreator::TaskbarPinShellLink(const std::wstring& shellLinkPath) {
     return result > 32;
 }
 
-bool ShellinkCreator::TaskbarUnpinShellLink(const std::wstring& shellLinkPath) {
+bool WinShellinkCreator::TaskbarUnpinShellLink(const std::wstring& shellLinkPath) {
     if (!OSVersion::IsWindowsVistaOrHigher())
         return false;
 

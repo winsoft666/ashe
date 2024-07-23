@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "ashe/event.h"
 
+#ifdef __cpp_lib_variant
 TEST_CASE("Event1", "wait_after_set_1") {
     ashe::Event event;
 
@@ -19,3 +20,4 @@ TEST_CASE("Event1", "wait_after_set_1") {
     t1.join();
     t2.join();
 }
+#endif

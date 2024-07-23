@@ -27,9 +27,9 @@
 #ifdef ASHE_WIN
 #include <string>
 namespace ashe {
-class ASHE_API ShellinkCreator {
+class ASHE_API WinShellinkCreator {
    public:
-    enum class OperationOption {
+    enum OperationOption {
         // Create a new shortcut (overwriting if necessary).
         SHORTCUT_CREATE_ALWAYS = 0,
         // Overwrite an existing shortcut (fails if the shortcut doesn't exist).

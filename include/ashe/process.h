@@ -29,7 +29,7 @@
 #include <unordered_map>
 #include <vector>
 #include "ashe/macros.h"
-#include "ashe/singleton_class.hpp"
+#include "ashe/singleton_class.h"
 
 namespace ashe {
 /// Platform independent class for creating processes.

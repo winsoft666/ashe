@@ -19,29 +19,36 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #endif  // !ASHE_WIN
+#include "ashe/string_encode.h"
 
-ashe::File::File(const fs::path& path) :
+namespace ashe {
+
+File::File(const std::wstring& path) :
     path_(path) {
 }
 
-ashe::File::File(fs::path&& path) :
-    path_(std::move(path)) {
+File::File(const std::string& path) {
+#ifdef ASHE_WIN
+    path_ = StringEncode::AnsiToUnicode(path);
+#else
+    path_ = StringEncode::Utf8ToUnicode(path);
+#endif
 }
 
-ashe::File::~File() {
+File::~File() {
     close();
 }
 
-ashe::fs::path ashe::File::path() const {
+std::wstring File::path() const {
     return path_;
 }
 
-bool ashe::File::isOpen() {
+bool File::isOpen() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     return (f_ != nullptr);
 }
 
-bool ashe::File::open(const ashe::fs::path& openMode) {
+bool File::open(const std::wstring& openMode) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_ != nullptr)
         return true;
@@ -50,15 +57,27 @@ bool ashe::File::open(const ashe::fs::path& openMode) {
         return false;
 
 #ifdef ASHE_WIN
-    _wfopen_s(&f_, path_.wstring().c_str(), openMode.wstring().c_str());
+    _wfopen_s(&f_, path_.c_str(), openMode.c_str());
 #else
-    f_ = fopen(path_.u8string().c_str(), openMode.u8string().c_str());
+    std::string u8 = StringEncode::UnicodeToUtf8(path_);
+    std::string modeu8 = StringEncode::UnicodeToUtf8(openMode);
+    f_ = fopen(u8.c_str(), modeu8.c_str());
 #endif
 
     return (f_ != nullptr);
 }
 
-bool ashe::File::close() {
+bool File::open(const std::string& openMode) {
+    std::wstring openModeW;
+#ifdef ASHE_WIN
+    openModeW = StringEncode::AnsiToUnicode(openMode);
+#else
+    openModeW = StringEncode::Utf8ToUnicode(openMode);
+#endif
+    return open(openModeW);
+}
+
+bool File::close() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_) {
         const int err = fclose(f_);
@@ -69,14 +88,14 @@ bool ashe::File::close() {
     return false;
 }
 
-bool ashe::File::flush() {
+bool File::flush() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_)
         return (fflush(f_) == 0);
     return false;
 }
 
-bool ashe::File::exist() const {
+bool File::exist() const {
     if (path_.empty())
         return false;
 #ifdef ASHE_WIN
@@ -86,7 +105,7 @@ bool ashe::File::exist() const {
 #endif
 }
 
-bool ashe::File::canRW() const {
+bool File::canRW() const {
     if (path_.empty())
         return false;
 
@@ -97,7 +116,7 @@ bool ashe::File::canRW() const {
 #endif
 }
 
-int64_t ashe::File::fileSize() {
+int64_t File::fileSize() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_)
         return -1;
@@ -130,7 +149,7 @@ int64_t ashe::File::fileSize() {
 }
 
 // Must be call open(...) first!
-bool ashe::File::seekFromCurrent(int64_t offset) {
+bool File::seekFromCurrent(int64_t offset) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_) {
 #ifdef ASHE_WIN
@@ -143,7 +162,7 @@ bool ashe::File::seekFromCurrent(int64_t offset) {
 }
 
 // Return: -1 is failed
-int64_t ashe::File::currentPointerPos() {
+int64_t File::currentPointerPos() {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_)
         return -1;
@@ -154,7 +173,7 @@ int64_t ashe::File::currentPointerPos() {
 #endif
 }
 
-bool ashe::File::seekFromBeginning(int64_t offset) {
+bool File::seekFromBeginning(int64_t offset) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_) {
 #ifdef ASHE_WIN
@@ -166,7 +185,7 @@ bool ashe::File::seekFromBeginning(int64_t offset) {
     return false;
 }
 
-bool ashe::File::seekFromEnd(int64_t offset) {
+bool File::seekFromEnd(int64_t offset) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (f_) {
 #ifdef ASHE_WIN
@@ -178,7 +197,7 @@ bool ashe::File::seekFromEnd(int64_t offset) {
     return false;
 }
 
-size_t ashe::File::readFrom(void* buffer, size_t needRead, int64_t from) {
+size_t File::readFrom(void* buffer, size_t needRead, int64_t from) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_ || !buffer || needRead == 0)
         return 0;
@@ -197,7 +216,7 @@ size_t ashe::File::readFrom(void* buffer, size_t needRead, int64_t from) {
     return read;
 }
 
-size_t ashe::File::writeFrom(const void* buffer, size_t needWrite, int64_t from) {
+size_t File::writeFrom(const void* buffer, size_t needWrite, int64_t from) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_ || !buffer || needWrite == 0)
         return 0;
@@ -216,7 +235,7 @@ size_t ashe::File::writeFrom(const void* buffer, size_t needWrite, int64_t from)
     return written;
 }
 
-size_t ashe::File::readAll(void** buffer) {
+size_t File::readAll(void** buffer) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
     if (!f_ || !buffer)
         return 0;
@@ -270,7 +289,7 @@ size_t ashe::File::readAll(void** buffer) {
 #endif
 }
 
-std::string ashe::File::readAll() {
+std::string File::readAll() {
     std::string ret;
     void* buffer = nullptr;
     const size_t read = readAll(&buffer);
@@ -282,7 +301,7 @@ std::string ashe::File::readAll() {
     return ret;
 }
 
-bool ashe::File::readAll(std::string& ret) {
+bool File::readAll(std::string& ret) {
     void* buffer = nullptr;
     const size_t read = readAll(&buffer);
 
@@ -294,3 +313,4 @@ bool ashe::File::readAll(std::string& ret) {
 
     return false;
 }
+}  // namespace ashe

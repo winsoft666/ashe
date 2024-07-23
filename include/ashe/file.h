@@ -28,19 +28,18 @@
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_
 #endif  // !_WINSOCKAPI_
-#include "ashe/filesystem.hpp"
 
 namespace ashe {
 class ASHE_API File {
    public:
     ASHE_DISALLOW_COPY_MOVE(File);
 
-    File(const fs::path& path);
-    File(fs::path&& path);
+    File(const std::wstring& path);
+    File(const std::string& path);
 
     virtual ~File();
 
-    fs::path path() const;
+    std::wstring path() const;
 
     bool isOpen();
 
@@ -80,7 +79,8 @@ class ASHE_API File {
     //
     // see: https://www.cplusplus.com/reference/cstdio/fopen/
     //
-    bool open(const fs::path& openMode);
+    bool open(const std::wstring& openMode);
+    bool open(const std::string& openMode);
 
     bool close();
 
@@ -133,7 +133,7 @@ class ASHE_API File {
 
    protected:
     FILE* f_ = nullptr;
-    ashe::fs::path path_;
+    std::wstring path_;
     std::recursive_mutex mutex_;
 };
 }  // namespace ashe

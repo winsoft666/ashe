@@ -22,25 +22,12 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 
 project(ashe CXX)
 
-function(group_sources)
-  foreach(_source IN ITEMS ${ARGN})
-  if (IS_ABSOLUTE "${_source}")
-      file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
-  else()
-      set(_source_rel "${_source}")
-  endif()
-  get_filename_component(_source_path "${_source_rel}" PATH)
-  string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
-  source_group("${_source_path_msvc}" FILES "${_source}")
-  endforeach()
-endfunction(group_sources)
-
-
 configure_file("${CMAKE_SOURCE_DIR}/include/ashe/config.h.in" "${CMAKE_SOURCE_DIR}/include/ashe/config.h")
 
 option(ASHE_BUILD_TESTS "Build tests project" ON)
 option(ASHE_USE_STATIC_CRT "Set to ON to build with static CRT on Windows (/MT)." OFF)
 option(ASHE_BUILD_SHARED_LIBS "Set to ON to build dynamic library." OFF)
+option(EASTL_STD_ITERATOR_CATEGORY_ENABLED "Enable compatibility with std:: iterator categories" OFF)
 
 set(DEBUG_LIBNAME_SUFFIX "-d" CACHE STRING "Optional suffix to append to the library name for a debug build")
 mark_as_advanced(DEBUG_LIBNAME_SUFFIX)
@@ -53,7 +40,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set (CMAKE_CXX_STANDARD 11)
-
 
 if(ASHE_BUILD_SHARED_LIBS)
 	set(ASHE_LIB_NAME ashe)

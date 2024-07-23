@@ -1,4 +1,4 @@
-#include "ashe/thread_pool.hpp"
+#include "ashe/thread_pool.h"
 
 namespace ashe {
 ThreadPool::ThreadPool(size_t threads) :
