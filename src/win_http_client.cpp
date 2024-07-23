@@ -91,7 +91,7 @@ int WinHttpClient::doRequest(std::shared_ptr<HttpReqDatagram> reqDatagram,
 
     if (!winHttp_->openSession(L"",
                                dwAccessType,
-                               ashe::StringEncode::Utf8ToUnicode(proxy_),
+                               Utf8ToUnicode(proxy_),
                                L"",
                                0)) {
         return checkErrorCode(winHttp_->getErrorCode());
@@ -101,7 +101,7 @@ int WinHttpClient::doRequest(std::shared_ptr<HttpReqDatagram> reqDatagram,
         return checkErrorCode(winHttp_->getErrorCode());
     }
 
-    if (!winHttp_->openConnect(ashe::StringEncode::Utf8ToUnicode(reqDatagram->url()))) {
+    if (!winHttp_->openConnect(Utf8ToUnicode(reqDatagram->url()))) {
         return checkErrorCode(winHttp_->getErrorCode());
     }
 
@@ -145,7 +145,7 @@ int WinHttpClient::doRequest(std::shared_ptr<HttpReqDatagram> reqDatagram,
 
     const HttpHeaders& headers = reqDatagram->headers();
     for (const auto& it : headers) {
-        if (!winHttp_->setRequestHeader(StringEncode::Utf8ToUnicode(it.first), StringEncode::Utf8ToUnicode(it.second))) {
+        if (!winHttp_->setRequestHeader(Utf8ToUnicode(it.first), Utf8ToUnicode(it.second))) {
             return checkErrorCode(winHttp_->getErrorCode());
         }
     }
@@ -165,7 +165,7 @@ int WinHttpClient::doRequest(std::shared_ptr<HttpReqDatagram> reqDatagram,
     }
 
     for (auto it = headerMap.begin(); it != headerMap.end(); it++) {
-        rspDatagram.addHeader(StringEncode::UnicodeToUtf8(it->first), StringEncode::UnicodeToUtf8(it->second));
+        rspDatagram.addHeader(UnicodeToUtf8(it->first), UnicodeToUtf8(it->second));
     }
 
     bool getRspRet = false;
@@ -173,7 +173,7 @@ int WinHttpClient::doRequest(std::shared_ptr<HttpReqDatagram> reqDatagram,
         getRspRet = winHttp_->saveResponseBodyToFile(rspDatagram.saveFileHandle());
     }
     else if (!rspDatagram.saveFilePath().empty()) {
-        getRspRet = winHttp_->saveResponseBodyToFile(StringEncode::Utf8ToUnicode(rspDatagram.saveFilePath()));
+        getRspRet = winHttp_->saveResponseBodyToFile(Utf8ToUnicode(rspDatagram.saveFilePath()));
     }
     else {
         getRspRet = winHttp_->getResponseBody(rspDatagram.body());

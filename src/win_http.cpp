@@ -336,9 +336,9 @@ bool WinHttp::getResponseHeaders(std::unordered_map<std::wstring, std::wstring>&
     if (!getResponseRawHeaders(strHeaders))
         return false;
 
-    std::vector<std::wstring> headers = StringHelper::Split(strHeaders, L"\r\n", false);
+    std::vector<std::wstring> headers = StrSplit(strHeaders, L"\r\n", false);
     for (const auto& item : headers) {
-        std::vector<std::wstring> v = StringHelper::Split(item, L": ", false);
+        std::vector<std::wstring> v = StrSplit(item, L": ", false);
         if (v.size() == 2) {
             headerMap[v[0]] = v[1];
         }

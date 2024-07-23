@@ -29,9 +29,9 @@ File::File(const std::wstring& path) :
 
 File::File(const std::string& path) {
 #ifdef ASHE_WIN
-    path_ = StringEncode::AnsiToUnicode(path);
+    path_ = AnsiToUnicode(path);
 #else
-    path_ = StringEncode::Utf8ToUnicode(path);
+    path_ = Utf8ToUnicode(path);
 #endif
 }
 
@@ -59,8 +59,8 @@ bool File::open(const std::wstring& openMode) {
 #ifdef ASHE_WIN
     _wfopen_s(&f_, path_.c_str(), openMode.c_str());
 #else
-    std::string u8 = StringEncode::UnicodeToUtf8(path_);
-    std::string modeu8 = StringEncode::UnicodeToUtf8(openMode);
+    std::string u8 = UnicodeToUtf8(path_);
+    std::string modeu8 = UnicodeToUtf8(openMode);
     f_ = fopen(u8.c_str(), modeu8.c_str());
 #endif
 
@@ -70,9 +70,9 @@ bool File::open(const std::wstring& openMode) {
 bool File::open(const std::string& openMode) {
     std::wstring openModeW;
 #ifdef ASHE_WIN
-    openModeW = StringEncode::AnsiToUnicode(openMode);
+    openModeW = AnsiToUnicode(openMode);
 #else
-    openModeW = StringEncode::Utf8ToUnicode(openMode);
+    openModeW = Utf8ToUnicode(openMode);
 #endif
     return open(openModeW);
 }

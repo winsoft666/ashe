@@ -163,7 +163,7 @@ std::wstring PathUtil::GetWinExplorerDisplayName(const std::wstring& path) noexc
 }
 
 std::string PathUtil::ReplaceKnownEnvToWow6432(const std::string& src) {
-    if (!StringHelper::IsContains(src, "%"))
+    if (!IsContains(src, "%"))
         return src;
 
     BOOL isWow64 = FALSE;
@@ -176,14 +176,14 @@ std::string PathUtil::ReplaceKnownEnvToWow6432(const std::string& src) {
         return src;
 
     std::string sl = src;
-    sl = StringHelper::Replace(sl, "%ProgramFiles%", "%ProgramW6432%", 0, true);
-    sl = StringHelper::Replace(sl, "%CommonProgramFiles%", "%CommonProgramW6432%", 0, true);
+    sl = Replace(sl, "%ProgramFiles%", "%ProgramW6432%", 0, true);
+    sl = Replace(sl, "%CommonProgramFiles%", "%CommonProgramW6432%", 0, true);
 
     return sl;
 }
 
 std::wstring PathUtil::ReplaceKnownEnvToWow6432(const std::wstring& src) {
-    if (!StringHelper::IsContains(src, L"%"))
+    if (!IsContains(src, L"%"))
         return src;
 
     BOOL isWow64 = FALSE;
@@ -196,8 +196,8 @@ std::wstring PathUtil::ReplaceKnownEnvToWow6432(const std::wstring& src) {
         return src;
 
     std::wstring sl = src;
-    sl = StringHelper::Replace(sl, L"%ProgramFiles%", L"%ProgramW6432%", 0, true);
-    sl = StringHelper::Replace(sl, L"%CommonProgramFiles%", L"%CommonProgramW6432%", 0, true);
+    sl = Replace(sl, L"%ProgramFiles%", L"%ProgramW6432%", 0, true);
+    sl = Replace(sl, L"%CommonProgramFiles%", L"%CommonProgramW6432%", 0, true);
 
     return sl;
 }

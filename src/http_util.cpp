@@ -106,7 +106,7 @@ std::string HttpRspDatagram::saveFilePath() const {
 }
 
 bool HttpUtil::IsHttps(const std::string& url) {
-    if (ashe::StringHelper::ToLower(url.substr(0, 6)) == "https:")
+    if (ashe::ToLower(url.substr(0, 6)) == "https:")
         return true;
     return false;
 }

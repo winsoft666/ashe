@@ -41,7 +41,7 @@ struct EqualA {
 
     bool operator()(char ch1, char ch2) {
         if (caseInsensitive_)
-            return StringHelper::ToUpper(ch1) == StringHelper::ToUpper(ch2);
+            return ToUpper(ch1) == ToUpper(ch2);
         return ch1 == ch2;
     }
 
@@ -56,7 +56,7 @@ struct EqualW {
 
     bool operator()(wchar_t ch1, wchar_t ch2) {
         if (caseInsensitive_)
-            return StringHelper::ToUpper(ch1) == StringHelper::ToUpper(ch2);
+            return ToUpper(ch1) == ToUpper(ch2);
         return ch1 == ch2;
     }
 
@@ -64,87 +64,87 @@ struct EqualW {
     bool caseInsensitive_ = false;
 };
 }  // namespace stringhelper_detail
-char StringHelper::ToLower(const char& in) {
+char ToLower(const char& in) {
     if (in <= 'Z' && in >= 'A')
         return in - ('Z' - 'z');
     return in;
 }
 
-char StringHelper::ToUpper(const char& in) {
+char ToUpper(const char& in) {
     if (in <= 'z' && in >= 'a')
         return in + ('Z' - 'z');
     return in;
 }
 
-wchar_t StringHelper::ToLower(const wchar_t& in) {
+wchar_t ToLower(const wchar_t& in) {
     if (in <= 'Z' && in >= 'A')
         return in - (L'Z' - L'z');
     return in;
 }
 
-wchar_t StringHelper::ToUpper(const wchar_t& in) {
+wchar_t ToUpper(const wchar_t& in) {
     if (in <= L'z' && in >= L'a')
         return in + (L'Z' - L'z');
     return in;
 }
 
-std::string StringHelper::ToLower(const std::string& s) {
+std::string ToLower(const std::string& s) {
     std::string d = s;
-    char (*pf)(const char&) = StringHelper::ToLower;
+    char (*pf)(const char&) = ToLower;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-std::wstring StringHelper::ToLower(const std::wstring& s) {
+std::wstring ToLower(const std::wstring& s) {
     std::wstring d = s;
-    wchar_t (*pf)(const wchar_t&) = StringHelper::ToLower;
+    wchar_t (*pf)(const wchar_t&) = ToLower;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-std::string StringHelper::ToUpper(const std::string& s) {
+std::string ToUpper(const std::string& s) {
     std::string d = s;
-    char (*pf)(const char&) = StringHelper::ToUpper;
+    char (*pf)(const char&) = ToUpper;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-std::wstring StringHelper::ToUpper(const std::wstring& s) {
+std::wstring ToUpper(const std::wstring& s) {
     std::wstring d = s;
-    wchar_t (*pf)(const wchar_t&) = StringHelper::ToUpper;
+    wchar_t (*pf)(const wchar_t&) = ToUpper;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-bool StringHelper::IsDigit(const std::string& s) {
+bool IsDigit(const std::string& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
 
-bool StringHelper::IsDigit(const std::wstring& s) {
+bool IsDigit(const std::wstring& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](wchar_t c) { return !std::iswdigit(c); }) == s.end();
 }
 
-bool StringHelper::IsLetterOrDigit(const char& c) {
+bool IsLetterOrDigit(const char& c) {
     return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-bool StringHelper::IsLetterOrDigit(const wchar_t& c) {
+bool IsLetterOrDigit(const wchar_t& c) {
     return (c >= L'0' && c <= L'9') || (c >= L'a' && c <= L'z') || (c >= L'A' && c <= L'Z');
 }
 
-bool StringHelper::IsLetterOrDigit(const std::string& s) {
+bool IsLetterOrDigit(const std::string& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](char c) { return !IsLetterOrDigit(c); }) == s.end();
 }
 
-bool StringHelper::IsLetterOrDigit(const std::wstring& s) {
+bool IsLetterOrDigit(const std::wstring& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](wchar_t c) { return !IsLetterOrDigit(c); }) == s.end();
 }
 
-std::string StringHelper::Trim(const std::string& s, const std::string& whitespaces) {
+std::string Trim(const std::string& s, const std::string& whitespaces) {
     const std::string::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::string::npos) {
         return std::string();
@@ -154,7 +154,7 @@ std::string StringHelper::Trim(const std::string& s, const std::string& whitespa
     return s.substr(pos, n);
 }
 
-std::wstring StringHelper::Trim(const std::wstring& s, const std::wstring& whitespaces) {
+std::wstring Trim(const std::wstring& s, const std::wstring& whitespaces) {
     const std::wstring::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::wstring::npos) {
         return std::wstring();
@@ -164,7 +164,7 @@ std::wstring StringHelper::Trim(const std::wstring& s, const std::wstring& white
     return s.substr(pos, n);
 }
 
-std::string StringHelper::LeftTrim(const std::string& s, const std::string& whitespaces) {
+std::string TrimLeft(const std::string& s, const std::string& whitespaces) {
     const std::string::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::string::npos) {
         return std::string();
@@ -173,7 +173,7 @@ std::string StringHelper::LeftTrim(const std::string& s, const std::string& whit
     return s.substr(pos);
 }
 
-std::wstring StringHelper::LeftTrim(const std::wstring& s, const std::wstring& whitespaces) {
+std::wstring TrimLeft(const std::wstring& s, const std::wstring& whitespaces) {
     const std::wstring::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::wstring::npos) {
         return std::wstring();
@@ -182,7 +182,7 @@ std::wstring StringHelper::LeftTrim(const std::wstring& s, const std::wstring& w
     return s.substr(pos);
 }
 
-std::string StringHelper::RightTrim(const std::string& s, const std::string& whitespaces) {
+std::string TrimRight(const std::string& s, const std::string& whitespaces) {
     const std::string::size_type pos = s.find_last_not_of(whitespaces);
     if (pos == std::string::npos) {
         return std::string();
@@ -191,7 +191,7 @@ std::string StringHelper::RightTrim(const std::string& s, const std::string& whi
     return s.substr(0, pos + 1);
 }
 
-std::wstring StringHelper::RightTrim(const std::wstring& s, const std::wstring& whitespaces) {
+std::wstring TrimRight(const std::wstring& s, const std::wstring& whitespaces) {
     const std::wstring::size_type pos = s.find_last_not_of(whitespaces);
     if (pos == std::wstring::npos) {
         return std::wstring();
@@ -200,37 +200,37 @@ std::wstring StringHelper::RightTrim(const std::wstring& s, const std::wstring& 
     return s.substr(0, pos + 1);
 }
 
-bool StringHelper::IsStartsWith(const std::string& s, const std::string& prefix) {
+bool IsStartsWith(const std::string& s, const std::string& prefix) {
     return s.compare(0, prefix.length(), prefix) == 0;
 }
 
-bool StringHelper::IsStartsWith(const std::wstring& s, const std::wstring& prefix) {
+bool IsStartsWith(const std::wstring& s, const std::wstring& prefix) {
     return s.compare(0, prefix.length(), prefix) == 0;
 }
 
-bool StringHelper::IsEndsWith(const std::string& s, const std::string& suffix) {
+bool IsEndsWith(const std::string& s, const std::string& suffix) {
     if (suffix.length() <= s.length()) {
         return s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0;
     }
     return false;
 }
 
-bool StringHelper::IsEndsWith(const std::wstring& s, const std::wstring& suffix) {
+bool IsEndsWith(const std::wstring& s, const std::wstring& suffix) {
     if (suffix.length() <= s.length()) {
         return s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0;
     }
     return false;
 }
 
-bool StringHelper::IsContains(const std::string& str, const std::string& substring) {
+bool IsContains(const std::string& str, const std::string& substring) {
     return (str.find(substring) != std::string::npos);
 }
 
-bool StringHelper::IsContains(const std::wstring& str, const std::wstring& substring) {
+bool IsContains(const std::wstring& str, const std::wstring& substring) {
     return (str.find(substring) != std::wstring::npos);
 }
 
-size_t StringHelper::ContainTimes(const std::string& str, const std::string& substring) {
+size_t ContainTimes(const std::string& str, const std::string& substring) {
     size_t times = 0;
     size_t pos = std::string::npos;
     size_t offset = 0;
@@ -250,7 +250,7 @@ size_t StringHelper::ContainTimes(const std::string& str, const std::string& sub
     return times;
 }
 
-size_t StringHelper::ContainTimes(const std::wstring& str, const std::wstring& substring) {
+size_t ContainTimes(const std::wstring& str, const std::wstring& substring) {
     size_t times = 0;
     size_t pos = std::wstring::npos;
     size_t offset = 0;
@@ -270,7 +270,7 @@ size_t StringHelper::ContainTimes(const std::wstring& str, const std::wstring& s
     return times;
 }
 
-std::string::size_type StringHelper::Find(const std::string& str, const std::string& substring, std::string::size_type offset, bool caseInsensitive) {
+std::string::size_type Find(const std::string& str, const std::string& substring, std::string::size_type offset, bool caseInsensitive) {
     if (offset >= str.length())
         return std::wstring::npos;
 
@@ -286,7 +286,7 @@ std::string::size_type StringHelper::Find(const std::string& str, const std::str
     return std::string::npos;  // Not found
 }
 
-std::wstring::size_type StringHelper::Find(const std::wstring& str, const std::wstring& substring, std::wstring::size_type offset, bool caseInsensitive) {
+std::wstring::size_type Find(const std::wstring& str, const std::wstring& substring, std::wstring::size_type offset, bool caseInsensitive) {
     if (offset >= str.length())
         return std::wstring::npos;
 
@@ -302,7 +302,7 @@ std::wstring::size_type StringHelper::Find(const std::wstring& str, const std::w
     return std::wstring::npos;  // Not found
 }
 
-std::string StringHelper::ReplaceFirst(const std::string& s, const std::string& from, const std::string& to) {
+std::string ReplaceFirst(const std::string& s, const std::string& from, const std::string& to) {
     const size_t start_pos = s.find(from);
     if (start_pos == std::string::npos) {
         return s;
@@ -313,7 +313,7 @@ std::string StringHelper::ReplaceFirst(const std::string& s, const std::string& 
     return ret;
 }
 
-std::wstring StringHelper::ReplaceFirst(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
+std::wstring ReplaceFirst(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
     const size_t start_pos = s.find(from);
     if (start_pos == std::wstring::npos) {
         return s;
@@ -324,7 +324,7 @@ std::wstring StringHelper::ReplaceFirst(const std::wstring& s, const std::wstrin
     return ret;
 }
 
-std::string StringHelper::ReplaceLast(const std::string& s, const std::string& from, const std::string& to) {
+std::string ReplaceLast(const std::string& s, const std::string& from, const std::string& to) {
     const size_t start_pos = s.rfind(from);
     if (start_pos == std::string::npos) {
         return s;
@@ -335,7 +335,7 @@ std::string StringHelper::ReplaceLast(const std::string& s, const std::string& f
     return ret;
 }
 
-std::wstring StringHelper::ReplaceLast(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
+std::wstring ReplaceLast(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
     const size_t start_pos = s.rfind(from);
     if (start_pos == std::wstring::npos) {
         return s;
@@ -346,19 +346,19 @@ std::wstring StringHelper::ReplaceLast(const std::wstring& s, const std::wstring
     return ret;
 }
 
-std::string StringHelper::Replace(const std::string& s, const std::string& from, const std::string& to, std::wstring::size_type offset, bool caseInsensitive) {
+std::string Replace(const std::string& s, const std::string& from, const std::string& to, std::wstring::size_type offset, bool caseInsensitive) {
     if (from.empty()) {
         return s;
     }
 
-    const bool found_substring = StringHelper::Find(s, from, offset, caseInsensitive) != std::string::npos;
+    const bool found_substring = Find(s, from, offset, caseInsensitive) != std::string::npos;
     if (!found_substring) {
         return s;
     }
 
     size_t start_pos = 0;
     std::string ret = s;
-    while ((start_pos = StringHelper::Find(ret, from, start_pos, caseInsensitive)) != std::string::npos) {
+    while ((start_pos = Find(ret, from, start_pos, caseInsensitive)) != std::string::npos) {
         ret.replace(start_pos, from.length(), to);
         start_pos += to.length();
     }
@@ -366,19 +366,19 @@ std::string StringHelper::Replace(const std::string& s, const std::string& from,
     return ret;
 }
 
-std::wstring StringHelper::Replace(const std::wstring& s, const std::wstring& from, const std::wstring& to, std::wstring::size_type offset, bool caseInsensitive) {
+std::wstring Replace(const std::wstring& s, const std::wstring& from, const std::wstring& to, std::wstring::size_type offset, bool caseInsensitive) {
     if (from.empty()) {
         return s;
     }
 
-    const bool found_substring = StringHelper::Find(s, from, offset, caseInsensitive) != std::wstring::npos;
+    const bool found_substring = Find(s, from, offset, caseInsensitive) != std::wstring::npos;
     if (!found_substring) {
         return s;
     }
 
     size_t start_pos = 0;
     std::wstring ret = s;
-    while ((start_pos = StringHelper::Find(ret, from, start_pos, caseInsensitive)) != std::wstring::npos) {
+    while ((start_pos = Find(ret, from, start_pos, caseInsensitive)) != std::wstring::npos) {
         ret.replace(start_pos, from.length(), to);
         start_pos += to.length();
     }
@@ -386,7 +386,7 @@ std::wstring StringHelper::Replace(const std::wstring& s, const std::wstring& fr
     return ret;
 }
 
-std::vector<std::string> StringHelper::Split(const std::string& src, const std::string& delimiter, bool includeEmptyStr) {
+std::vector<std::string> StrSplit(const std::string& src, const std::string& delimiter, bool includeEmptyStr) {
     std::vector<std::string> fields;
     typename std::string::size_type offset = 0;
     typename std::string::size_type pos = src.find(delimiter, 0);
@@ -405,7 +405,7 @@ std::vector<std::string> StringHelper::Split(const std::string& src, const std::
     return fields;
 }
 
-std::vector<std::wstring> StringHelper::Split(const std::wstring& src, const std::wstring& delimiter, bool includeEmptyStr) {
+std::vector<std::wstring> StrSplit(const std::wstring& src, const std::wstring& delimiter, bool includeEmptyStr) {
     std::vector<std::wstring> fields;
     typename std::wstring::size_type offset = 0;
     typename std::wstring::size_type pos = src.find(delimiter, 0);
@@ -424,7 +424,7 @@ std::vector<std::wstring> StringHelper::Split(const std::wstring& src, const std
     return fields;
 }
 
-std::string StringHelper::Join(const std::vector<std::string>& src, const std::string& delimiter, bool includeEmptyStr) {
+std::string StrJoin(const std::vector<std::string>& src, const std::string& delimiter, bool includeEmptyStr) {
     std::stringstream ss;
     for (std::vector<std::string>::const_iterator it = src.cbegin(); it != src.cend(); ++it) {
         if (it->length() > 0) {
@@ -443,7 +443,7 @@ std::string StringHelper::Join(const std::vector<std::string>& src, const std::s
     return ss.str();
 }
 
-std::wstring StringHelper::Join(const std::vector<std::wstring>& src, const std::wstring& delimiter, bool includeEmptyStr) {
+std::wstring StrJoin(const std::vector<std::wstring>& src, const std::wstring& delimiter, bool includeEmptyStr) {
     std::wstringstream ss;
     for (std::vector<std::wstring>::const_iterator it = src.cbegin(); it != src.cend(); ++it) {
         if (it->length() > 0) {
@@ -462,7 +462,7 @@ std::wstring StringHelper::Join(const std::vector<std::wstring>& src, const std:
     return ss.str();
 }
 
-bool StringHelper::IsEqual(const std::string& s1, const std::string& s2, bool ignoreCase) {
+bool IsEqual(const std::string& s1, const std::string& s2, bool ignoreCase) {
     const std::string::size_type s1_len = s1.length();
     if (s1_len != s2.length())
         return false;
@@ -481,7 +481,7 @@ bool StringHelper::IsEqual(const std::string& s1, const std::string& s2, bool ig
     return true;
 }
 
-bool StringHelper::IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase) {
+bool IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase) {
     const std::wstring::size_type s1_len = s1.length();
     if (s1_len != s2.length())
         return false;
@@ -501,7 +501,7 @@ bool StringHelper::IsEqual(const std::wstring& s1, const std::wstring& s2, bool 
 }
 
 // format a string
-bool StringHelper::StringPrintfV(const char* format, va_list argList, std::string& output) noexcept {
+bool StringPrintfV(const char* format, va_list argList, std::string& output) noexcept {
     if (!format)
         return false;
 
@@ -586,7 +586,7 @@ bool StringHelper::StringPrintfV(const char* format, va_list argList, std::strin
 #endif
 }
 
-bool StringHelper::StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) noexcept {
+bool StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) noexcept {
     if (!format)
         return false;
 
@@ -671,7 +671,7 @@ bool StringHelper::StringPrintfV(const wchar_t* format, va_list argList, std::ws
 #endif
 }
 
-std::string StringHelper::StringPrintf(const char* format, ...) noexcept {
+std::string StringPrintf(const char* format, ...) noexcept {
     std::string output;
     try {
         va_list args;
@@ -687,7 +687,7 @@ std::string StringHelper::StringPrintf(const char* format, ...) noexcept {
     return output;
 }
 
-std::wstring StringHelper::StringPrintf(const wchar_t* format, ...) noexcept {
+std::wstring StringPrintf(const wchar_t* format, ...) noexcept {
     std::wstring output;
     try {
         va_list args;
@@ -701,32 +701,32 @@ std::wstring StringHelper::StringPrintf(const wchar_t* format, ...) noexcept {
     return output;
 }
 
-std::string StringHelper::StringPrintfV(const char* format, va_list argList) noexcept {
+std::string StringPrintfV(const char* format, va_list argList) noexcept {
     std::string output;
     StringPrintfV(format, argList, output);
     return output;
 }
 
-std::wstring StringHelper::StringPrintfV(const wchar_t* format, va_list argList) noexcept {
+std::wstring StringPrintfV(const wchar_t* format, va_list argList) noexcept {
     std::wstring output;
     StringPrintfV(format, argList, output);
     return output;
 }
 
 #ifdef ASHE_WIN
-bool StringHelper::IsResourceString(const std::wstring& s) {
+bool IsResourceString(const std::wstring& s) {
     std::wstring s2 = Trim(s, L" \"");
     return IsStartsWith(s2, L"@");
 }
 
-bool StringHelper::LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
+bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
     std::wstring resStrFormat = Trim(resStr, L" \"");
     resStrFormat = resStrFormat.substr(1);  // @
 
     if (resStrFormat.empty())
         return false;
 
-    std::vector<std::wstring> v = Split(resStrFormat, L",", true);
+    std::vector<std::wstring> v = StrSplit(resStrFormat, L",", true);
     if (v.size() < 2)
         return false;
 
@@ -748,7 +748,7 @@ bool StringHelper::LoadStringFromRes(const std::wstring& resStr, std::wstring& r
         return false;
     }
 
-    if (StringHelper::IsStartsWith(v[1], L"-"))
+    if (IsStartsWith(v[1], L"-"))
         v[1] = v[1].substr(1);
 
     UINT id = _wtoi(v[1].c_str());

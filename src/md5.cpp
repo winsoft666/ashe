@@ -36,7 +36,7 @@ std::string MD5::GetFileMD5(const std::wstring& file_path) {
     FILE* f = nullptr;
     _wfopen_s(&f, file_path.c_str(), L"rb");
 #else
-    std::string pathu8 = StringEncode::UnicodeToUtf8(file_path);
+    std::string pathu8 = UnicodeToUtf8(file_path);
     FILE* f = fopen(pathu8.c_str(), "rb");
 #endif
 

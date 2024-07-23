@@ -102,7 +102,7 @@ void ashe::CmdLineParser::parse() {
 
         if (sVal == NULL) {
             std::wstring Key(sArg);
-            Key = StringHelper::ToLower(Key);
+            Key = ToLower(Key);
             value_map_.insert(CmdLineParser::ValsMap::value_type(Key, L""));
             break;
         }
@@ -111,7 +111,7 @@ void ashe::CmdLineParser::parse() {
             std::wstring Key(sArg, (int)(sVal - sArg));
 
             if (Key.length() > 0) {
-                Key = StringHelper::ToLower(Key);
+                Key = ToLower(Key);
                 value_map_.insert(CmdLineParser::ValsMap::value_type(Key, L""));
             }
 
@@ -121,7 +121,7 @@ void ashe::CmdLineParser::parse() {
         else {
             // key has value
             std::wstring Key(sArg, (int)(sVal - sArg));
-            Key = StringHelper::ToLower(Key);
+            Key = ToLower(Key);
 
             sVal++;
 
@@ -163,6 +163,6 @@ void ashe::CmdLineParser::parse() {
 }
 
 ashe::CmdLineParser::ITERPOS ashe::CmdLineParser::findKey(const std::wstring& key) const {
-    const std::wstring keyLower = StringHelper::ToLower(key);
+    const std::wstring keyLower = ToLower(key);
     return value_map_.find(keyLower);
 }

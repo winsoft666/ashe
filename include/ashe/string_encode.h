@@ -24,45 +24,36 @@
 #include "ashe/arch.h"
 
 namespace ashe {
-class ASHE_API StringEncode {
-   public:
 #ifdef ASHE_WIN
-    static std::string UnicodeToAnsi(const std::wstring& str, unsigned int code_page = 0) noexcept;
-
-    static std::wstring AnsiToUnicode(const std::string& str, unsigned int code_page = 0) noexcept;
-
+ASHE_API std::string UnicodeToAnsi(const std::wstring& str, unsigned int code_page = 0) noexcept;
+ASHE_API std::wstring AnsiToUnicode(const std::string& str, unsigned int code_page = 0) noexcept;
 #endif
 
-    static std::string UnicodeToUtf8(const std::wstring& str) noexcept;
-
-    static std::string UnicodeToUtf8BOM(const std::wstring& str) noexcept;
-
-    static std::wstring Utf8ToUnicode(const std::string& str) noexcept;
+ASHE_API std::string UnicodeToUtf8(const std::wstring& str) noexcept;
+ASHE_API std::string UnicodeToUtf8BOM(const std::wstring& str) noexcept;
+ASHE_API std::wstring Utf8ToUnicode(const std::string& str) noexcept;
 
 #ifdef ASHE_WIN
-    static std::string AnsiToUtf8(const std::string& str, unsigned int code_page = 0) noexcept;
-
-    static std::string AnsiToUtf8BOM(const std::string& str, unsigned int code_page = 0) noexcept;
-
-    static std::string Utf8ToAnsi(const std::string& str, unsigned int code_page = 0) noexcept;
+ASHE_API std::string AnsiToUtf8(const std::string& str, unsigned int code_page = 0) noexcept;
+ASHE_API std::string AnsiToUtf8BOM(const std::string& str, unsigned int code_page = 0) noexcept;
+ASHE_API std::string Utf8ToAnsi(const std::string& str, unsigned int code_page = 0) noexcept;
 #endif
-};
 
 #ifdef ASHE_WIN
 #if (defined UNICODE || defined _UNICODE)
-#define TCHARToAnsi(str) ashe::StringEncode::UnicodeToAnsi((str), 0)
-#define TCHARToUtf8(str) ashe::StringEncode::UnicodeToUtf8((str))
-#define AnsiToTCHAR(str) ashe::StringEncode::AnsiToUnicode((str), 0)
-#define Utf8ToTCHAR(str) ashe::StringEncode::Utf8ToUnicode((str))
+#define TCHARToAnsi(str) ashe::UnicodeToAnsi((str), 0)
+#define TCHARToUtf8(str) ashe::UnicodeToUtf8((str))
+#define AnsiToTCHAR(str) ashe::AnsiToUnicode((str), 0)
+#define Utf8ToTCHAR(str) ashe::Utf8ToUnicode((str))
 #define TCHARToUnicode(str) ((std::wstring)(str))
 #define UnicodeToTCHAR(str) ((std::wstring)(str))
 #else
 #define TCHARToAnsi(str) ((std::string)(str))
-#define TCHARToUtf8 ashe::StringEncode::AnsiToUtf8((str), 0)
+#define TCHARToUtf8 ashe::AnsiToUtf8((str), 0)
 #define AnsiToTCHAR(str) ((std::string)(str))
-#define Utf8ToTCHAR(str) ashe::StringEncode::Utf8ToAnsi((str), 0)
-#define TCHARToUnicode(str) ashe::StringEncode::AnsiToUnicode((str), 0)
-#define UnicodeToTCHAR(str) ashe::StringEncode::UnicodeToAnsi((str), 0)
+#define Utf8ToTCHAR(str) ashe::Utf8ToAnsi((str), 0)
+#define TCHARToUnicode(str) ashe::AnsiToUnicode((str), 0)
+#define UnicodeToTCHAR(str) ashe::UnicodeToAnsi((str), 0)
 #endif
 #endif
 }  // namespace ashe

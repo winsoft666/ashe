@@ -3,13 +3,13 @@
 
 namespace ashe {
 Version::Version(const std::string& s) {
-    const std::string sc = StringHelper::Trim(s);
-    const std::vector<std::string> v = StringHelper::Split(sc, ".");
+    const std::string sc = Trim(s);
+    const std::vector<std::string> v = StrSplit(sc, ".");
     const bool valid = !v.empty() &&
                        std::find_if(v.begin(),
                                     v.end(),
                                     [](const std::string& c) {
-                                        return !StringHelper::IsDigit(c);
+                                        return !IsDigit(c);
                                     }) == v.end();
     if (valid) {
         for (const auto& c : v) {
@@ -19,13 +19,13 @@ Version::Version(const std::string& s) {
 }
 
 Version::Version(const std::wstring& s) {
-    const std::wstring sc = StringHelper::Trim(s);
-    const std::vector<std::wstring> v = StringHelper::Split(sc, L".");
+    const std::wstring sc = Trim(s);
+    const std::vector<std::wstring> v = StrSplit(sc, L".");
     const bool valid = !v.empty() &&
                        std::find_if(v.begin(),
                                     v.end(),
                                     [](const std::wstring& c) {
-                                        return !StringHelper::IsDigit(c);
+                                        return !IsDigit(c);
                                     }) == v.end();
     if (valid) {
         for (const auto& c : v) {

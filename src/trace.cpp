@@ -24,7 +24,7 @@ void Trace::MsgW(const wchar_t* lpFormat, ...) noexcept {
     std::wstring output;
     va_list args;
     va_start(args, lpFormat);
-    const bool ret = StringHelper::StringPrintfV(lpFormat, args, output);
+    const bool ret = StringPrintfV(lpFormat, args, output);
     va_end(args);
 
     if (ret) {
@@ -40,7 +40,7 @@ void Trace::MsgA(const char* lpFormat, ...) noexcept {
     std::string output;
     va_list args;
     va_start(args, lpFormat);
-    const bool ret = StringHelper::StringPrintfV(lpFormat, args, output);
+    const bool ret = StringPrintfV(lpFormat, args, output);
     va_end(args);
 
     if (ret) {

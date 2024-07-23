@@ -333,7 +333,7 @@ class ASHE_API WinServiceBase {
     }
 
     void WriteEventLogEntryA(LPCSTR pszMessage, WORD wType) {
-        std::wstring strMessageW = StringEncode::AnsiToUnicode(pszMessage);
+        std::wstring strMessageW = AnsiToUnicode(pszMessage);
         WriteEventLogEntry((LPCWSTR)strMessageW.c_str(), wType);
     }
 

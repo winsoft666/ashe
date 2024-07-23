@@ -43,7 +43,7 @@ void Configor::Element::set(const std::wstring& value, const std::size_t i) noex
         values_.resize(i + 1);
     }
 
-    values_[i] = ashe::StringEncode::UnicodeToUtf8(value);
+    values_[i] = UnicodeToUtf8(value);
 
     c_->saveFile();
 }
@@ -103,10 +103,10 @@ std::wstring Configor::Element::getWString(const std::size_t i, const std::wstri
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
     if (i >= values_.size()) {
         values_.resize(i + 1);
-        values_[i] = ashe::StringEncode::UnicodeToUtf8(defaultValue);
+        values_[i] = UnicodeToUtf8(defaultValue);
     }
 
-    return ashe::StringEncode::Utf8ToUnicode(values_[i]);
+    return Utf8ToUnicode(values_[i]);
 }
 
 int Configor::Element::getInt(const std::size_t i, int defaultValue) noexcept {
@@ -154,7 +154,7 @@ Configor::Element& Configor::Element::operator[](const std::string& name) {
 
 Configor::Element& Configor::Element::operator[](const std::wstring& name) {
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
-    std::string nameu8 = ashe::StringEncode::UnicodeToUtf8(name);
+    std::string nameu8 = UnicodeToUtf8(name);
     for (auto i = children_.begin(); i != children_.end(); i++) {
         if ((*i).name_ == nameu8) {
             return *i;
@@ -589,7 +589,7 @@ Configor::Element& Configor::operator[](const std::string& name) {
 }
 
 Configor::Element& Configor::operator[](const std::wstring& name) {
-    std::string nameu8 = ashe::StringEncode::UnicodeToUtf8(name);
+    std::string nameu8 = UnicodeToUtf8(name);
     return root_[nameu8];
 }
 

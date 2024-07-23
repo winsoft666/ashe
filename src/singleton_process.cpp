@@ -110,7 +110,7 @@ void SingletonProcess::check() {
                 if (viewOfFile_) {
                     LPWSTR pCML = ::GetCommandLineW();
                     if (pCML) {
-                        std::string strCMLu8 = ashe::StringEncode::UnicodeToUtf8(std::wstring(pCML));
+                        std::string strCMLu8 = UnicodeToUtf8(std::wstring(pCML));
                         memset(viewOfFile_, 0, kSizeOfMap);
                         StringCchCopyA((LPSTR)viewOfFile_, kSizeOfMap, strCMLu8.c_str());
                     }

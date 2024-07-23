@@ -869,7 +869,7 @@ std::wstring ShellinkParser::getDescription() const {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
             result = stringData_.NameStringW;
         else
-            result = StringEncode::AnsiToUnicode(stringData_.NameStringA);
+            result = AnsiToUnicode(stringData_.NameStringA);
     }
 
     return result;
@@ -883,20 +883,20 @@ std::wstring ShellinkParser::getTargetPath() {
             if (linkInfo_.LinkInfoHeaderSize >= 0x00000024)
                 result = linkInfo_.LocalBasePathUnicode + linkInfo_.CommonPathSuffixUnicode;
             else
-                result = StringEncode::AnsiToUnicode(linkInfo_.LocalBasePath + linkInfo_.CommonPathSuffix);
+                result = AnsiToUnicode(linkInfo_.LocalBasePath + linkInfo_.CommonPathSuffix);
         }
         else if (linkInfo_.LnkInfFlags & LinkInfoFlag::LIF_CommonNetworkRelativeLinkAndPathSuffix) {
             if (linkInfo_.CommonNetRelLnk.ComNetRelLnkFlags & CommonNetworkRelativeLinkFlag::CNETRLNK_ValidDevice) {
                 if (linkInfo_.CommonNetRelLnk.NetNameOffset > 0x00000014)
                     result = linkInfo_.CommonNetRelLnk.DeviceNameUnicode;
                 else
-                    result = StringEncode::AnsiToUnicode(linkInfo_.CommonNetRelLnk.DeviceName);
+                    result = AnsiToUnicode(linkInfo_.CommonNetRelLnk.DeviceName);
             }
             else if (linkInfo_.CommonNetRelLnk.ComNetRelLnkFlags & CommonNetworkRelativeLinkFlag::CNETRLNK_ValidNetType) {
                 if (linkInfo_.CommonNetRelLnk.NetNameOffset > 0x00000014)
                     result = linkInfo_.CommonNetRelLnk.NetNameUnicode;
                 else
-                    result = StringEncode::AnsiToUnicode(linkInfo_.CommonNetRelLnk.NetName);
+                    result = AnsiToUnicode(linkInfo_.CommonNetRelLnk.NetName);
             }
         }
     }
@@ -933,7 +933,7 @@ std::wstring ShellinkParser::getTargetPath() {
                 if (hr == S_OK) {
                     if (strret.uType == STRRET_CSTR) {
                         std::string strAnsi = strret.cStr;
-                        result = ashe::StringEncode::AnsiToUnicode(strAnsi);
+                        result = ashe::AnsiToUnicode(strAnsi);
                     }
                     else if (strret.uType == STRRET_WSTR) {
                         result = strret.pOleStr;
@@ -954,7 +954,7 @@ std::wstring ShellinkParser::getTargetPath() {
         if (!extraData_.envVarDB.TargetUnicode.empty())
             result = extraData_.envVarDB.TargetUnicode;
         else if (!extraData_.envVarDB.TargetAnsi.empty())
-            result = StringEncode::AnsiToUnicode(extraData_.envVarDB.TargetAnsi);
+            result = AnsiToUnicode(extraData_.envVarDB.TargetAnsi);
     }
 
     targetPath_ = result;
@@ -967,7 +967,7 @@ std::wstring ShellinkParser::getWorkingDir() const {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
             result = stringData_.WorkingDirW;
         else
-            result = StringEncode::AnsiToUnicode(stringData_.WorkingDirA);
+            result = AnsiToUnicode(stringData_.WorkingDirA);
     }
 
     return result;
@@ -979,7 +979,7 @@ std::wstring ShellinkParser::getArguments() const {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
             result = stringData_.CommandLineArgumentsW;
         else
-            result = StringEncode::AnsiToUnicode(stringData_.CommandLineArgumentsA);
+            result = AnsiToUnicode(stringData_.CommandLineArgumentsA);
     }
     return result;
 }
@@ -992,7 +992,7 @@ std::wstring ShellinkParser::getIconPath() const {
         if (header_.LinkFlags & ShllinkLinkFlag::LF_IsUnicode)
             result = stringData_.IconLocationW;
         else
-            result = StringEncode::AnsiToUnicode(stringData_.IconLocationA);
+            result = AnsiToUnicode(stringData_.IconLocationA);
     }
 
     if (result.empty()) {
@@ -1000,7 +1000,7 @@ std::wstring ShellinkParser::getIconPath() const {
             if (!extraData_.iconEnvDB.TargetUnicode.empty())
                 result = extraData_.iconEnvDB.TargetUnicode;
             else if (!extraData_.iconEnvDB.TargetAnsi.empty())
-                result = StringEncode::AnsiToUnicode(extraData_.iconEnvDB.TargetAnsi);
+                result = AnsiToUnicode(extraData_.iconEnvDB.TargetAnsi);
         }
     }
 

@@ -7,8 +7,8 @@
 TEST_CASE("StringEncodeTest") {
     const std::string u8str = u8"中国china";
     const std::wstring wstr = L"中国china";
-    REQUIRE(ashe::StringEncode::Utf8ToUnicode(u8str) == wstr);
-    REQUIRE(ashe::StringEncode::UnicodeToUtf8(wstr) == u8str);
+    REQUIRE(ashe::Utf8ToUnicode(u8str) == wstr);
+    REQUIRE(ashe::UnicodeToUtf8(wstr) == u8str);
 }
 
 // Test: string base64 encode/decode.
