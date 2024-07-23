@@ -21,6 +21,7 @@
 #define ASHE_WIN_FILE_INFO_H__
 #pragma once
 
+#include "ashe/arch.h"
 #include "ashe/config.h"
 
 #ifdef ASHE_WIN
