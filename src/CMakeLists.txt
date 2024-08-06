@@ -37,14 +37,14 @@ if(ASHE_BUILD_SHARED_LIBS)
 		OUTPUT_NAME ${ASHE_LIB_NAME}
 		DEBUG_OUTPUT_NAME ${ASHE_LIB_NAME}${DEBUG_LIBNAME_SUFFIX})
 else()
-	add_definitions(-DASHE_STATIC)
-	
 	add_library(
 		${ASHE_LIB_NAME}
 		STATIC
 		${HEADERS}
 		${SOURCES}
 	)
+
+	target_compile_definitions(${ASHE_LIB_NAME} PUBLIC ASHE_STATIC)
 	
 	# set output name prefix/suffix
   	set_target_properties(${ASHE_LIB_NAME} PROPERTIES 
