@@ -56,5 +56,12 @@ ASHE_API std::string Utf8ToAnsi(const std::string& str, unsigned int code_page =
 #define UnicodeToTCHAR(str) ashe::UnicodeToAnsi((str), 0)
 #endif
 #endif
+
+#define w2a(s) UnicodeToAnsi((s))
+#define a2w(s) AnsiToUnicode((s))
+#define w2u(s) UnicodeToUtf8((s))
+#define u2w(s) Utf8ToUnicode((s))
+#define a2u(s) AnsiToUtf8((s))
+#define u2a(s) Utf8ToAnsi((s))
 }  // namespace ashe
 #endif  // ASHE_STRING_ENCODE_HPP_

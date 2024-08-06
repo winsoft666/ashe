@@ -766,5 +766,29 @@ bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
     return true;
 }
 
+std::wstring Win32ErrCodeToStr(LONG err) {
+    std::wstring result;
+    LPWSTR buffer = NULL;
+    DWORD dwRet = FormatMessageW(
+        FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        err,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPWSTR)&buffer,
+        NULL,
+        NULL);
+
+    if (dwRet > 0) {
+        if (buffer) {
+            result = buffer;
+            LocalFree(buffer);
+        }
+    }
+
+    return result;
+}
+
 #endif
 }  // namespace ashe

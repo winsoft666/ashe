@@ -104,6 +104,9 @@ ASHE_API bool IsResourceString(const std::wstring& s);
 
 // Notice: 32bit program can not load 64bit dll
 ASHE_API bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result);
+
+// Get HRESULT/LSTATUS discription message.
+ASHE_API std::wstring Win32ErrCodeToStr(long err);
 #endif
 }  // namespace ashe
 #endif  // !ASHE_STRING_HELPER_HPP__
