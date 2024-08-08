@@ -1,20 +1,23 @@
-#include "ashe/os_ver.h"
+#include "ashe/os_version.h"
 
 namespace ashe {
 #ifdef ASHE_WIN
-WinVerInfo OSVersion::GetWinVer() noexcept{
-    WinVerInfo wvf;
-    LONG(WINAPI * RtlGetVersion)
-    (LPOSVERSIONINFOEX);
-    *(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll.dll"), "RtlGetVersion");
+typedef LONG(WINAPI* RtlGetVersion)(LPOSVERSIONINFOEX);
 
+WinVerInfo OSVersion::GetWinVer() noexcept {
+    WinVerInfo wvf;
+    RtlGetVersion fn = nullptr;
+    HMODULE hDll = GetModuleHandleA("ntdll.dll");
+    if (hDll) {
+        fn = (RtlGetVersion)GetProcAddress(hDll, "RtlGetVersion");
+    }
     OSVERSIONINFOEX osversion;
     osversion.dwOSVersionInfoSize = sizeof(osversion);
     osversion.szCSDVersion[0] = TEXT('\0');
 
-    if (RtlGetVersion != NULL) {
+    if (fn != NULL) {
         // RtlGetVersion uses 0 (STATUS_SUCCESS) as return value when succeeding
-        if (RtlGetVersion(&osversion) != 0)
+        if (fn(&osversion) != 0)
             return wvf;
     }
     else {
@@ -37,22 +40,32 @@ WinVerInfo OSVersion::GetWinVer() noexcept{
     return wvf;
 }
 
-bool OSVersion::IsWindowsVistaOrHigher() noexcept{
+bool OSVersion::IsWindowsVistaOrHigher() noexcept {
     const WinVerInfo wvi = GetWinVer();
     return (wvi.major >= 6);
 }
 
-bool OSVersion::IsWindows11() noexcept{
+bool OSVersion::IsWindows11() noexcept {
     const WinVerInfo wvi = GetWinVer();
     return (wvi.major >= 10 && wvi.build >= 22000);
 }
 
-bool OSVersion::IsWin64() noexcept{
-#ifdef ASHE_WIN64
+bool OSVersion::IsWin64() noexcept {
+#if 0
+#ifdef ASHE_WIN64  // 64bit process
     return true;
-#else
+#else              // 32bit process
     bool result = false;
     IsWow64(GetCurrentProcess(), result);
+    return result;
+#endif
+#else
+    bool result = false;
+    SYSTEM_INFO si;
+    RtlZeroMemory(&si, sizeof(SYSTEM_INFO));
+    GetNativeSystemInfo(&si);
+    if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+        result = true;
     return result;
 #endif
 }

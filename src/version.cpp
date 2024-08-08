@@ -3,7 +3,7 @@
 
 namespace ashe {
 Version::Version(const std::string& s) {
-    const std::string sc = Trim(s);
+    const std::string sc = StrTrim(s);
     const std::vector<std::string> v = StrSplit(sc, ".");
     const bool valid = !v.empty() &&
                        std::find_if(v.begin(),
@@ -19,7 +19,7 @@ Version::Version(const std::string& s) {
 }
 
 Version::Version(const std::wstring& s) {
-    const std::wstring sc = Trim(s);
+    const std::wstring sc = StrTrim(s);
     const std::vector<std::wstring> v = StrSplit(sc, L".");
     const bool valid = !v.empty() &&
                        std::find_if(v.begin(),

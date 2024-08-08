@@ -12,7 +12,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 #endif
 #include <wchar.h>
-#include "ashe/os_ver.h"
+#include "ashe/os_version.h"
 #include "ashe/string_helper.h"
 
 namespace ashe {
@@ -176,8 +176,8 @@ std::string PathUtil::ReplaceKnownEnvToWow6432(const std::string& src) {
         return src;
 
     std::string sl = src;
-    sl = Replace(sl, "%ProgramFiles%", "%ProgramW6432%", 0, true);
-    sl = Replace(sl, "%CommonProgramFiles%", "%CommonProgramW6432%", 0, true);
+    sl = StrReplace(sl, "%ProgramFiles%", "%ProgramW6432%", 0, true);
+    sl = StrReplace(sl, "%CommonProgramFiles%", "%CommonProgramW6432%", 0, true);
 
     return sl;
 }
@@ -196,8 +196,8 @@ std::wstring PathUtil::ReplaceKnownEnvToWow6432(const std::wstring& src) {
         return src;
 
     std::wstring sl = src;
-    sl = Replace(sl, L"%ProgramFiles%", L"%ProgramW6432%", 0, true);
-    sl = Replace(sl, L"%CommonProgramFiles%", L"%CommonProgramW6432%", 0, true);
+    sl = StrReplace(sl, L"%ProgramFiles%", L"%ProgramW6432%", 0, true);
+    sl = StrReplace(sl, L"%CommonProgramFiles%", L"%CommonProgramW6432%", 0, true);
 
     return sl;
 }

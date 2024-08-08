@@ -6,7 +6,7 @@
 #include <shlobj.h>
 #include <propkey.h>
 #include <strsafe.h>
-#include "ashe/os_ver.h"
+#include "ashe/os_version.h"
 #include <assert.h>
 #include "ashe/file.h"
 #include "ashe/scoped_object.h"

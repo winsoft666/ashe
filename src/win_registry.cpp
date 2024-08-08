@@ -3,7 +3,7 @@
 #ifdef ASHE_WIN
 #include <process.h>
 #include <strsafe.h>
-#include "ashe/os_ver.h"
+#include "ashe/os_version.h"
 
 namespace ashe {
 WinRegistry::WinRegistry(HKEY hkeyRoot, const std::wstring& subKey) noexcept :

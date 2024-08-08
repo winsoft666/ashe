@@ -46,14 +46,14 @@ ASHE_API bool IsLetterOrDigit(const wchar_t& c);
 ASHE_API bool IsLetterOrDigit(const std::string& s);
 ASHE_API bool IsLetterOrDigit(const std::wstring& s);
 
-ASHE_API std::string Trim(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r");
-ASHE_API std::wstring Trim(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r");
+ASHE_API std::string StrTrim(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r");
+ASHE_API std::wstring StrTrim(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r");
 
-ASHE_API std::string TrimLeft(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r");
-ASHE_API std::wstring TrimLeft(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r");
+ASHE_API std::string StrTrimLeft(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r");
+ASHE_API std::wstring StrTrimLeft(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r");
 
-ASHE_API std::string TrimRight(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r");
-ASHE_API std::wstring TrimRight(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r");
+ASHE_API std::string StrTrimRight(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r");
+ASHE_API std::wstring StrTrimRight(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r");
 
 ASHE_API bool IsStartsWith(const std::string& s, const std::string& prefix);
 ASHE_API bool IsStartsWith(const std::wstring& s, const std::wstring& prefix);
@@ -64,20 +64,20 @@ ASHE_API bool IsEndsWith(const std::wstring& s, const std::wstring& suffix);
 ASHE_API bool IsContains(const std::string& str, const std::string& substring);
 ASHE_API bool IsContains(const std::wstring& str, const std::wstring& substring);
 
-ASHE_API size_t ContainTimes(const std::string& str, const std::string& substring);
-ASHE_API size_t ContainTimes(const std::wstring& str, const std::wstring& substring);
+ASHE_API size_t StrContainTimes(const std::string& str, const std::string& substring);
+ASHE_API size_t StrContainTimes(const std::wstring& str, const std::wstring& substring);
 
-ASHE_API std::string::size_type Find(const std::string& str, const std::string& substring, std::string::size_type offset = 0, bool caseInsensitive = false);
-ASHE_API std::wstring::size_type Find(const std::wstring& str, const std::wstring& substring, std::wstring::size_type offset = 0, bool caseInsensitive = false);
+ASHE_API std::string::size_type StrFind(const std::string& str, const std::string& substring, std::string::size_type offset = 0, bool caseInsensitive = false);
+ASHE_API std::wstring::size_type StrFind(const std::wstring& str, const std::wstring& substring, std::wstring::size_type offset = 0, bool caseInsensitive = false);
 
-ASHE_API std::string ReplaceFirst(const std::string& s, const std::string& from, const std::string& to);
-ASHE_API std::wstring ReplaceFirst(const std::wstring& s, const std::wstring& from, const std::wstring& to);
+ASHE_API std::string StrReplaceFirst(const std::string& s, const std::string& from, const std::string& to);
+ASHE_API std::wstring StrReplaceFirst(const std::wstring& s, const std::wstring& from, const std::wstring& to);
 
-ASHE_API std::string ReplaceLast(const std::string& s, const std::string& from, const std::string& to);
-ASHE_API std::wstring ReplaceLast(const std::wstring& s, const std::wstring& from, const std::wstring& to);
+ASHE_API std::string StrReplaceLast(const std::string& s, const std::string& from, const std::string& to);
+ASHE_API std::wstring StrReplaceLast(const std::wstring& s, const std::wstring& from, const std::wstring& to);
 
-ASHE_API std::string Replace(const std::string& s, const std::string& from, const std::string& to, std::string::size_type offset = 0, bool caseInsensitive = false);
-ASHE_API std::wstring Replace(const std::wstring& s, const std::wstring& from, const std::wstring& to, std::wstring::size_type offset = 0, bool caseInsensitive = false);
+ASHE_API std::string StrReplace(const std::string& s, const std::string& from, const std::string& to, std::string::size_type offset = 0, bool caseInsensitive = false);
+ASHE_API std::wstring StrReplace(const std::wstring& s, const std::wstring& from, const std::wstring& to, std::wstring::size_type offset = 0, bool caseInsensitive = false);
 
 ASHE_API std::vector<std::string> StrSplit(const std::string& src, const std::string& delimiter, bool includeEmptyStr = true);
 ASHE_API std::vector<std::wstring> StrSplit(const std::wstring& src, const std::wstring& delimiter, bool includeEmptyStr = true);
@@ -89,14 +89,14 @@ ASHE_API bool IsEqual(const std::string& s1, const std::string& s2, bool ignoreC
 ASHE_API bool IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase = false);
 
 // format a string
-ASHE_API bool StringPrintfV(const char* format, va_list argList, std::string& output) noexcept;
-ASHE_API bool StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) noexcept;
+ASHE_API bool StrFormat(const char* format, va_list argList, std::string& output) noexcept;
+ASHE_API bool StrFormat(const wchar_t* format, va_list argList, std::wstring& output) noexcept;
 
-ASHE_API std::string StringPrintf(const char* format, ...) noexcept;
-ASHE_API std::wstring StringPrintf(const wchar_t* format, ...) noexcept;
+ASHE_API std::string StrFormat(const char* format, ...) noexcept;
+ASHE_API std::wstring StrFormat(const wchar_t* format, ...) noexcept;
 
-ASHE_API std::string StringPrintfV(const char* format, va_list argList) noexcept;
-ASHE_API std::wstring StringPrintfV(const wchar_t* format, va_list argList) noexcept;
+ASHE_API std::string StrFormat(const char* format, va_list argList) noexcept;
+ASHE_API std::wstring StrFormat(const wchar_t* format, va_list argList) noexcept;
 
 #ifdef ASHE_WIN
 // such as @%SystemRoot%\\system32\\%SystemRoot%.dll,-10113
@@ -105,7 +105,7 @@ ASHE_API bool IsResourceString(const std::wstring& s);
 // Notice: 32bit program can not load 64bit dll
 ASHE_API bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result);
 
-// Get HRESULT/LSTATUS discription message.
+// Get HRESULT/LSTATUS description message.
 ASHE_API std::wstring Win32ErrCodeToStr(long err);
 #endif
 }  // namespace ashe

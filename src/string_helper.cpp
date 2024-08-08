@@ -144,7 +144,7 @@ bool IsLetterOrDigit(const std::wstring& s) {
            std::find_if(s.begin(), s.end(), [](wchar_t c) { return !IsLetterOrDigit(c); }) == s.end();
 }
 
-std::string Trim(const std::string& s, const std::string& whitespaces) {
+std::string StrTrim(const std::string& s, const std::string& whitespaces) {
     const std::string::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::string::npos) {
         return std::string();
@@ -154,7 +154,7 @@ std::string Trim(const std::string& s, const std::string& whitespaces) {
     return s.substr(pos, n);
 }
 
-std::wstring Trim(const std::wstring& s, const std::wstring& whitespaces) {
+std::wstring StrTrim(const std::wstring& s, const std::wstring& whitespaces) {
     const std::wstring::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::wstring::npos) {
         return std::wstring();
@@ -164,7 +164,7 @@ std::wstring Trim(const std::wstring& s, const std::wstring& whitespaces) {
     return s.substr(pos, n);
 }
 
-std::string TrimLeft(const std::string& s, const std::string& whitespaces) {
+std::string StrTrimLeft(const std::string& s, const std::string& whitespaces) {
     const std::string::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::string::npos) {
         return std::string();
@@ -173,7 +173,7 @@ std::string TrimLeft(const std::string& s, const std::string& whitespaces) {
     return s.substr(pos);
 }
 
-std::wstring TrimLeft(const std::wstring& s, const std::wstring& whitespaces) {
+std::wstring StrTrimLeft(const std::wstring& s, const std::wstring& whitespaces) {
     const std::wstring::size_type pos = s.find_first_not_of(whitespaces);
     if (pos == std::wstring::npos) {
         return std::wstring();
@@ -182,7 +182,7 @@ std::wstring TrimLeft(const std::wstring& s, const std::wstring& whitespaces) {
     return s.substr(pos);
 }
 
-std::string TrimRight(const std::string& s, const std::string& whitespaces) {
+std::string StrTrimRight(const std::string& s, const std::string& whitespaces) {
     const std::string::size_type pos = s.find_last_not_of(whitespaces);
     if (pos == std::string::npos) {
         return std::string();
@@ -191,7 +191,7 @@ std::string TrimRight(const std::string& s, const std::string& whitespaces) {
     return s.substr(0, pos + 1);
 }
 
-std::wstring TrimRight(const std::wstring& s, const std::wstring& whitespaces) {
+std::wstring StrTrimRight(const std::wstring& s, const std::wstring& whitespaces) {
     const std::wstring::size_type pos = s.find_last_not_of(whitespaces);
     if (pos == std::wstring::npos) {
         return std::wstring();
@@ -230,7 +230,7 @@ bool IsContains(const std::wstring& str, const std::wstring& substring) {
     return (str.find(substring) != std::wstring::npos);
 }
 
-size_t ContainTimes(const std::string& str, const std::string& substring) {
+size_t StrContainTimes(const std::string& str, const std::string& substring) {
     size_t times = 0;
     size_t pos = std::string::npos;
     size_t offset = 0;
@@ -250,7 +250,7 @@ size_t ContainTimes(const std::string& str, const std::string& substring) {
     return times;
 }
 
-size_t ContainTimes(const std::wstring& str, const std::wstring& substring) {
+size_t StrContainTimes(const std::wstring& str, const std::wstring& substring) {
     size_t times = 0;
     size_t pos = std::wstring::npos;
     size_t offset = 0;
@@ -270,7 +270,7 @@ size_t ContainTimes(const std::wstring& str, const std::wstring& substring) {
     return times;
 }
 
-std::string::size_type Find(const std::string& str, const std::string& substring, std::string::size_type offset, bool caseInsensitive) {
+std::string::size_type StrFind(const std::string& str, const std::string& substring, std::string::size_type offset, bool caseInsensitive) {
     if (offset >= str.length())
         return std::wstring::npos;
 
@@ -286,7 +286,7 @@ std::string::size_type Find(const std::string& str, const std::string& substring
     return std::string::npos;  // Not found
 }
 
-std::wstring::size_type Find(const std::wstring& str, const std::wstring& substring, std::wstring::size_type offset, bool caseInsensitive) {
+std::wstring::size_type StrFind(const std::wstring& str, const std::wstring& substring, std::wstring::size_type offset, bool caseInsensitive) {
     if (offset >= str.length())
         return std::wstring::npos;
 
@@ -302,7 +302,7 @@ std::wstring::size_type Find(const std::wstring& str, const std::wstring& substr
     return std::wstring::npos;  // Not found
 }
 
-std::string ReplaceFirst(const std::string& s, const std::string& from, const std::string& to) {
+std::string StrReplaceFirst(const std::string& s, const std::string& from, const std::string& to) {
     const size_t start_pos = s.find(from);
     if (start_pos == std::string::npos) {
         return s;
@@ -313,7 +313,7 @@ std::string ReplaceFirst(const std::string& s, const std::string& from, const st
     return ret;
 }
 
-std::wstring ReplaceFirst(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
+std::wstring StrReplaceFirst(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
     const size_t start_pos = s.find(from);
     if (start_pos == std::wstring::npos) {
         return s;
@@ -324,7 +324,7 @@ std::wstring ReplaceFirst(const std::wstring& s, const std::wstring& from, const
     return ret;
 }
 
-std::string ReplaceLast(const std::string& s, const std::string& from, const std::string& to) {
+std::string StrReplaceLast(const std::string& s, const std::string& from, const std::string& to) {
     const size_t start_pos = s.rfind(from);
     if (start_pos == std::string::npos) {
         return s;
@@ -335,7 +335,7 @@ std::string ReplaceLast(const std::string& s, const std::string& from, const std
     return ret;
 }
 
-std::wstring ReplaceLast(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
+std::wstring StrReplaceLast(const std::wstring& s, const std::wstring& from, const std::wstring& to) {
     const size_t start_pos = s.rfind(from);
     if (start_pos == std::wstring::npos) {
         return s;
@@ -346,19 +346,19 @@ std::wstring ReplaceLast(const std::wstring& s, const std::wstring& from, const 
     return ret;
 }
 
-std::string Replace(const std::string& s, const std::string& from, const std::string& to, std::wstring::size_type offset, bool caseInsensitive) {
+std::string StrReplace(const std::string& s, const std::string& from, const std::string& to, std::wstring::size_type offset, bool caseInsensitive) {
     if (from.empty()) {
         return s;
     }
 
-    const bool found_substring = Find(s, from, offset, caseInsensitive) != std::string::npos;
+    const bool found_substring = StrFind(s, from, offset, caseInsensitive) != std::string::npos;
     if (!found_substring) {
         return s;
     }
 
     size_t start_pos = 0;
     std::string ret = s;
-    while ((start_pos = Find(ret, from, start_pos, caseInsensitive)) != std::string::npos) {
+    while ((start_pos = StrFind(ret, from, start_pos, caseInsensitive)) != std::string::npos) {
         ret.replace(start_pos, from.length(), to);
         start_pos += to.length();
     }
@@ -366,19 +366,19 @@ std::string Replace(const std::string& s, const std::string& from, const std::st
     return ret;
 }
 
-std::wstring Replace(const std::wstring& s, const std::wstring& from, const std::wstring& to, std::wstring::size_type offset, bool caseInsensitive) {
+std::wstring StrReplace(const std::wstring& s, const std::wstring& from, const std::wstring& to, std::wstring::size_type offset, bool caseInsensitive) {
     if (from.empty()) {
         return s;
     }
 
-    const bool found_substring = Find(s, from, offset, caseInsensitive) != std::wstring::npos;
+    const bool found_substring = StrFind(s, from, offset, caseInsensitive) != std::wstring::npos;
     if (!found_substring) {
         return s;
     }
 
     size_t start_pos = 0;
     std::wstring ret = s;
-    while ((start_pos = Find(ret, from, start_pos, caseInsensitive)) != std::wstring::npos) {
+    while ((start_pos = StrFind(ret, from, start_pos, caseInsensitive)) != std::wstring::npos) {
         ret.replace(start_pos, from.length(), to);
         start_pos += to.length();
     }
@@ -501,7 +501,7 @@ bool IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase) {
 }
 
 // format a string
-bool StringPrintfV(const char* format, va_list argList, std::string& output) noexcept {
+bool StrFormat(const char* format, va_list argList, std::string& output) noexcept {
     if (!format)
         return false;
 
@@ -586,7 +586,7 @@ bool StringPrintfV(const char* format, va_list argList, std::string& output) noe
 #endif
 }
 
-bool StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output) noexcept {
+bool StrFormat(const wchar_t* format, va_list argList, std::wstring& output) noexcept {
     if (!format)
         return false;
 
@@ -671,13 +671,13 @@ bool StringPrintfV(const wchar_t* format, va_list argList, std::wstring& output)
 #endif
 }
 
-std::string StringPrintf(const char* format, ...) noexcept {
+std::string StrFormat(const char* format, ...) noexcept {
     std::string output;
     try {
         va_list args;
         va_start(args, format);
 
-        StringPrintfV(format, args, output);
+        StrFormat(format, args, output);
         va_end(args);
     } catch (std::exception& e) {
         ASHE_UNUSED(e);
@@ -687,12 +687,12 @@ std::string StringPrintf(const char* format, ...) noexcept {
     return output;
 }
 
-std::wstring StringPrintf(const wchar_t* format, ...) noexcept {
+std::wstring StrFormat(const wchar_t* format, ...) noexcept {
     std::wstring output;
     try {
         va_list args;
         va_start(args, format);
-        StringPrintfV(format, args, output);
+        StrFormat(format, args, output);
         va_end(args);
     } catch (std::exception& e) {
         ASHE_UNUSED(e);
@@ -701,26 +701,26 @@ std::wstring StringPrintf(const wchar_t* format, ...) noexcept {
     return output;
 }
 
-std::string StringPrintfV(const char* format, va_list argList) noexcept {
+std::string StrFormat(const char* format, va_list argList) noexcept {
     std::string output;
-    StringPrintfV(format, argList, output);
+    StrFormat(format, argList, output);
     return output;
 }
 
-std::wstring StringPrintfV(const wchar_t* format, va_list argList) noexcept {
+std::wstring StrFormat(const wchar_t* format, va_list argList) noexcept {
     std::wstring output;
-    StringPrintfV(format, argList, output);
+    StrFormat(format, argList, output);
     return output;
 }
 
 #ifdef ASHE_WIN
 bool IsResourceString(const std::wstring& s) {
-    std::wstring s2 = Trim(s, L" \"");
+    std::wstring s2 = StrTrim(s, L" \"");
     return IsStartsWith(s2, L"@");
 }
 
 bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
-    std::wstring resStrFormat = Trim(resStr, L" \"");
+    std::wstring resStrFormat = StrTrim(resStr, L" \"");
     resStrFormat = resStrFormat.substr(1);  // @
 
     if (resStrFormat.empty())

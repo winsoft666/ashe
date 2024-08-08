@@ -1,6 +1,6 @@
 #include "catch.hpp"
 #include "ashe/path_util.h"
-#include "ashe/os_ver.h"
+#include "ashe/os_version.h"
 #include "ashe/process_util.h"
 
 #ifdef ASHE_WIN

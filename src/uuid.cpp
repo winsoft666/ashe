@@ -22,7 +22,7 @@ uint32_t UUID::Rand32() {
 }
 
 std::string UUID::GenUuid4() {
-    return StringPrintf(
+    return StrFormat(
         "%08x-%04x-%04x-%04x-%04x%08x",
         Rand32(),           // Generates a 32-bit Hex number
         Rand32() & 0xffff,  // Generates a 16-bit Hex number
@@ -42,7 +42,7 @@ std::string UUID::Create() {
     if (S_OK != CoCreateGuid(&guid))
         return std::string();
 
-    return StringPrintf(
+    return StrFormat(
         "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
         guid.Data1,
         guid.Data2,
