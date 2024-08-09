@@ -22,6 +22,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 
 project(ashe CXX)
 
+set (PACKAGE_VERSION 2.0)
+
 configure_file("${CMAKE_SOURCE_DIR}/include/ashe/config.h.in" "${CMAKE_SOURCE_DIR}/include/ashe/config.h")
 
 option(ASHE_BUILD_TESTS "Build tests project" ON)

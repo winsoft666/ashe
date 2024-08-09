@@ -5,7 +5,10 @@
 #include <tchar.h>
 #include <strsafe.h>
 #include <Shlwapi.h>
+#include <TlHelp32.h>
 #include <shellapi.h>
+#include <Psapi.h>
+#include "ashe/win_pe.h"
 #elif defined(_GNU_SOURCE)
 #include <errno.h>
 #endif
@@ -13,12 +16,13 @@
 #include "ashe/string_encode.h"
 #include "ashe/path_util.h"
 #include "ashe/os_version.h"
+#include "ashe/check_failure.h"
 
 #pragma warning(disable : 4996)
 
 namespace ashe {
 #ifdef ASHE_WIN
-bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) noexcept {
+bool IsRunAsAdminPrivilege(HANDLE hProcess) noexcept {
     BOOL fRet = FALSE;
     HANDLE hToken = NULL;
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
@@ -36,7 +40,7 @@ bool ProcessUtil::IsRunAsAdminPrivilege(HANDLE hProcess) noexcept {
     return !!fRet;
 }
 
-bool ProcessUtil::IsRunAsAdminPrivilege(DWORD dwPid) noexcept {
+bool IsRunAsAdminPrivilege(DWORD dwPid) noexcept {
     HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwPid);
     if (!hProcess)
         return false;
@@ -45,7 +49,7 @@ bool ProcessUtil::IsRunAsAdminPrivilege(DWORD dwPid) noexcept {
     return ret;
 }
 
-bool ProcessUtil::SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) noexcept {
+bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) noexcept {
     OSVERSIONINFO VersionTmp;
     VersionTmp.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&VersionTmp);
@@ -89,8 +93,8 @@ bool ProcessUtil::SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAll
     return !!res;
 }
 
-bool ProcessUtil::CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD* dwPID, HANDLE* pProcess) {
-    std::wstring newPath = PathUtil::PathRemoveQuote(path);
+bool CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD* dwPID, HANDLE* pProcess) {
+    std::wstring newPath = PathRemoveQuote(path);
 
     WCHAR szDir[MAX_PATH] = {0};
     StringCchPrintfW(szDir, MAX_PATH, L"%s", newPath.c_str());
@@ -124,8 +128,8 @@ bool ProcessUtil::CreateNewProcess(const std::wstring& path, const std::wstring&
     return true;
 }
 
-bool ProcessUtil::RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd /*= SW_SHOWDEFAULT*/) {
-    std::wstring newPath = PathUtil::PathRemoveQuote(path);
+bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd /*= SW_SHOWDEFAULT*/) {
+    std::wstring newPath = PathRemoveQuote(path);
     WCHAR szDir[MAX_PATH] = {0};
     StringCchPrintfW(szDir, MAX_PATH, L"%s", newPath.c_str());
     PathRemoveFileSpecW(szDir);
@@ -140,22 +144,22 @@ bool ProcessUtil::RunAsAdmin(const std::wstring& path, const std::wstring& param
     return result;
 }
 
-bool ProcessUtil::Is32BitProcess(HANDLE process, bool& result) noexcept {
+bool Is32BitProcess(HANDLE process, bool& result) noexcept {
     if (!process)
         return false;
 
     bool wow64 = false;
-    if (!OSVersion::IsWow64(process, wow64))
+    if (!IsWow64(process, wow64))
         return false;
 
     if (wow64)
         result = true;
     else
-        result = !OSVersion::IsWin64();
+        result = !IsWin64();
     return true;
 }
 
-std::wstring ProcessUtil::GetCurrentExePathW() {
+std::wstring GetCurrentExePathW() {
     wchar_t* buf = nullptr;
     if (!GetCurrentExePath(&buf)) {
         return L"";
@@ -167,7 +171,7 @@ std::wstring ProcessUtil::GetCurrentExePathW() {
     return result;
 }
 
-std::string ProcessUtil::GetCurrentExePathA() {
+std::string GetCurrentExePathA() {
     char* buf = nullptr;
     if (!GetCurrentExePath(&buf)) {
         return "";
@@ -179,7 +183,7 @@ std::string ProcessUtil::GetCurrentExePathA() {
     return result;
 }
 
-bool ProcessUtil::GetCurrentExePath(wchar_t** buf) {
+bool GetCurrentExePath(wchar_t** buf) {
     if (!buf) {
         return false;
     }
@@ -221,7 +225,7 @@ bool ProcessUtil::GetCurrentExePath(wchar_t** buf) {
     return result;
 }
 
-bool ProcessUtil::GetCurrentExePath(char** buf) {
+bool GetCurrentExePath(char** buf) {
     if (!buf) {
         return false;
     }
@@ -263,7 +267,7 @@ bool ProcessUtil::GetCurrentExePath(char** buf) {
     return result;
 }
 
-std::wstring ProcessUtil::GetCurrentExeDirectoryW() {
+std::wstring GetCurrentExeDirectoryW() {
     wchar_t* buf = nullptr;
     if (!GetCurrentExePath(&buf)) {
         return L"";
@@ -280,7 +284,7 @@ std::wstring ProcessUtil::GetCurrentExeDirectoryW() {
     return result;
 }
 
-std::string ProcessUtil::GetCurrentExeDirectoryA() {
+std::string GetCurrentExeDirectoryA() {
     char* buf = nullptr;
     if (!GetCurrentExePath(&buf)) {
         return "";
@@ -297,10 +301,16 @@ std::string ProcessUtil::GetCurrentExeDirectoryA() {
     return result;
 }
 
-#endif
+bool IsPeX64(LPCWSTR pszModulePath) {
+    HMODULE h = GetModuleHandleW(pszModulePath);
+    CHECK_FAILURE(!h, L"The module must have been loaded by the calling process.");
+    if (!h) {
+        return false;
+    }
+    return PE_OPT_HEADER((CHAR*)h)->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC;
+}
 
-#ifdef ASHE_WIN
-BOOL CALLBACK ProcessUtil::EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam) {
+BOOL CALLBACK EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam) {
     std::list<std::string>* pList = (std::list<std::string>*)lParam;
 
     HRSRC hResInfo = FindResourceW(hModule, lpName, lpType);
@@ -323,7 +333,7 @@ BOOL CALLBACK ProcessUtil::EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpT
     return TRUE;  // Keep going
 }
 
-bool ProcessUtil::GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manifests) {
+bool GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manifests) {
     HMODULE hModule = LoadLibraryExW(path.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
     if (!hModule)
         return false;
@@ -333,5 +343,268 @@ bool ProcessUtil::GetExeOrDllManifest(const std::wstring& path, std::list<std::s
 
     return true;
 }
+
+// Based on http://stackoverflow.com/a/1173396
+void KillProcessTree(unsigned long pid) noexcept {
+    if (pid == 0)
+        return;
+
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot) {
+        PROCESSENTRY32 process;
+        ZeroMemory(&process, sizeof(process));
+        process.dwSize = sizeof(process);
+        if (Process32First(snapshot, &process)) {
+            do {
+                if (process.th32ParentProcessID == pid) {
+                    const HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
+                    if (process_handle) {
+                        TerminateProcess(process_handle, 2);
+                        CloseHandle(process_handle);
+                    }
+                }
+            } while (Process32Next(snapshot, &process));
+        }
+        CloseHandle(snapshot);
+    }
+
+    const HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    if (process_handle)
+        TerminateProcess(process_handle, 2);
+}
+
+bool KillProcess(unsigned long pid) noexcept {
+    if (pid == 0)
+        return false;
+
+    const HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    if (!process_handle)
+        return false;
+    return !!TerminateProcess(process_handle, 2);
+}
+
+bool KillProcess(const std::wstring& exeName) noexcept {
+    if (exeName.empty())
+        return false;
+
+    bool ret = false;
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+    if (snapshot) {
+        PROCESSENTRY32 process;
+        ZeroMemory(&process, sizeof(process));
+        process.dwSize = sizeof(process);
+        if (Process32First(snapshot, &process)) {
+            do {
+                if (lstrcmpi(process.szExeFile, exeName.c_str()) == 0) {
+                    HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
+                    if (process_handle) {
+                        if (::TerminateProcess(process_handle, 2))
+                            ret = true;
+                        CloseHandle(process_handle);
+                    }
+                }
+            } while (Process32Next(snapshot, &process));
+        }
+        CloseHandle(snapshot);
+    }
+    return ret;
+}
+
+bool KillProcess(const std::string& exeName) noexcept {
+    return KillProcess(a2w(exeName));
+}
+
+void RecursiveKillProcess(const std::wstring& dir, bool excludeSelf) noexcept {
+    size_t len = dir.length();
+    TCHAR szTemp[MAX_PATH] = {0};
+
+    StringCchCopy(szTemp, MAX_PATH, dir.c_str());
+
+    if (szTemp[len - 1] != TEXT('\\'))
+        _tcscat_s(szTemp, MAX_PATH, TEXT("\\"));
+
+    StringCchCat(szTemp, MAX_PATH, TEXT("*.*"));
+
+    WIN32_FIND_DATA filedata;
+    HANDLE fhandle = FindFirstFile(szTemp, &filedata);
+
+    if (fhandle != INVALID_HANDLE_VALUE) {
+        if (filedata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            if (((_tcscmp(filedata.cFileName, TEXT(".")) != 0) &&
+                 (_tcscmp(filedata.cFileName, TEXT("..")) != 0))) {
+                TCHAR szTemp[MAX_PATH] = {0};
+                StringCchCat(szTemp, MAX_PATH, dir.c_str());
+
+                if (szTemp[_tcslen(szTemp) - 1] != TEXT('\\'))
+                    StringCchCat(szTemp, MAX_PATH, TEXT("\\"));
+
+                _tcscat_s(szTemp, MAX_PATH, filedata.cFileName);
+                RecursiveKillProcess(szTemp, excludeSelf);
+            }
+        }
+        else {
+            TCHAR* p = _tcsrchr(filedata.cFileName, TEXT('.'));
+
+            if (p) {
+                if (_tcscmp(p, TEXT(".exe")) == 0) {
+                    bool teminate = true;
+                    if (excludeSelf) {
+                        TCHAR szSelf[MAX_PATH] = {0};
+                        GetModuleFileName(NULL, szSelf, MAX_PATH);
+                        LPWSTR pSelf = PathFindFileName(szSelf);
+                        if (_tcscmp(filedata.cFileName, pSelf) == 0)
+                            teminate = false;
+                    }
+                    if (teminate) {
+                        int tryTimes = 0;
+                        while (KillProcess(filedata.cFileName) && ++tryTimes < 1000)
+                            ;
+                    }
+                }
+            }
+        }
+
+        while (FindNextFile(fhandle, &filedata) != 0) {
+            if (filedata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                if (((_tcscmp(filedata.cFileName, TEXT(".")) != 0) &&
+                     (_tcscmp(filedata.cFileName, TEXT("..")) != 0))) {
+                    TCHAR szTemp[MAX_PATH] = {0};
+                    StringCchCopy(szTemp, MAX_PATH, dir.c_str());
+
+                    if (szTemp[_tcslen(szTemp) - 1] != TEXT('\\'))
+                        StringCchCat(szTemp, MAX_PATH, TEXT("\\"));
+
+                    StringCchCat(szTemp, MAX_PATH, filedata.cFileName);
+                    RecursiveKillProcess(szTemp, excludeSelf);
+                }
+            }
+            else {
+                TCHAR* p = _tcsrchr(filedata.cFileName, TEXT('.'));
+
+                if (p) {
+                    if (_tcscmp(p, TEXT(".exe")) == 0) {
+                        bool teminate = true;
+                        if (excludeSelf) {
+                            TCHAR szSelf[MAX_PATH] = {0};
+                            GetModuleFileName(NULL, szSelf, MAX_PATH);
+                            LPWSTR pSelf = PathFindFileName(szSelf);
+                            if (_tcscmp(filedata.cFileName, pSelf) == 0)
+                                teminate = false;
+                        }
+                        if (teminate) {
+                            int tryTimes = 0;
+                            while (KillProcess(filedata.cFileName) && ++tryTimes < 1000)
+                                ;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    FindClose(fhandle);
+}
+
+void RecursiveKillProcess(const std::string& dir, bool excludeSelf) noexcept {
+    RecursiveKillProcess(a2w(dir), excludeSelf);
+}
+
+std::wstring GetProcessPathW(unsigned long id) noexcept {
+    std::wstring strPath;
+    wchar_t szFilename[MAX_PATH] = {0};
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, id);
+    if (hProcess == NULL)
+        return strPath;
+
+    HMODULE hModule = NULL;
+    DWORD cbNeeded;
+    if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
+        if (GetModuleFileNameExW(hProcess, hModule, szFilename, MAX_PATH)) {
+            strPath = szFilename;
+        }
+    }
+    else {
+        DWORD size = MAX_PATH;
+        if (QueryFullProcessImageNameW(hProcess, 0, szFilename, &size)) {
+            strPath = szFilename;
+        }
+    }
+    CloseHandle(hProcess);
+
+    return strPath;
+}
+
+std::string GetProcessPathA(unsigned long id) noexcept {
+    std::string strPath;
+    char szFilename[MAX_PATH] = {0};
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, id);
+    if (hProcess == NULL)
+        return strPath;
+
+    HMODULE hModule = NULL;
+    DWORD cbNeeded;
+    if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
+        if (GetModuleFileNameExA(hProcess, hModule, szFilename, MAX_PATH)) {
+            strPath = szFilename;
+        }
+    }
+    else {
+        DWORD size = MAX_PATH;
+        if (QueryFullProcessImageNameA(hProcess, 0, szFilename, &size)) {
+            strPath = szFilename;
+        }
+    }
+    CloseHandle(hProcess);
+
+    return strPath;
+}
+#else
+void KillProcessTree(pid_t id, bool force) noexcept {
+    if (id <= 0)
+        return;
+
+    if (force)
+        ::kill(-id, SIGTERM);
+    else
+        ::kill(-id, SIGINT);
+}
+
+bool KillProcess(pid_t id, bool force) noexcept {
+    if (force)
+        return ::kill(id, SIGTERM) == 0;
+    return ::kill(id, SIGINT) == 0;
+}
+
+std::string GetProcessPathA(pid_t id) noexcept {
+    std::string cmdPath = std::string("/proc/") + std::to_string(id) + std::string("/cmdline");
+    std::ifstream cmdFile(cmdPath.c_str());
+
+    std::string cmdLine;
+    std::getline(cmdFile, cmdLine);
+    if (!cmdLine.empty()) {
+        // Keep first cmdline item which contains the program path
+        size_t pos = cmdLine.find('\0');
+        if (pos != string_type::npos)
+            cmdLine = cmdLine.substr(0, pos);
+    }
+    return cmdLine;
+}
+
+std::wstring GetProcessPathW(pid_t id) noexcept {
+    std::wstring cmdPath = std::wstring(L"/proc/") + std::to_wstring(id) + std::wstring(L"/cmdline");
+    std::wifstream cmdFile(cmdPath.c_str());
+
+    std::wstring cmdLine;
+    std::getline(cmdFile, cmdLine);
+    if (!cmdLine.empty()) {
+        // Keep first cmdline item which contains the program path
+        size_t pos = cmdLine.find(L'\0');
+        if (pos != string_type::npos)
+            cmdLine = cmdLine.substr(0, pos);
+    }
+    return cmdLine;
+}
 #endif
+
 }  // namespace ashe

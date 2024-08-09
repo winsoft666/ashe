@@ -24,38 +24,35 @@
 #include <string>
 
 namespace ashe {
-class ASHE_API HexEncode {
-   public:
-    static char Encode(unsigned char val);
+ASHE_API char HexEncode(unsigned char val);
 
-    static bool Decode(char ch, unsigned char* val);
+ASHE_API bool HexDecode(char ch, unsigned char* val);
 
-    static size_t EncodeWithDelimiter(char* buffer,
-                                      size_t buflen,
-                                      const char* csource,
-                                      size_t srclen,
-                                      char delimiter);
+ASHE_API size_t HexEncodeWithDelimiter(char* buffer,
+                                       size_t buflen,
+                                       const char* csource,
+                                       size_t srclen,
+                                       char delimiter);
 
-    static std::string Encode(const std::string& str);
+ASHE_API std::string HexEncode(const std::string& str);
 
-    static std::string Encode(const char* source, size_t srclen);
+ASHE_API std::string HexEncode(const char* source, size_t srclen);
 
-    static std::string EncodeWithDelimiter(const char* source, size_t srclen, char delimiter);
+ASHE_API std::string HexEncodeWithDelimiter(const char* source, size_t srclen, char delimiter);
 
-    static size_t DecodeWithDelimiter(char* cbuffer,
-                                      size_t buflen,
-                                      const char* source,
-                                      size_t srclen,
-                                      char delimiter);
+ASHE_API size_t HexDecodeWithDelimiter(char* cbuffer,
+                                       size_t buflen,
+                                       const char* source,
+                                       size_t srclen,
+                                       char delimiter);
 
-    static size_t Decode(char* buffer, size_t buflen, const std::string& source);
+ASHE_API size_t HexDecode(char* buffer, size_t buflen, const std::string& source);
 
-    static std::string Decode(const std::string& str);
+ASHE_API std::string HexDecode(const std::string& str);
 
-    static size_t DecodeWithDelimiter(char* buffer,
-                                      size_t buflen,
-                                      const std::string& source,
-                                      char delimiter);
-};
+ASHE_API size_t HexDecodeWithDelimiter(char* buffer,
+                                       size_t buflen,
+                                       const std::string& source,
+                                       char delimiter);
 }  // namespace ashe
 #endif  // !ASHE_HEX_ENCODE_HPP__

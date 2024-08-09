@@ -21,9 +21,7 @@
 #define ASHE_CONFIG_HPP__
 #pragma once
 
-#define ASHE_VERSION_MAJOR 1
-#define ASHE_VERSION_MINOR 0
-#define ASHE_VERSION_PATCH 4
+#define PACKAGE_VERSION "@PACKAGE_VERSION@"
 
 #ifdef ASHE_STATIC
 #define ASHE_API

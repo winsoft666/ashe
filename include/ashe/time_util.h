@@ -62,37 +62,34 @@ class ASHE_API Time {
     int nanoseconds;
 };
 
-class ASHE_API TimeUtil {
-   public:
-    static const int64_t kNumMillisecsPerSec = INT64_C(1000);
-    static const int64_t kNumMicrosecsPerSec = INT64_C(1000000);
-    static const int64_t kNumNanosecsPerSec = INT64_C(1000000000);
+#define kNumMillisecsPerSec INT64_C(1000)
+#define kNumMicrosecsPerSec INT64_C(1000000);
+#define kNumNanosecsPerSec INT64_C(1000000000);
 
-    static const int64_t kNumMicrosecsPerMillisec = kNumMicrosecsPerSec / kNumMillisecsPerSec;
-    static const int64_t kNumNanosecsPerMillisec = kNumNanosecsPerSec / kNumMillisecsPerSec;
-    static const int64_t kNumNanosecsPerMicrosec = kNumNanosecsPerSec / kNumMicrosecsPerSec;
+#define kNumMicrosecsPerMillisec (kNumMicrosecsPerSec / kNumMillisecsPerSec)
+#define kNumNanosecsPerMillisec (kNumNanosecsPerSec / kNumMillisecsPerSec)
+#define kNumNanosecsPerMicrosec (kNumNanosecsPerSec / kNumMicrosecsPerSec)
 
-    // The microseconds that since 1970-01-01 00:00:00(UTC)
-    static int64_t GetCurrentTimestampByMicroSec();
+// The microseconds that since 1970-01-01 00:00:00(UTC)
+ASHE_API int64_t GetCurrentTimestampByMicroSec();
 
-    // The milliseconds that since 1970-01-01 00:00:00(UTC)
-    static int64_t GetCurrentTimestampByMilliSec();
+// The milliseconds that since 1970-01-01 00:00:00(UTC)
+ASHE_API int64_t GetCurrentTimestampByMilliSec();
 
-    // The seconds that since 1970-01-01 00:00:00(UTC)
-    static int64_t GetCurrentTimestampBySec();
+// The seconds that since 1970-01-01 00:00:00(UTC)
+ASHE_API int64_t GetCurrentTimestampBySec();
 
-    // Windows: precision is milliseconds
-    static Time GetLocalTime();
+// Windows: precision is milliseconds
+ASHE_API Time GetLocalTime();
 
-    // Windows: precision is milliseconds
-    static Time GetUTCTime();
+// Windows: precision is milliseconds
+ASHE_API Time GetUTCTime();
 
 #ifdef ASHE_WIN
-    Time FILETIMEToUTC(unsigned int dwLowDateTime,
-                       unsigned int dwHighDateTime);
+Time FILETIMEToUTC(unsigned int dwLowDateTime,
+                   unsigned int dwHighDateTime);
 #endif
-    int64_t UTCToTimeStamp(Time t);
-};
+int64_t UTCToTimeStamp(Time t);
 
 class ASHE_API TimeMeter {
    public:

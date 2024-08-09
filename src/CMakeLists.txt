@@ -17,8 +17,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #################################################################################
 
-set (PACKAGE_VERSION 1.7)
-
 file(GLOB_RECURSE HEADERS ../include/*.h)
 file(GLOB_RECURSE SOURCES ./*.cpp)
 

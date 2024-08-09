@@ -455,12 +455,12 @@ bool WinIconHelper::SaveToFile(const std::vector<HICON>& hIcons, const std::wstr
         return false;
     }
 
-    if (WriteIconHeader(hFile, hIcons.size()) == 0) {
+    if (WriteIconHeader(hFile, (int)hIcons.size()) == 0) {
         CloseHandle(hFile);
         return false;
     }
 
-    SetFilePointer(hFile, sizeof(ICONDIR) * hIcons.size(), 0, FILE_CURRENT);
+    SetFilePointer(hFile, (LONG)(sizeof(ICONDIR) * hIcons.size()), 0, FILE_CURRENT);
 
     pImageOffset = (int*)malloc(hIcons.size() * sizeof(int));
     if (!pImageOffset) {
@@ -525,7 +525,7 @@ bool WinIconHelper::SaveToFile(const std::vector<HICON>& hIcons, const std::wstr
     SetFilePointer(hFile, sizeof(ICONHEADER), 0, FILE_BEGIN);
 
     for (size_t i = 0; i < hIcons.size(); i++) {
-        if (WriteIconDirectoryEntry(hFile, i, hIcons[i], pImageOffset[i]) == 0) {
+        if (WriteIconDirectoryEntry(hFile, (int)i, hIcons[i], pImageOffset[i]) == 0) {
             free(pImageOffset);
             CloseHandle(hFile);
             return false;

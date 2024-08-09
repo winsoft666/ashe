@@ -130,6 +130,9 @@ void SingletonProcess::check() {
 #endif
 }
 
+SingletonProcess::SingletonProcess() {
+}
+
 SingletonProcess::~SingletonProcess() {
 #ifdef ASHE_WIN
     exit_.set();

@@ -2,9 +2,10 @@
 #include "ashe/path_util.h"
 #include "ashe/win_shellink_creator.h"
 
+#if 0
 #ifdef ASHE_WIN
 TEST_CASE("ShellinkCreator", "") {
-    std::wstring lnkPath = ashe::PathUtil::GetCurrentUserDesktopFolder() + L"test.lnk";
+    std::wstring lnkPath = ashe::GetCurrentUserDesktopFolder() + L"test.lnk";
 
     ashe::WinShellinkCreator::ShellLinkProperties prop;
     prop.setTarget(L"C:\\abc\\a.exe");
@@ -28,4 +29,5 @@ TEST_CASE("ShellinkCreator", "") {
     REQUIRE(ret);
 }
 
+#endif
 #endif

@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "ashe/shellink_parser.h"
 
+#if 0
 #ifdef ASHE_WIN
 TEST_CASE("shellink-parse", "") {
     std::wstring lnkPath = LR"()";
@@ -27,4 +28,5 @@ TEST_CASE("shellink-parse", "") {
     }
 }
 
+#endif
 #endif

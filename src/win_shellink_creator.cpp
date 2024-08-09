@@ -241,7 +241,7 @@ bool WinShellinkCreator::ResolveShellLink(const std::wstring& shellLinkPath, She
 }
 
 bool WinShellinkCreator::TaskbarPinShellLink(const std::wstring& shellLinkPath) {
-    if (!OSVersion::IsWindowsVistaOrHigher())
+    if (!IsWindowsVistaOrHigher())
         return false;
 
     INT_PTR result = (INT_PTR)(ShellExecuteW(NULL, L"taskbarpin", shellLinkPath.c_str(), NULL, NULL, 0));
@@ -249,7 +249,7 @@ bool WinShellinkCreator::TaskbarPinShellLink(const std::wstring& shellLinkPath) 
 }
 
 bool WinShellinkCreator::TaskbarUnpinShellLink(const std::wstring& shellLinkPath) {
-    if (!OSVersion::IsWindowsVistaOrHigher())
+    if (!IsWindowsVistaOrHigher())
         return false;
 
     INT_PTR result = (INT_PTR)(ShellExecuteW(NULL, L"taskbarunpin", shellLinkPath.c_str(), NULL, NULL, 0));

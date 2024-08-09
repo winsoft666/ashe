@@ -27,16 +27,38 @@ namespace ashe {
 #ifdef ASHE_WIN
 ASHE_API std::string UnicodeToAnsi(const std::wstring& str, unsigned int code_page = 0) noexcept;
 ASHE_API std::wstring AnsiToUnicode(const std::string& str, unsigned int code_page = 0) noexcept;
+
+// Same as UnicodeToAnsi
+ASHE_API std::string w2a(const std::wstring& str, unsigned int code_page = 0) noexcept;
+
+// Same as AnsiToUnicode
+ASHE_API std::wstring a2w(const std::string& str, unsigned int code_page = 0) noexcept;
 #endif
 
 ASHE_API std::string UnicodeToUtf8(const std::wstring& str) noexcept;
+
+// Same as UnicodeToUtf8
+ASHE_API std::string w2u(const std::wstring& str) noexcept;
+
 ASHE_API std::string UnicodeToUtf8BOM(const std::wstring& str) noexcept;
+
 ASHE_API std::wstring Utf8ToUnicode(const std::string& str) noexcept;
+
+// Same as Utf8ToUnicode
+ASHE_API std::wstring u2w(const std::string& str) noexcept;
 
 #ifdef ASHE_WIN
 ASHE_API std::string AnsiToUtf8(const std::string& str, unsigned int code_page = 0) noexcept;
+
+// Same as AnsiToUtf8
+ASHE_API std::string a2u(const std::string& str, unsigned int code_page = 0) noexcept;
+
 ASHE_API std::string AnsiToUtf8BOM(const std::string& str, unsigned int code_page = 0) noexcept;
+
 ASHE_API std::string Utf8ToAnsi(const std::string& str, unsigned int code_page = 0) noexcept;
+
+// Same as Utf8ToAnsi
+ASHE_API std::string u2a(const std::string& str, unsigned int code_page = 0) noexcept;
 #endif
 
 #ifdef ASHE_WIN
@@ -56,12 +78,5 @@ ASHE_API std::string Utf8ToAnsi(const std::string& str, unsigned int code_page =
 #define UnicodeToTCHAR(str) ashe::UnicodeToAnsi((str), 0)
 #endif
 #endif
-
-#define w2a(s) UnicodeToAnsi((s))
-#define a2w(s) AnsiToUnicode((s))
-#define w2u(s) UnicodeToUtf8((s))
-#define u2w(s) Utf8ToUnicode((s))
-#define a2u(s) AnsiToUtf8((s))
-#define u2a(s) Utf8ToAnsi((s))
 }  // namespace ashe
 #endif  // ASHE_STRING_ENCODE_HPP_

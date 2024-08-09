@@ -24,11 +24,8 @@
 #include "ashe/config.h"
 
 namespace ashe {
-class ASHE_API Trace {
-   public:
-    static void MsgW(const wchar_t* lpFormat, ...) noexcept;
-    static void MsgA(const char* lpFormat, ...) noexcept;
-};
+ASHE_API void TraceW(const wchar_t* lpFormat, ...) noexcept;
+ASHE_API void TraceA(const char* lpFormat, ...) noexcept;
 }  // namespace ashe
 
 #endif  // !ASHE_TRACE_H__

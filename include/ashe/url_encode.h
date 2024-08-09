@@ -26,22 +26,17 @@
 #include "ashe/hex_encode.h"
 
 namespace ashe {
-class ASHE_API UrlEncode {
-   public:
-    static std::string Encode(const std::string& str);
+// 'str' is encoded with utf8,
+ASHE_API std::string UrlEncode(const std::string& str);
 
-    static size_t Decode(char* buffer, size_t buflen, const char* source, size_t srclen);
+ASHE_API std::wstring UrlEncode(const std::wstring& str);
 
-    static std::string Decode(const std::string& source);
+ASHE_API size_t UrlDecode(char* buffer, size_t buflen, const char* source, size_t srclen);
 
-   private:
-    // Apply any suitable string transform (including the ones above) to an STL
-    // string. Stack-allocated temporary space is used for the transformation, so
-    // value and source may refer to the same string.
-    typedef size_t (*Transform)(char* buffer, size_t buflen, const char* source, size_t srclen);
+// 'str' is encoded with utf8,
+ASHE_API std::string UrlDecode(const std::string& source);
 
-    // Return the result of applying transform t to source.
-    static std::string s_transform(const std::string& source, Transform t);
-};
+ASHE_API std::wstring UrlDecode(const std::wstring& source);
+
 }  // namespace ashe
 #endif  // !ASHE_URL_ENCODE_HPP__

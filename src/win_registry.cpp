@@ -418,7 +418,7 @@ unsigned int _stdcall WinRegistry::NotifyWaitThreadProc(LPVOID pvParam) {
 }
 
 LSTATUS WinRegistry::regDeleteKey32_64(HKEY hKey, LPCWSTR pszSubKey, bool bPrefer64View) noexcept {
-    REGSAM rsam = (bPrefer64View && OSVersion::IsWin64()) ? KEY_WOW64_64KEY : KEY_WOW64_32KEY;
+    REGSAM rsam = (bPrefer64View && IsWin64()) ? KEY_WOW64_64KEY : KEY_WOW64_32KEY;
     HMODULE hAdvAPI32 = LoadLibrary(TEXT("AdvAPI32.dll"));
 
     if (!hAdvAPI32)

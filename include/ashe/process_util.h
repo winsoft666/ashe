@@ -36,41 +36,66 @@
 #endif  // !_INC_WINDOWS
 
 #pragma comment(lib, "Shlwapi.lib")
+#pragma comment(lib, "Psapi.lib")
 #endif
 
 namespace ashe {
-class ASHE_API ProcessUtil {
-   public:
 #ifdef ASHE_WIN
-    static bool IsRunAsAdminPrivilege(HANDLE hProcess) noexcept;
+ASHE_API bool IsRunAsAdminPrivilege(HANDLE hProcess) noexcept;
 
-    static bool IsRunAsAdminPrivilege(DWORD dwPid) noexcept;
+ASHE_API bool IsRunAsAdminPrivilege(DWORD dwPid) noexcept;
 
-    static bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) noexcept;
+ASHE_API bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) noexcept;
 
-    static bool CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD* dwPID, HANDLE* pProcess);
+ASHE_API bool CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD* dwPID, HANDLE* pProcess);
 
-    static bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd = SW_SHOWDEFAULT);
+ASHE_API bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd = SW_SHOWDEFAULT);
 
-    static bool Is32BitProcess(HANDLE process, bool& result) noexcept;
+ASHE_API bool Is32BitProcess(HANDLE process, bool& result) noexcept;
 
-    // User need call free(buf)
-    static bool GetCurrentExePath(wchar_t** buf);
+// Require user call free(buf).
+ASHE_API bool GetCurrentExePath(wchar_t** buf);
 
-    static bool GetCurrentExePath(char** buf);
+ASHE_API bool GetCurrentExePath(char** buf);
 
-    static std::wstring GetCurrentExePathW();
-    static std::string GetCurrentExePathA();
+ASHE_API std::wstring GetCurrentExePathW();
+ASHE_API std::string GetCurrentExePathA();
 
-    static std::wstring GetCurrentExeDirectoryW();
-    static std::string GetCurrentExeDirectoryA();
+ASHE_API std::wstring GetCurrentExeDirectoryW();
+ASHE_API std::string GetCurrentExeDirectoryA();
+
+// The module must have been loaded by the calling process.
+ASHE_API bool IsPeX64(LPCWSTR pszModulePath = NULL);
+
+ASHE_API BOOL CALLBACK EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam);
+
+ASHE_API bool GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manifests);
+
 #endif
 
 #ifdef ASHE_WIN
-    static BOOL CALLBACK EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType, LPWSTR lpName, LONG_PTR lParam);
+ASHE_API void KillProcessTree(unsigned long pid) noexcept;
 
-    static bool GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manifests);
+ASHE_API bool KillProcess(unsigned long pid) noexcept;
+
+ASHE_API std::string GetProcessPathA(unsigned long pid) noexcept;
+ASHE_API std::wstring GetProcessPathW(unsigned long pid) noexcept;
+
+// Kill all process that executed file name is exeName.
+// Return true when all process have been killed.
+// Return false when have one or more process kill failed.
+ASHE_API bool KillProcess(const std::wstring& exeName) noexcept;
+ASHE_API bool KillProcess(const std::string& exeName) noexcept;
+
+// Kill all process that EXE file in "dirPath" directory.
+ASHE_API void RecursiveKillProcess(const std::wstring& dirPath, bool excludeSelf) noexcept;
+ASHE_API void RecursiveKillProcess(const std::string& dirPath, bool excludeSelf) noexcept;
+#else
+ASHE_API void KillProcessTree(pid_t id, bool force = false) noexcept;
+ASHE_API bool KillProcess(pid_t id, bool force = false) noexcept;
+
+ASHE_API std::string GetProcessPathA(pid_t id) noexcept;
+ASHE_API std::wstring GetProcessPathW(pid_t id) noexcept;
 #endif
-};
 }  // namespace ashe
 #endif

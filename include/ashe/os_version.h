@@ -80,21 +80,18 @@ typedef struct _WinVerInfo {
     }
 } WinVerInfo;
 
-class ASHE_API OSVersion {
-   public:
 #ifdef ASHE_WIN
-    static WinVerInfo GetWinVer() noexcept;
+ASHE_API WinVerInfo GetWinVer() noexcept;
 
-    static bool IsWindowsVistaOrHigher() noexcept;
+ASHE_API bool IsWindowsVistaOrHigher() noexcept;
 
-    static bool IsWindows11() noexcept;
+ASHE_API bool IsWindows11() noexcept;
 
-    static bool IsWin64() noexcept;
+ASHE_API bool IsWin64() noexcept;
 
-    static bool IsWow64(HANDLE process, bool& result) noexcept;
+ASHE_API bool IsWow64(HANDLE process, bool& result) noexcept;
 #endif
 
-    static std::string GetOSVersion();
-};
+ASHE_API std::string GetOSVersion();
 }  // namespace ashe
 #endif  // !ASHE_OS_VER_HPP__

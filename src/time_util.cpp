@@ -19,8 +19,8 @@
 
 namespace ashe {
 std::string Time::toString(bool milli_precision,
-                                      bool micro_precision,
-                                      bool nano_precision) const {
+                           bool micro_precision,
+                           bool nano_precision) const {
     char szString[512];
     if (nano_precision) {
         snprintf(szString, 512, "%04d/%02d/%02d %02u:%02u:%02u:%03u:%03u:%03u", year, month, day,
@@ -43,7 +43,7 @@ std::string Time::toString(bool milli_precision,
 }
 
 // The microseconds that since 1970-01-01 00:00:00(UTC)
-int64_t TimeUtil::GetCurrentTimestampByMicroSec() {
+int64_t GetCurrentTimestampByMicroSec() {
 #ifdef ASHE_WIN
     union {
         int64_t ns100;
@@ -64,17 +64,17 @@ int64_t TimeUtil::GetCurrentTimestampByMicroSec() {
 }
 
 // The milliseconds that since 1970-01-01 00:00:00(UTC)
-int64_t TimeUtil::GetCurrentTimestampByMilliSec() {
+int64_t GetCurrentTimestampByMilliSec() {
     return GetCurrentTimestampByMicroSec() / 1000;
 }
 
 // The seconds that since 1970-01-01 00:00:00(UTC)
-int64_t TimeUtil::GetCurrentTimestampBySec() {
+int64_t GetCurrentTimestampBySec() {
     return GetCurrentTimestampByMicroSec() / 1000000;
 }
 
 // Windows: precision is milliseconds
-Time TimeUtil::GetLocalTime() {
+Time GetLocalTime() {
 #ifdef ASHE_WIN
     Time t;
     SYSTEMTIME st;
@@ -110,7 +110,7 @@ Time TimeUtil::GetLocalTime() {
 }
 
 // Windows: precision is milliseconds
-Time TimeUtil::GetUTCTime() {
+Time GetUTCTime() {
 #ifdef ASHE_WIN
     Time t;
     SYSTEMTIME st;
@@ -147,8 +147,8 @@ Time TimeUtil::GetUTCTime() {
 }
 
 #ifdef ASHE_WIN
-Time TimeUtil::FILETIMEToUTC(unsigned int dwLowDateTime,
-                                        unsigned int dwHighDateTime) {
+Time FILETIMEToUTC(unsigned int dwLowDateTime,
+                   unsigned int dwHighDateTime) {
     FILETIME ft;
     ft.dwLowDateTime = dwLowDateTime;
     ft.dwHighDateTime = dwHighDateTime;
@@ -168,7 +168,7 @@ Time TimeUtil::FILETIMEToUTC(unsigned int dwLowDateTime,
     return t;
 }
 #endif
-int64_t TimeUtil::UTCToTimeStamp(Time t) {
+int64_t UTCToTimeStamp(Time t) {
     struct tm tmUTC;
     tmUTC.tm_year = t.year - 1900;
     tmUTC.tm_mon = t.month - 1;

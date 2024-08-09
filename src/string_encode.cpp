@@ -65,6 +65,14 @@ std::wstring AnsiToUnicode(const std::string& str, unsigned int code_page) noexc
     return strRes;
 }
 
+std::string w2a(const std::wstring& str, unsigned int code_page /*= 0*/) noexcept {
+    return UnicodeToAnsi(str, code_page);
+}
+
+std::wstring a2w(const std::string& str, unsigned int code_page /*= 0*/) noexcept {
+    return AnsiToUnicode(str, code_page);
+}
+
 #endif
 
 std::string UnicodeToUtf8(const std::wstring& str) noexcept {
@@ -98,6 +106,10 @@ std::string UnicodeToUtf8(const std::wstring& str) noexcept {
     }
     return strRes;
 #endif
+}
+
+std::string w2u(const std::wstring& str) noexcept {
+    return UnicodeToUtf8(str);
 }
 
 std::string UnicodeToUtf8BOM(const std::wstring& str) noexcept {
@@ -181,9 +193,17 @@ std::wstring Utf8ToUnicode(const std::string& str) noexcept {
 #endif
 }
 
+std::wstring u2w(const std::string& str) noexcept {
+    return Utf8ToUnicode(str);
+}
+
 #ifdef ASHE_WIN
 std::string AnsiToUtf8(const std::string& str, unsigned int code_page) noexcept {
     return UnicodeToUtf8(AnsiToUnicode(str, code_page));
+}
+
+std::string a2u(const std::string& str, unsigned int code_page /*= 0*/) noexcept {
+    return AnsiToUtf8(str, code_page);
 }
 
 std::string AnsiToUtf8BOM(const std::string& str, unsigned int code_page) noexcept {
@@ -193,5 +213,10 @@ std::string AnsiToUtf8BOM(const std::string& str, unsigned int code_page) noexce
 std::string Utf8ToAnsi(const std::string& str, unsigned int code_page) noexcept {
     return UnicodeToAnsi(Utf8ToUnicode(str), code_page);
 }
+
+std::string u2a(const std::string& str, unsigned int code_page /*= 0*/) noexcept {
+    return Utf8ToAnsi(str, code_page);
+}
+
 #endif
 }  // namespace ashe

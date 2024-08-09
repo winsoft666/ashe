@@ -83,21 +83,21 @@ class ASHE_API WinIconHelper {
     // You should call DestroyIcon for icon.
     static HICON LoadFromProcessRes(HINSTANCE hInst, LPCWSTR resPath, int cxDesired = 0, int cyDesired = 0) noexcept;
 
-    // It is best to first use PathUtil::ExpandEnvString to expand environment variables in filePath.
+    // It is best to first use ExpandEnvString to expand environment variables in filePath.
     // You should call DestroyIcon for icon.
     static HICON LoadFromProcessRes(const std::wstring& filePath, LPCWSTR resPath, int cxDesired = 0, int cyDesired = 0) noexcept;
 
-    // It is best to first use PathUtil::ExpandEnvString to expand environment variables in shell32Path.
+    // It is best to first use ExpandEnvString to expand environment variables in shell32Path.
     static bool ParseShell32IconInfo(const std::wstring& shell32Path,
                                      int shellIconIndex,
                                      std::wstring& iconPath,
                                      int& iconIndex) noexcept;
 
-    // It is best to first use PathUtil::ExpandEnvString to expand environment variables in filePath.
+    // It is best to first use ExpandEnvString to expand environment variables in filePath.
     // Do not need call DestroyIcon for icon.
     static bool EnumIconGroups(const std::wstring& filePath, std::vector<IconGroup>& iconGroups) noexcept;
 
-    // It is best to first use PathUtil::ExpandEnvString to expand environment variables in filePath.
+    // It is best to first use ExpandEnvString to expand environment variables in filePath.
     // You should call DestroyIcon for icon.
     static HICON LoadFromFile(const std::wstring& filePath, uint32_t iconIndex, int desiredSize = 256, int* actualSize = nullptr) noexcept;
 
@@ -112,7 +112,7 @@ class ASHE_API WinIconHelper {
     //           does not exceed the color depth of the display is chosen.
     //           If all exceed the color depth, the one with the lowest color depth is chosen.
     //
-    // It is best to first use PathUtil::ExpandEnvString to expand environment variables in filePath.
+    // It is best to first use ExpandEnvString to expand environment variables in filePath.
     // You should call DestroyIcon for icon.
     static HICON GetExeDisplayIcon(const std::wstring& filePath, int desiredSize, int* actualSize = nullptr) noexcept;
 

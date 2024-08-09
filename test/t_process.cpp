@@ -1,5 +1,8 @@
 #include "catch.hpp"
 #include "ashe/process.h"
+#include "ashe/process_util.h"
+
+using namespace ashe;
 
 // Test: create process, send data to process's input and get process's output.
 //

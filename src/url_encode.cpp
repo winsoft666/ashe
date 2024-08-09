@@ -1,8 +1,29 @@
 #include "ashe/config.h"
 #include "ashe/url_encode.h"
+#include "ashe/string_encode.h"
 
 namespace ashe {
-std::string UrlEncode::Encode(const std::string& str) {
+namespace {
+// Apply any suitable string transform (including the ones above) to an STL
+// string. Stack-allocated temporary space is used for the transformation, so
+// value and source may refer to the same string.
+typedef size_t (*Transform)(char* buffer, size_t buflen, const char* source, size_t srclen);
+
+// Return the result of applying transform t to source.
+std::string s_transform(const std::string& source, Transform t) {
+    // Ask transformation function to approximate the destination size (returns upper bound)
+    size_t maxlen = t(nullptr, 0, source.data(), source.length());
+    char* buffer = static_cast<char*>(::malloc((maxlen) * sizeof(char)));
+    if (!buffer)
+        return "";
+    const size_t len = t(buffer, maxlen, source.data(), source.length());
+    std::string result(buffer, len);
+    free(buffer);
+    return result;
+}
+}  // namespace
+
+std::string UrlEncode(const std::string& str) {
     char hex[] = "0123456789ABCDEF";
     std::string dst;
 
@@ -24,7 +45,12 @@ std::string UrlEncode::Encode(const std::string& str) {
     return dst;
 }
 
-size_t UrlEncode::Decode(char* buffer, size_t buflen, const char* source, size_t srclen) {
+std::wstring UrlEncode(const std::wstring& str) {
+    std::string res = UrlEncode(w2u(str));
+    return u2w(res);
+}
+
+size_t UrlDecode(char* buffer, size_t buflen, const char* source, size_t srclen) {
     if (nullptr == buffer)
         return srclen + 1;
 
@@ -40,8 +66,8 @@ size_t UrlEncode::Decode(char* buffer, size_t buflen, const char* source, size_t
         if (ch == '+') {
             buffer[bufpos++] = ' ';
         }
-        else if ((ch == '%') && (srcpos + 1 < srclen) && HexEncode::Decode(source[srcpos], &h1) &&
-                 HexEncode::Decode(source[srcpos + 1], &h2)) {
+        else if ((ch == '%') && (srcpos + 1 < srclen) && HexDecode(source[srcpos], &h1) &&
+                 HexDecode(source[srcpos + 1], &h2)) {
             buffer[bufpos++] = (h1 << 4) | h2;
             srcpos += 2;
         }
@@ -54,20 +80,13 @@ size_t UrlEncode::Decode(char* buffer, size_t buflen, const char* source, size_t
     return bufpos;
 }
 
-std::string UrlEncode::Decode(const std::string& source) {
-    return s_transform(source, Decode);
+std::string UrlDecode(const std::string& source) {
+    return s_transform(source, UrlDecode);
 }
 
-// Return the result of applying transform t to source.
-std::string UrlEncode::s_transform(const std::string& source, UrlEncode::Transform t) {
-    // Ask transformation function to approximate the destination size (returns upper bound)
-    size_t maxlen = t(nullptr, 0, source.data(), source.length());
-    char* buffer = static_cast<char*>(::malloc((maxlen) * sizeof(char)));
-    if (!buffer)
-        return "";
-    const size_t len = t(buffer, maxlen, source.data(), source.length());
-    std::string result(buffer, len);
-    free(buffer);
-    return result;
+std::wstring UrlDecode(const std::wstring& source) {
+    std::string res = UrlDecode(w2u(source));
+    return u2w(res);
 }
+
 }  // namespace ashe

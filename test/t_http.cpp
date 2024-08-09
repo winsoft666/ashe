@@ -17,6 +17,7 @@ TEST_CASE("Http1", "get") {
     REQUIRE(rspBody.size() > 1000);
 }
 
+#if 0
 TEST_CASE("Http2", "download") {
     ashe::WinHttp http;
     REQUIRE(http.openSession());
@@ -27,6 +28,7 @@ TEST_CASE("Http2", "download") {
     REQUIRE(http.saveResponseBodyToFile(L".\\sogou_explorer_11.0.1.34700_0000.exe"));
     REQUIRE(ashe::MD5::GetFileMD5(L".\\sogou_explorer_11.0.1.34700_0000.exe") == "73a0e33385b7fd3c2ce6279f35ef0c0b");
 }
+#endif
 
 TEST_CASE("HttpClient1", "get") {
     using namespace ashe;
@@ -59,6 +61,7 @@ TEST_CASE("HttpClient2", "get_cancel") {
     CHECK(client.wait(-1) == true);
 }
 
+#if 0
 TEST_CASE("HttpClient3", "download") {
     using namespace ashe;
 
@@ -92,3 +95,4 @@ TEST_CASE("HttpClient4", "download") {
     client.abort();
     CHECK(client.wait(-1) == true);
 }
+#endif

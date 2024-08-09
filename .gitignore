@@ -37,3 +37,4 @@ Release/
 
 build/
 build32/
+/include/ashe/config.h

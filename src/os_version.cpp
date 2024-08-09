@@ -4,7 +4,7 @@ namespace ashe {
 #ifdef ASHE_WIN
 typedef LONG(WINAPI* RtlGetVersion)(LPOSVERSIONINFOEX);
 
-WinVerInfo OSVersion::GetWinVer() noexcept {
+WinVerInfo GetWinVer() noexcept {
     WinVerInfo wvf;
     RtlGetVersion fn = nullptr;
     HMODULE hDll = GetModuleHandleA("ntdll.dll");
@@ -40,17 +40,17 @@ WinVerInfo OSVersion::GetWinVer() noexcept {
     return wvf;
 }
 
-bool OSVersion::IsWindowsVistaOrHigher() noexcept {
+bool IsWindowsVistaOrHigher() noexcept {
     const WinVerInfo wvi = GetWinVer();
     return (wvi.major >= 6);
 }
 
-bool OSVersion::IsWindows11() noexcept {
+bool IsWindows11() noexcept {
     const WinVerInfo wvi = GetWinVer();
     return (wvi.major >= 10 && wvi.build >= 22000);
 }
 
-bool OSVersion::IsWin64() noexcept {
+bool IsWin64() noexcept {
 #if 0
 #ifdef ASHE_WIN64  // 64bit process
     return true;
@@ -70,7 +70,7 @@ bool OSVersion::IsWin64() noexcept {
 #endif
 }
 
-bool OSVersion::IsWow64(HANDLE process, bool& result) noexcept {
+bool IsWow64(HANDLE process, bool& result) noexcept {
     BOOL bIsWow64 = FALSE;
 
     typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
@@ -90,7 +90,7 @@ bool OSVersion::IsWow64(HANDLE process, bool& result) noexcept {
 }
 #endif
 
-std::string OSVersion::GetOSVersion() {
+std::string GetOSVersion() {
 #ifdef ASHE_WIN
     const WinVerInfo wvi = GetWinVer();
     char result[200] = {0};

@@ -23,6 +23,7 @@
 #include <float.h>
 #include <stdlib.h>
 #include <chrono>
+#include <assert.h>
 
 // Compare two float point value
 #ifndef IS_NEARLY_EQUAL
@@ -128,10 +129,6 @@
 #define ASHE_DEPRECATED(message)
 #endif  // ! ASHE_DEPRECATED
 
-#ifndef ASHE_ASSERT
-#define ASHE_ASSERT(condition) assert(condition)
-#endif
-
 #ifndef ASHE_NODISCARD
 #if __cplusplus >= 201703L
 #define ASHE_NODISCARD [[nodiscard]]
@@ -142,21 +139,6 @@
 #else
 #define ASHE_NODISCARD
 #endif
-#endif
-
-#ifndef ASHE_FAIL_MESSAGE
-// The call to assert() will show the failure message in debug builds.
-#define ASHE_FAIL_MESSAGE(message) \
-    {                              \
-        assert(false && message);  \
-    }
-#endif
-
-#ifndef ASHE_ASSERT_MESSAGE
-#define ASHE_ASSERT_MESSAGE(condition, message) \
-    if (!(condition)) {                         \
-        ASHE_FAIL_MESSAGE(message);             \
-    }
 #endif
 
 #ifndef STD_ASYNC_IS_RUNNING

@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -17,33 +17,22 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_CONFIG_HPP__
-#define ASHE_CONFIG_HPP__
+#ifndef ASHE_WIN_PE_H_
+#define ASHE_WIN_PE_H_
 #pragma once
 
-#define ASHE_VERSION_MAJOR 1
-#define ASHE_VERSION_MINOR 0
-#define ASHE_VERSION_PATCH 4
+#include "ashe/arch.h"
 
-#ifdef ASHE_STATIC
-#define ASHE_API
-#else
-#if defined(ASHE_EXPORTS)
-#if defined(_MSC_VER)
-#define ASHE_API __declspec(dllexport)
-#else
-#define ASHE_API
-#endif
-#else
-#if defined(_MSC_VER)
-#define ASHE_API __declspec(dllimport)
-#pragma warning(disable: 4251)
-#else
-#define ASHE_API
-#endif
-#endif
-#endif
+#ifdef ASHE_WIN
+#include "ashe/windows_lite.h"
 
+#define PE_DOS_HEADER(base) ((PIMAGE_DOS_HEADER)base)
+#define PE_NT_HEADER(base) ((PIMAGE_NT_HEADERS)((CHAR*)base + PE_DOS_HEADER(base)->e_lfanew))
+#define PE_OPT_HEADER(base) ((PIMAGE_OPTIONAL_HEADER)(&PE_NT_HEADER(base)->OptionalHeader))
+#define PE_OPT_HEADER32(base) ((PIMAGE_OPTIONAL_HEADER32)(&PE_NT_HEADER(base)->OptionalHeader))
+#define PE_OPT_HEADER64(base) ((PIMAGE_OPTIONAL_HEADER64)(&PE_NT_HEADER(base)->OptionalHeader))
+#define PE_X64(base) (PE_OPT_HEADER(base)->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
 
+#endif // ASHE_WIN
 
-#endif //!ASHE_CONFIG_HPP__
+#endif  // !ASHE_WIN_PE_H_

@@ -537,6 +537,7 @@ bool StrFormat(const char* format, va_list argList, std::string& output) noexcep
 
         ret = (hr == S_OK);
     } catch (std::exception& e) {
+        // Can't use CheckFailure macro.
         ASHE_UNUSED(e);
         ret = false;
     }
@@ -578,6 +579,7 @@ bool StrFormat(const char* format, va_list argList, std::string& output) noexcep
             msgBuf = nullptr;
         }
     } catch (std::exception& e) {
+        // Can't use CheckFailure macro.
         ASHE_UNUSED(e);
         ret = false;
     }
@@ -680,6 +682,7 @@ std::string StrFormat(const char* format, ...) noexcept {
         StrFormat(format, args, output);
         va_end(args);
     } catch (std::exception& e) {
+        // Can't use CheckFailure macro.
         ASHE_UNUSED(e);
         output.clear();
     }
@@ -695,6 +698,7 @@ std::wstring StrFormat(const wchar_t* format, ...) noexcept {
         StrFormat(format, args, output);
         va_end(args);
     } catch (std::exception& e) {
+        // Can't use CheckFailure macro.
         ASHE_UNUSED(e);
         output.clear();
     }
@@ -733,7 +737,7 @@ bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
     if (v[0].empty() || v[1].empty())
         return false;
 
-    std::wstring envExpanded = PathUtil::ExpandEnvString(v[0]);
+    std::wstring envExpanded = ExpandEnvString(v[0]);
     DWORD dwBinType = 0;
     if (GetBinaryTypeW(envExpanded.c_str(), &dwBinType)) {
 #ifdef ASHE_WIN32

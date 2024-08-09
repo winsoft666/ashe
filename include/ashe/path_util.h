@@ -26,48 +26,57 @@
 
 namespace ashe {
 // On Windows, the directory path ends with a "\"
-class ASHE_API PathUtil {
-   public:
 #ifdef ASHE_WIN
-    static std::wstring GetWindowsFolder() noexcept;
+ASHE_API std::wstring GetWindowsFolder() noexcept;
 
-    static std::wstring GetSystemFolder() noexcept;
+ASHE_API std::wstring GetSystemFolder() noexcept;
 
-    static std::wstring GetTempFolder() noexcept;
+ASHE_API std::wstring GetTempFolder() noexcept;
 
-    static std::wstring GetCurrentUserDesktopFolder() noexcept;
+ASHE_API std::wstring GetCurrentUserDesktopFolder() noexcept;
 
-    static std::wstring GetAllUserDesktopFolder() noexcept;
+ASHE_API std::wstring GetAllUserDesktopFolder() noexcept;
 
-    static std::wstring GetCurrentUserProgramsFolder() noexcept;
-    static std::wstring GetAllUserProgramsFolder() noexcept;
+ASHE_API std::wstring GetCurrentUserProgramsFolder() noexcept;
+ASHE_API std::wstring GetAllUserProgramsFolder() noexcept;
 
-    static std::wstring GetProgramFilesx86Folder() noexcept;
-    static std::wstring GetProgramFilesFolder() noexcept;
+ASHE_API std::wstring GetProgramFilesx86Folder() noexcept;
+ASHE_API std::wstring GetProgramFilesFolder() noexcept;
 
-    static std::wstring GetLocalAppDataFolder() noexcept;
+ASHE_API std::wstring GetLocalAppDataFolder() noexcept;
 
-    static bool OpenWinExplorerAndLocate(const std::wstring& path) noexcept;
+ASHE_API bool OpenWinExplorerAndLocate(const std::wstring& path) noexcept;
 
-    static std::wstring GetWinExplorerDisplayName(const std::wstring& path) noexcept;
+ASHE_API std::wstring GetWinExplorerDisplayName(const std::wstring& path) noexcept;
 
-    static std::string ReplaceKnownEnvToWow6432(const std::string& src);
-    static std::wstring ReplaceKnownEnvToWow6432(const std::wstring& src);
+ASHE_API std::string ReplaceKnownEnvToWow6432(const std::string& src);
+ASHE_API std::wstring ReplaceKnownEnvToWow6432(const std::wstring& src);
 
-    static std::string ExpandEnvString(const std::string& src, bool disableWow64FsRedirection = false) noexcept;
-    static std::wstring ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection = false) noexcept;
+ASHE_API std::string ExpandEnvString(const std::string& src, bool disableWow64FsRedirection = false) noexcept;
+ASHE_API std::wstring ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection = false) noexcept;
 
 #endif
 
-    static bool PathIsSurroundQuote(const wchar_t* szPath) noexcept;
-    static bool PathIsSurroundQuote(const std::wstring& path) noexcept;
+ASHE_API bool PathIsSurroundQuote(const wchar_t* szPath) noexcept;
+ASHE_API bool PathIsSurroundQuote(const std::wstring& path) noexcept;
 
-    // Remove the quotes that surrounding the path.
-    static void PathRemoveQuote(wchar_t* szPath) noexcept;
-    static std::wstring PathRemoveQuote(const std::wstring& path) noexcept;
+// Remove the quotes that surrounding the path.
+ASHE_API void PathRemoveQuote(wchar_t* szPath) noexcept;
+ASHE_API std::wstring PathRemoveQuote(const std::wstring& path) noexcept;
 
-    static bool PathAddQuote(wchar_t* szPath, size_t buffSize, bool singleQuote = false) noexcept;
-    static std::wstring PathAddQuote(const std::wstring& path, bool singleQuote = false) noexcept;
-};
+ASHE_API bool PathAddQuote(wchar_t* szPath, size_t buffSize, bool singleQuote = false) noexcept;
+ASHE_API std::wstring PathAddQuote(const std::wstring& path, bool singleQuote = false) noexcept;
+
+ASHE_API std::wstring GetDirFromPath(const std::wstring& path, int upLevel = 1) noexcept;
+
+ASHE_API std::wstring GetFileNameFromPath(const std::wstring& path) noexcept;
+
+ASHE_API std::wstring CombinePath(const std::wstring& path1, const std::wstring& path2) noexcept;
+
+ASHE_API bool IsExistedPath(const std::wstring& path) noexcept;
+
+ASHE_API bool IsFilePath(const std::wstring& path) noexcept;
+
+ASHE_API bool IsDirPath(const std::wstring& path) noexcept;
 }  // namespace ashe
 #endif  // !ASHE_PATH_UTIL_HPP_

@@ -59,7 +59,7 @@ bool WinHttpClient::request(std::shared_ptr<HttpReqDatagram> reqDatagram,
 
     abort_.store(false);
     future_ = std::async(std::launch::async, [=]() {
-        int64_t startTS = TimeUtil::GetCurrentTimestampByMilliSec();
+        int64_t startTS = GetCurrentTimestampByMilliSec();
         HttpRspDatagram rspDatagram;
         rspDatagram.setSaveFileHandle(reqDatagram->saveFileHandle());
         rspDatagram.setSaveFilePath(reqDatagram->saveFilePath());
@@ -73,7 +73,7 @@ bool WinHttpClient::request(std::shared_ptr<HttpReqDatagram> reqDatagram,
         winHttp_->closeSession();
 
         if (reqRet) {
-            int64_t endTS = TimeUtil::GetCurrentTimestampByMilliSec();
+            int64_t endTS = GetCurrentTimestampByMilliSec();
             reqRet(ccode, (unsigned long)(endTS - startTS), rspDatagram);
         }
     });

@@ -153,28 +153,6 @@ class ASHE_API Process {
     /// Kill the process and it's child processes. force=true is only supported on Unix-like systems.
     void killProcessTree(bool force = false) noexcept;
 
-    /// Kill a given process id. Use KillProcessTree(bool force) instead if
-    /// possible. force=true is only supported on Unix-like systems.
-    static void KillProcessTree(id_type id, bool force = false) noexcept;
-
-    /// Kill a given process id.
-    /// force=true is only supported on Unix-like systems.
-    static bool Kill(id_type id, bool force = false) noexcept;
-
-#ifdef ASHE_WIN
-    /// Kill all process that executed file name is executed_file_name.
-    /// force=true is only supported on Unix-like systems.
-    /// Return true when all process have been killed.
-    /// Return false when have one or more process kill failed.
-    static bool Kill(const string_type& executedFileName, bool force = false) noexcept;
-
-    /// terminate all process that EXE file in "dir" directory.
-    static void RecursiveKill(const string_type& dir, bool excludeSelf) noexcept;
-#endif
-
-    static std::string GetProcessPathA(id_type id) noexcept;
-    static std::wstring GetProcessPathW(id_type id) noexcept;
-
    private:
 #ifdef ASHE_WIN
     class ProcessMutex : public SingletonClass<ProcessMutex> {

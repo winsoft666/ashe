@@ -3,5 +3,5 @@
 
 TEST_CASE("OsVersionTest") {
     using namespace ashe;
-    bool w64 = OSVersion::IsWin64();
+    bool w64 = IsWin64();
 }
