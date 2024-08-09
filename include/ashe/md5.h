@@ -35,11 +35,6 @@ class ASHE_API MD5 {
         unsigned int in[16];
     };
 
-    // Support large memory.
-    //
-    static std::string GetDataMD5(const unsigned char* buffer, size_t buffer_size);
-    static std::string GetFileMD5(const std::wstring& file_path);
-
    public:
     /*
        * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
@@ -65,7 +60,7 @@ class ASHE_API MD5 {
 
    private:
 #ifndef ASM_MD5
-     /*
+    /*
      * The core of the MD5 algorithm, this alters an existing MD5 hash to
      * reflect the addition of 16 longwords of new data.  MD5Update blocks
      * the data and converts bytes into longwords for this routine.
@@ -79,5 +74,10 @@ class ASHE_API MD5 {
     bool bigEndian_ = false;
     const char HEX_STRING[17] = "0123456789abcdef"; /* to convert to hex */
 };
+
+// Support large memory.
+//
+ASHE_API std::string GetDataMD5(const unsigned char* buffer, size_t buffer_size);
+ASHE_API std::string GetFileMD5(const std::wstring& filePath);
 }  // namespace ashe
 #endif  // !ASHE_MD5_HPP__

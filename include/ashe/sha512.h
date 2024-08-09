@@ -33,9 +33,8 @@ class ASHE_API SHA512 {
 
     void transform(const unsigned char* message, unsigned int block_nb);
 
-    static std::string GetFileSHA512(const std::wstring& filePath);
-
-    static std::string GetDataSHA512(const unsigned char* data, size_t dataSize);
+    static const unsigned int SHA384_512_BLOCK_SIZE = (1024 / 8);
+    static const unsigned int DIGEST_SIZE = (512 / 8);
 
    private:
     typedef unsigned char uint8;
@@ -44,12 +43,14 @@ class ASHE_API SHA512 {
 
     static uint64 getSha512K(int i);
 
-    static const unsigned int SHA384_512_BLOCK_SIZE = (1024 / 8);
-    static const unsigned int DIGEST_SIZE = (512 / 8);
     unsigned int m_tot_len;
     unsigned int m_len;
     unsigned char m_block[2 * SHA384_512_BLOCK_SIZE];
     uint64 m_h[8];
 };
+
+ASHE_API std::string GetFileSHA512(const std::wstring& filePath);
+
+ASHE_API std::string GetDataSHA512(const unsigned char* data, size_t dataSize);
 }  // namespace ashe
 #endif  // !ASHE_SHA512_HPP__

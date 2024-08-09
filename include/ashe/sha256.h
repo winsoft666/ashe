@@ -47,9 +47,6 @@ class ASHE_API SHA256 {
 
     std::string digest();
 
-    static std::string GetFileSHA256(const std::wstring& filePath);
-    static std::string GetDataSHA256(const unsigned char* data, size_t dataSize);
-
    private:
     void sha256_block(const unsigned char* block);
 
@@ -64,5 +61,8 @@ class ASHE_API SHA256 {
     class Private;
     Private* p_ = nullptr;
 };
+
+ASHE_API std::string GetFileSHA256(const std::wstring& filePath);
+ASHE_API std::string GetDataSHA256(const unsigned char* data, size_t dataSize);
 }  // namespace ashe
 #endif  // !ASHE_SHA256_HPP__

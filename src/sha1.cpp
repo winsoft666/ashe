@@ -1,16 +1,19 @@
 #include "ashe/config.h"
 #include "ashe/sha1.h"
 #include "ashe/file.h"
+#include "ashe/check_failure.h"
 
-ashe::SHA1::SHA1() {
+namespace ashe {
+
+SHA1::SHA1() {
     reset();
 }
 
-ashe::SHA1::~SHA1() {
+SHA1::~SHA1() {
     reset();
 }
 
-void ashe::SHA1::reset() {
+void SHA1::reset() {
     // SHA1 initialization constants
     m_state[0] = 0x67452301;
     m_state[1] = 0xEFCDAB89;
@@ -23,7 +26,7 @@ void ashe::SHA1::reset() {
 }
 
 // Use this function to hash in binary data and strings
-void ashe::SHA1::update(const unsigned char* data, unsigned int len) {
+void SHA1::update(const unsigned char* data, unsigned int len) {
     uint32_t i = 0, j = 0;
 
     j = (m_count[0] >> 3) & 63;
@@ -49,7 +52,7 @@ void ashe::SHA1::update(const unsigned char* data, unsigned int len) {
     memcpy(&m_buffer[j], &data[i], len - i);
 }
 
-void ashe::SHA1::final() {
+void SHA1::final() {
     uint32_t i = 0, j = 0;
     unsigned char finalcount[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -80,7 +83,7 @@ void ashe::SHA1::final() {
 }
 
 // Get the final hash as a pre-formatted string
-void ashe::SHA1::reportHash(char* szReport, size_t bufSize, unsigned char uReportType) {
+void SHA1::reportHash(char* szReport, size_t bufSize, unsigned char uReportType) {
     unsigned char i = 0;
 
     if (uReportType == (unsigned char)REPORT_HEX) {
@@ -99,61 +102,71 @@ void ashe::SHA1::reportHash(char* szReport, size_t bufSize, unsigned char uRepor
 }
 
 // Get the raw message digest
-void ashe::SHA1::getHash(unsigned char* uDest) {
+void SHA1::getHash(unsigned char* uDest) {
     unsigned char i = 0;
 
     for (i = 0; i < 20; i++)
         uDest[i] = m_digest[i];
 }
 
-std::string ashe::SHA1::GetFileSHA1(const std::wstring& filePath) {
+std::string GetFileSHA1(const std::wstring& filePath) {
     std::string result;
 
-    File file(filePath);
-    if (!file.open(L"rb")) {
-        return result;
+    try {
+        File file(filePath);
+        if (!file.open(L"rb")) {
+            return result;
+        }
+
+        SHA1 sha1;
+        sha1.reset();
+
+        size_t readBytes = 0;
+        unsigned char szData[1024] = {0};
+
+        while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
+            sha1.update(szData, (unsigned int)readBytes);
+        }
+        file.close();
+
+        sha1.final();
+
+        char szSHA1[256] = {0};
+        sha1.reportHash(szSHA1, 255, SHA1::REPORT_HEX);
+
+        result = szSHA1;
+    } catch (std::exception& e) {
+        result.clear();
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file sha1 failed");
     }
-
-    SHA1 sha1;
-    sha1.reset();
-
-    size_t readBytes = 0;
-    unsigned char szData[1024] = {0};
-
-    while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
-        sha1.update(szData, (unsigned int)readBytes);
-    }
-    file.close();
-
-    sha1.final();
-
-    char szSHA1[256] = {0};
-    sha1.reportHash(szSHA1, 255, SHA1::REPORT_HEX);
-
-    result = szSHA1;
     return result;
 }
 
-std::string ashe::SHA1::GetDataSHA1(const unsigned char* data, size_t dataSize) {
-    SHA1 sha1;
-    sha1.reset();
+std::string GetDataSHA1(const unsigned char* data, size_t dataSize) {
+    try {
+        SHA1 sha1;
+        sha1.reset();
 
-    size_t offset = 0;
-    while (offset < dataSize) {
-        size_t needRead = 10240;
-        if (offset + needRead > dataSize)
-            needRead = dataSize - offset;
+        size_t offset = 0;
+        while (offset < dataSize) {
+            size_t needRead = 10240;
+            if (offset + needRead > dataSize)
+                needRead = dataSize - offset;
 
-        sha1.update(data + offset, (unsigned int)needRead);
-        offset += needRead;
+            sha1.update(data + offset, (unsigned int)needRead);
+            offset += needRead;
+        }
+
+        sha1.final();
+
+        char szSHA1[256] = {0};
+        sha1.reportHash(szSHA1, 255, SHA1::REPORT_HEX);
+
+        return szSHA1;
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get data sha1 failed");
+        return "";
     }
-
-    sha1.final();
-
-    char szSHA1[256] = {0};
-    sha1.reportHash(szSHA1, 255, SHA1::REPORT_HEX);
-
-    return szSHA1;
 }
 
 #define ROL32(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
@@ -196,7 +209,7 @@ std::string ashe::SHA1::GetDataSHA1(const unsigned char* data, size_t dataSize) 
         w = ROL32(w, 30);                                        \
     }
 
-void ashe::SHA1::transform(uint32_t state[5], const unsigned char buffer[64]) {
+void SHA1::transform(uint32_t state[5], const unsigned char buffer[64]) {
     uint32_t a = 0, b = 0, c = 0, d = 0, e = 0;
 
     SHA1_WORKSPACE_BLOCK* block;
@@ -307,3 +320,4 @@ void ashe::SHA1::transform(uint32_t state[5], const unsigned char buffer[64]) {
     d = 0;
     e = 0;
 }
+}  // namespace ashe

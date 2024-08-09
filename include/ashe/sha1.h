@@ -49,10 +49,6 @@ class ASHE_API SHA1 {
     // Get the raw message digest
     void getHash(unsigned char* uDest);
 
-    static std::string GetFileSHA1(const std::wstring& filePath);
-
-    static std::string GetDataSHA1(const unsigned char* data, size_t dataSize);
-
    private:
     typedef union {
         unsigned char c[64];
@@ -66,5 +62,10 @@ class ASHE_API SHA1 {
     unsigned char m_buffer[64];
     unsigned char m_digest[20];
 };
+
+ASHE_API std::string GetFileSHA1(const std::wstring& filePath);
+
+ASHE_API std::string GetDataSHA1(const unsigned char* data, size_t dataSize);
+
 }  // namespace ashe
 #endif  // !ASHE_SHA1_HPP__

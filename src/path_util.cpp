@@ -358,7 +358,7 @@ std::wstring GetDirFromPath(const std::wstring& path, int upLevel) noexcept {
         }
         return dir;
     } catch (std::exception& e) {
-        UNEXPECTED_EXCEPTION(e, L"");
+        ASHE_UNEXPECTED_EXCEPTION(e, L"");
         return L"";
     }
 }
@@ -367,7 +367,7 @@ std::wstring GetFileNameFromPath(const std::wstring& path) noexcept {
     try {
         return path.substr(path.find_last_of(L"\\/") + 1);
     } catch (std::exception& e) {
-        UNEXPECTED_EXCEPTION(e, L"");
+        ASHE_UNEXPECTED_EXCEPTION(e, L"");
         return L"";
     }
 }

@@ -39,11 +39,11 @@ class ASHE_API CRC32 {
 
     std::string digest();
 
-    static std::string GetFileCRC32(const std::wstring& filePath);
-    static std::string GetDataCRC32(const unsigned char* data, size_t dataSize);
-
    private:
     uint32_t ulCRC32_ = 0;
 };
+
+ASHE_API std::string GetFileCRC32(const std::wstring& filePath);
+ASHE_API std::string GetDataCRC32(const unsigned char* data, size_t dataSize);
 }  // namespace ashe
 #endif  // !ASHE_CRC32_HPP__

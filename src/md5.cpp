@@ -2,67 +2,78 @@
 #include "ashe/md5.h"
 #include "ashe/arch.h"
 #include "ashe/byteorder.h"
+#include "ashe/check_failure.h"
 
 namespace ashe {
 
 // Support large memory.
 //
-std::string MD5::GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
-    unsigned char md5Sig[16] = {0};
-    char szMd5[33] = {0};
+std::string GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
+    try {
+        unsigned char md5Sig[16] = {0};
+        char szMd5[33] = {0};
 
-    MD5 md5;
-    MD5Context md5Context;
-    md5.MD5Init(&md5Context);
+        MD5 md5;
+        MD5::MD5Context md5Context;
+        md5.MD5Init(&md5Context);
 
-    size_t offset = 0;
-    while (offset < buffer_size) {
-        size_t needRead = 10240;
-        if (offset + needRead > buffer_size)
-            needRead = buffer_size - offset;
+        size_t offset = 0;
+        while (offset < buffer_size) {
+            size_t needRead = 10240;
+            if (offset + needRead > buffer_size)
+                needRead = buffer_size - offset;
 
-        md5.MD5Update(&md5Context, buffer + offset, (unsigned int)needRead);
-        offset += needRead;
+            md5.MD5Update(&md5Context, buffer + offset, (unsigned int)needRead);
+            offset += needRead;
+        }
+
+        md5.MD5Final(md5Sig, &md5Context);
+        md5.MD5SigToString(md5Sig, szMd5, 33);
+
+        return szMd5;
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get data md5 failed");
+        return "";
     }
-
-    md5.MD5Final(md5Sig, &md5Context);
-    md5.MD5SigToString(md5Sig, szMd5, 33);
-
-    return szMd5;
 }
 
-std::string MD5::GetFileMD5(const std::wstring& file_path) {
+std::string GetFileMD5(const std::wstring& file_path) {
+    try {
 #ifdef ASHE_WIN
-    FILE* f = nullptr;
-    _wfopen_s(&f, file_path.c_str(), L"rb");
+        FILE* f = nullptr;
+        _wfopen_s(&f, file_path.c_str(), L"rb");
 #else
-    std::string pathu8 = UnicodeToUtf8(file_path);
-    FILE* f = fopen(pathu8.c_str(), "rb");
+        std::string pathu8 = UnicodeToUtf8(file_path);
+        FILE* f = fopen(pathu8.c_str(), "rb");
 #endif
 
-    if (!f)
+        if (!f)
+            return "";
+
+        MD5 md5;
+
+        unsigned char szMd5Sig[16] = {0};
+        char szMd5[33] = {0};
+        MD5::MD5Context md5Context;
+        md5.MD5Init(&md5Context);
+
+        size_t readBytes = 0;
+        unsigned char szData[1024] = {0};
+
+        while ((readBytes = fread(szData, 1, 1024, f)) > 0) {
+            md5.MD5Update(&md5Context, szData, (unsigned int)readBytes);
+        }
+
+        fclose(f);
+
+        md5.MD5Final(szMd5Sig, &md5Context);
+        md5.MD5SigToString(szMd5Sig, szMd5, 33);
+
+        return szMd5;
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file md5 failed");
         return "";
-
-    MD5 md5;
-
-    unsigned char szMd5Sig[16] = {0};
-    char szMd5[33] = {0};
-    MD5Context md5Context;
-    md5.MD5Init(&md5Context);
-
-    size_t readBytes = 0;
-    unsigned char szData[1024] = {0};
-
-    while ((readBytes = fread(szData, 1, 1024, f)) > 0) {
-        md5.MD5Update(&md5Context, szData, (unsigned int)readBytes);
     }
-
-    fclose(f);
-
-    md5.MD5Final(szMd5Sig, &md5Context);
-    md5.MD5SigToString(szMd5Sig, szMd5, 33);
-
-    return szMd5;
 }
 
 /*

@@ -2,6 +2,7 @@
 #include "ashe/sha256.h"
 #include "ashe/arch.h"
 #include "ashe/file.h"
+#include "ashe/check_failure.h"
 
 namespace ashe {
 
@@ -203,48 +204,58 @@ std::string SHA256::digest() {
     return strSHA256;
 }
 
-std::string SHA256::GetFileSHA256(const std::wstring& filePath) {
+std::string GetFileSHA256(const std::wstring& filePath) {
     std::string result;
 
-    ashe::File file(filePath);
-    if (!file.open(L"rb")) {
-        return result;
+    try {
+        ashe::File file(filePath);
+        if (!file.open(L"rb")) {
+            return result;
+        }
+
+        SHA256 sha256;
+        sha256.init();
+
+        size_t readBytes = 0;
+        unsigned char szData[1024] = {0};
+
+        while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
+            sha256.update(szData, (uint32_t)readBytes);
+        }
+        file.close();
+
+        sha256.final();
+
+        result = sha256.digest();
+    } catch (std::exception& e) {
+        result.clear();
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file sha256 failed");
     }
-
-    SHA256 sha256;
-    sha256.init();
-
-    size_t readBytes = 0;
-    unsigned char szData[1024] = {0};
-
-    while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
-        sha256.update(szData, (uint32_t)readBytes);
-    }
-    file.close();
-
-    sha256.final();
-
-    result = sha256.digest();
     return result;
 }
 
-std::string SHA256::GetDataSHA256(const unsigned char* data, size_t dataSize) {
-    SHA256 sha256;
-    sha256.init();
+std::string GetDataSHA256(const unsigned char* data, size_t dataSize) {
+    try {
+        SHA256 sha256;
+        sha256.init();
 
-    size_t offset = 0;
-    while (offset < dataSize) {
-        size_t needRead = 10240;
-        if (offset + needRead > dataSize)
-            needRead = dataSize - offset;
+        size_t offset = 0;
+        while (offset < dataSize) {
+            size_t needRead = 10240;
+            if (offset + needRead > dataSize)
+                needRead = dataSize - offset;
 
-        sha256.update(data + offset, (uint32_t)needRead);
-        offset += needRead;
+            sha256.update(data + offset, (uint32_t)needRead);
+            offset += needRead;
+        }
+
+        sha256.final();
+
+        return sha256.digest();
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get data sha256 failed");
+        return "";
     }
-
-    sha256.final();
-
-    return sha256.digest();
 }
 
 void SHA256::sha256_block(const unsigned char* block) {

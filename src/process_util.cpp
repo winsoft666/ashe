@@ -303,7 +303,7 @@ std::string GetCurrentExeDirectoryA() {
 
 bool IsPeX64(LPCWSTR pszModulePath) {
     HMODULE h = GetModuleHandleW(pszModulePath);
-    CHECK_FAILURE(!h, L"The module must have been loaded by the calling process.");
+    ASHE_CHECK_FAILURE(!h, L"The module must have been loaded by the calling process.");
     if (!h) {
         return false;
     }
@@ -577,31 +577,39 @@ bool KillProcess(pid_t id, bool force) noexcept {
 }
 
 std::string GetProcessPathA(pid_t id) noexcept {
-    std::string cmdPath = std::string("/proc/") + std::to_string(id) + std::string("/cmdline");
-    std::ifstream cmdFile(cmdPath.c_str());
-
     std::string cmdLine;
-    std::getline(cmdFile, cmdLine);
-    if (!cmdLine.empty()) {
-        // Keep first cmdline item which contains the program path
-        size_t pos = cmdLine.find('\0');
-        if (pos != string_type::npos)
-            cmdLine = cmdLine.substr(0, pos);
+    try {
+        std::string cmdPath = std::string("/proc/") + std::to_string(id) + std::string("/cmdline");
+        std::ifstream cmdFile(cmdPath.c_str());
+
+        std::getline(cmdFile, cmdLine);
+        if (!cmdLine.empty()) {
+            // Keep first cmdline item which contains the program path
+            size_t pos = cmdLine.find('\0');
+            if (pos != string_type::npos)
+                cmdLine = cmdLine.substr(0, pos);
+        }
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"GetProcessPathA");
     }
     return cmdLine;
 }
 
 std::wstring GetProcessPathW(pid_t id) noexcept {
-    std::wstring cmdPath = std::wstring(L"/proc/") + std::to_wstring(id) + std::wstring(L"/cmdline");
-    std::wifstream cmdFile(cmdPath.c_str());
-
     std::wstring cmdLine;
-    std::getline(cmdFile, cmdLine);
-    if (!cmdLine.empty()) {
-        // Keep first cmdline item which contains the program path
-        size_t pos = cmdLine.find(L'\0');
-        if (pos != string_type::npos)
-            cmdLine = cmdLine.substr(0, pos);
+    try {
+        std::wstring cmdPath = std::wstring(L"/proc/") + std::to_wstring(id) + std::wstring(L"/cmdline");
+        std::wifstream cmdFile(cmdPath.c_str());
+
+        std::getline(cmdFile, cmdLine);
+        if (!cmdLine.empty()) {
+            // Keep first cmdline item which contains the program path
+            size_t pos = cmdLine.find(L'\0');
+            if (pos != string_type::npos)
+                cmdLine = cmdLine.substr(0, pos);
+        }
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"GetProcessPathW");
     }
     return cmdLine;
 }

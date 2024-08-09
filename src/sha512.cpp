@@ -1,6 +1,7 @@
 #include "ashe/config.h"
 #include "ashe/sha512.h"
 #include "ashe/file.h"
+#include "ashe/check_failure.h"
 
 namespace ashe {
 SHA512::uint64 SHA512::getSha512K(int i) {
@@ -168,48 +169,56 @@ void SHA512::transform(const unsigned char* message, unsigned int block_nb) {
     }
 }
 
-std::string SHA512::GetFileSHA512(const std::wstring& filePath) {
-    std::string result;
+std::string GetFileSHA512(const std::wstring& filePath) {
+    try {
+        File file(filePath);
+        if (!file.open("rb")) {
+            return "";
+        }
 
-    File file(filePath);
-    if (!file.open("rb")) {
-        return result;
+        unsigned char digest[SHA512::DIGEST_SIZE];
+        memset(digest, 0, SHA512::DIGEST_SIZE);
+        SHA512 ctx;
+        ctx.init();
+
+        size_t readBytes = 0;
+        unsigned char szData[1024] = {0};
+
+        while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
+            ctx.update(szData, (unsigned int)readBytes);
+        }
+        file.close();
+
+        ctx.final(digest);
+
+        char buf[2 * SHA512::DIGEST_SIZE + 1];
+        buf[2 * SHA512::DIGEST_SIZE] = 0;
+        for (int i = 0; i < SHA512::DIGEST_SIZE; i++)
+            sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
+
+        return std::string(buf);
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file sha512 failed");
+        return "";
     }
-
-    unsigned char digest[SHA512::DIGEST_SIZE];
-    memset(digest, 0, SHA512::DIGEST_SIZE);
-    SHA512 ctx;
-    ctx.init();
-
-    size_t readBytes = 0;
-    unsigned char szData[1024] = {0};
-
-    while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
-        ctx.update(szData, (unsigned int)readBytes);
-    }
-    file.close();
-
-    ctx.final(digest);
-
-    char buf[2 * SHA512::DIGEST_SIZE + 1];
-    buf[2 * SHA512::DIGEST_SIZE] = 0;
-    for (int i = 0; i < SHA512::DIGEST_SIZE; i++)
-        sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
-
-    return std::string(buf);
 }
 
-std::string SHA512::GetDataSHA512(const unsigned char* data, size_t dataSize) {
-    unsigned char digest[SHA512::DIGEST_SIZE] = {0};
-    SHA512 ctx;
-    ctx.init();
-    ctx.update((const unsigned char*)data, (unsigned int)dataSize);
-    ctx.final(digest);
+std::string GetDataSHA512(const unsigned char* data, size_t dataSize) {
+    try {
+        unsigned char digest[SHA512::DIGEST_SIZE] = {0};
+        SHA512 ctx;
+        ctx.init();
+        ctx.update((const unsigned char*)data, (unsigned int)dataSize);
+        ctx.final(digest);
 
-    char buf[2 * SHA512::DIGEST_SIZE + 1] = {0};
-    for (unsigned int i = 0; i < SHA512::DIGEST_SIZE; i++) {
-        sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
+        char buf[2 * SHA512::DIGEST_SIZE + 1] = {0};
+        for (unsigned int i = 0; i < SHA512::DIGEST_SIZE; i++) {
+            sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
+        }
+        return std::string(buf);
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file sha512 failed");
+        return "";
     }
-    return std::string(buf);
 }
 }  // namespace ashe

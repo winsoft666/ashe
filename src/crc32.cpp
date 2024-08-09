@@ -1,12 +1,15 @@
 #include "ashe/config.h"
 #include "ashe/crc32.h"
 #include "ashe/file.h"
+#include "ashe/check_failure.h"
 
-void ashe::CRC32::init() {
+namespace ashe {
+
+void CRC32::init() {
     ulCRC32_ = 0xFFFFFFFF;
 }
 
-void ashe::CRC32::update(const unsigned char* pData, uint32_t uSize) {
+void CRC32::update(const unsigned char* pData, uint32_t uSize) {
     // CRC-32 table for the following polynominal:
     // X^32+X^26+X^23+X^22+X^16+X^12+X^11+X^10+X^8+X^7+X^5+X^4+X^2+X+1
     static uint32_t crc32tab[] = {
@@ -50,55 +53,66 @@ void ashe::CRC32::update(const unsigned char* pData, uint32_t uSize) {
     uint32_t i = 0;
 
     for (i = 0; i < uSize; i++)
-        ulCRC32_ = ((ulCRC32_) >> 8) ^ crc32tab[(pData[i]) ^ ((ulCRC32_)&0x000000FF)];
+        ulCRC32_ = ((ulCRC32_) >> 8) ^ crc32tab[(pData[i]) ^ ((ulCRC32_) & 0x000000FF)];
 }
 
-void ashe::CRC32::finish() {
+void CRC32::finish() {
     ulCRC32_ = ~(ulCRC32_);
 }
 
-std::string ashe::CRC32::digest() {
+std::string CRC32::digest() {
     char szCRC[10] = {0};
     snprintf(szCRC, sizeof(szCRC), "%08x", ulCRC32_);
     return szCRC;
 }
 
-std::string ashe::CRC32::GetFileCRC32(const std::wstring& filePath) {
-    File file(filePath);
-    if (!file.open(L"rb"))
+std::string GetFileCRC32(const std::wstring& filePath) {
+    try {
+        File file(filePath);
+        if (!file.open(L"rb"))
+            return "";
+
+        CRC32 crc32;
+        crc32.init();
+
+        size_t readBytes = 0;
+        unsigned char szData[1024] = {0};
+
+        while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
+            crc32.update(szData, (uint32_t)readBytes);
+        }
+        file.close();
+
+        crc32.finish();
+
+        return crc32.digest();
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file crc32 failed");
         return "";
-
-    CRC32 crc32;
-    crc32.init();
-
-    size_t readBytes = 0;
-    unsigned char szData[1024] = {0};
-
-    while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
-        crc32.update(szData, (uint32_t)readBytes);
     }
-    file.close();
-
-    crc32.finish();
-
-    return crc32.digest();
 }
 
-std::string ashe::CRC32::GetDataCRC32(const unsigned char* data, size_t dataSize) {
-    CRC32 crc32;
-    crc32.init();
+std::string GetDataCRC32(const unsigned char* data, size_t dataSize) {
+    try {
+        CRC32 crc32;
+        crc32.init();
 
-    size_t offset = 0;
-    while (offset < dataSize) {
-        size_t needRead = 10240;
-        if (offset + needRead > dataSize)
-            needRead = dataSize - offset;
+        size_t offset = 0;
+        while (offset < dataSize) {
+            size_t needRead = 10240;
+            if (offset + needRead > dataSize)
+                needRead = dataSize - offset;
 
-        crc32.update(data + offset, (uint32_t)needRead);
-        offset += needRead;
+            crc32.update(data + offset, (uint32_t)needRead);
+            offset += needRead;
+        }
+
+        crc32.finish();
+
+        return crc32.digest();
+    } catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"Get data crc32 failed");
+        return "";
     }
-
-    crc32.finish();
-
-    return crc32.digest();
 }
+}  // namespace ashe
