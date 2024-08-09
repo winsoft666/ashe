@@ -1,4 +1,5 @@
 #include "ashe/os_version.h"
+#include "ashe/check_failure.h"
 
 namespace ashe {
 #ifdef ASHE_WIN
@@ -70,24 +71,6 @@ bool IsWin64() noexcept {
 #endif
 }
 
-bool IsWow64(HANDLE process, bool& result) noexcept {
-    BOOL bIsWow64 = FALSE;
-
-    typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
-    LPFN_ISWOW64PROCESS fnIsWow64Process =
-        (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
-
-    if (NULL == fnIsWow64Process) {
-        return false;
-    }
-
-    if (!fnIsWow64Process(process, &bIsWow64)) {
-        return false;
-    }
-
-    result = !!bIsWow64;
-    return true;
-}
 #endif
 
 std::string GetOSVersion() {

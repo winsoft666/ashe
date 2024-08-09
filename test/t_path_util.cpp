@@ -12,9 +12,7 @@ TEST_CASE("PathUtil-ExpandEnvString", "") {
 
     expand = ashe::ExpandEnvString(L"%ProgramFiles%", false);
     if (ashe::IsWin64()) {
-        bool is32Bit = false;
-        bool ret = ashe::Is32BitProcess(GetCurrentProcess(), is32Bit);
-        REQUIRE(ret);
+        bool is32Bit = ashe::Is32BitProcess(GetCurrentProcess());
 
         if (is32Bit)
             CHECK(expand == L"C:\\Program Files (x86)");

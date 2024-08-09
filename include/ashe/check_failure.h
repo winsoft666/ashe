@@ -29,41 +29,27 @@
 #include <string>
 
 namespace ashe {
-#define CHECK_FAILURE_STRINGIFY(arg) #arg
+#define _L(x) __L(x)
+#define __L(x) L##x
 
-void ShowUnexpectedException(const std::wstring& fileLine, const std::wstring& description, const std::exception& e);
+namespace internal {
 
 #ifdef ASHE_WIN
 // Return true if failure occurred
-bool CheckFailure(HRESULT hr, const std::wstring& fileLine, const std::wstring& description);
-
-#define ASHE_CHECK_FAILURE_HRESULT_FILE_LINE(hr, desc, file, line) CheckFailure((hr), L"" CHECK_FAILURE_STRINGIFY(file) L"(" CHECK_FAILURE_STRINGIFY(line) L")", desc)
-
-// Using this macro
-#define ASHE_CHECK_FAILURE_HRESULT(hr, desc) ASHE_CHECK_FAILURE_HRESULT_FILE_LINE(hr, desc, __FILE__, __LINE__)
-
-// Return true if failure occurred
-bool CheckFailureLSTATUS(LSTATUS ls, const std::wstring& fileLine, const std::wstring& description);
-
-#define ASHE_CHECK_FAILURE_STATUS_FILE_LINE(ls, desc, file, line) CheckFailureLSTATUS((ls), L"" CHECK_FAILURE_STRINGIFY(file) L"(" CHECK_FAILURE_STRINGIFY(line) L")", desc)
-
-// Using this macro
-#define ASHE_CHECK_FAILURE_STATUS(ls, desc) ASHE_CHECK_FAILURE_STATUS_FILE_LINE(ls, desc, __FILE__, __LINE__)
-
+bool CheckFailureHRESULT(HRESULT hr, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
+bool CheckFailureLSTATUS(LSTATUS ls, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
 #endif  // ASHE_WIN
+void ShowUnexpectedException(const std::exception& e, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
+bool CheckFailureBool(bool result, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
 
-// Return true if failure occurred
-bool CheckFailure(bool result, const std::wstring& fileLine, const std::wstring& description);
+}  // namespace internal
 
-#define ASHE_UNEXPECTED_EXCEPTION_FILE_LINE(e, desc, file, line) ShowUnexpectedException(L"" CHECK_FAILURE_STRINGIFY(file) L"(" CHECK_FAILURE_STRINGIFY(line) L")", desc, e)
-
-// Using this macro
-#define ASHE_UNEXPECTED_EXCEPTION(e, desc) ASHE_UNEXPECTED_EXCEPTION_FILE_LINE((e), desc, __FILE__, __LINE__)
-
-#define ASHE_CHECK_FAILURE_FILE_LINE(value, desc, file, line) CheckFailure((value), L"" CHECK_FAILURE_STRINGIFY(file) L"(" CHECK_FAILURE_STRINGIFY(line) L")", desc)
-
-// Using this macro
-#define ASHE_CHECK_FAILURE(value, desc) ASHE_CHECK_FAILURE_FILE_LINE(value, desc, __FILE__, __LINE__)
+#ifdef ASHE_WIN
+#define ASHE_CHECK_FAILURE_LSTATUS(ls, desc) internal::CheckFailureLSTATUS(ls, _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
+#define ASHE_CHECK_FAILURE_HRESULT(hr, desc) internal::CheckFailureHRESULT(hr, _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
+#endif
+#define ASHE_UNEXPECTED_EXCEPTION(e, desc) internal::ShowUnexpectedException((e), _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
+#define ASHE_CHECK_FAILURE(value, desc) internal::CheckFailureBool((value), _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
 
 }  // namespace ashe
 

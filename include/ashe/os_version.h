@@ -89,7 +89,6 @@ ASHE_API bool IsWindows11() noexcept;
 
 ASHE_API bool IsWin64() noexcept;
 
-ASHE_API bool IsWow64(HANDLE process, bool& result) noexcept;
 #endif
 
 ASHE_API std::string GetOSVersion();

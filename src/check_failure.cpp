@@ -5,30 +5,31 @@
 #include "ashe/trace.h"
 
 namespace ashe {
-void ShowUnexpectedException(const std::wstring& fileLine, const std::wstring& description, const std::exception& e) {
+namespace internal {
+void ShowUnexpectedException(const std::exception& e, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description) {
     std::wstring strWhat;
 #ifdef ASHE_WIN
     strWhat = a2w(e.what());
 #else
     strWhat = u2w(e.what());
 #endif
-    if (description.empty()) {
-        TraceW(L"Unexpected exception at %s: %s\n", fileLine.c_str(), strWhat.c_str());
+    if (!description || !description[0]) {
+        TraceW(L"Unexpected exception at %s:%s(%d): %s\n", file, func, line, strWhat.c_str());
     }
     else {
-        TraceW(L"Unexpected exception at %s: %s, %s\n", fileLine.c_str(), description.c_str(), strWhat.c_str());
+        TraceW(L"Unexpected exception at %s:%s(%d): %s, %s\n", file, func, line, description, strWhat.c_str());
     }
     assert(false);
 }
 
 #ifdef ASHE_WIN
-bool CheckFailure(HRESULT hr, const std::wstring& fileLine, const std::wstring& description) {
+bool CheckFailureHRESULT(HRESULT hr, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description) {
     if (FAILED(hr)) {
-        if (description.empty()) {
-            TraceW(L"Failure at %s: (0x%08X) %s\n", fileLine.c_str(), hr, StrTrim(Win32ErrCodeToStr(hr)).c_str());
+        if (!description || !description[0]) {
+            TraceW(L"Failure at %s:%s(%d): (0x%08X) %s\n", file, func, line, hr, StrTrim(Win32ErrCodeToStr(hr)).c_str());
         }
         else {
-            TraceW(L"Failure at %s: %s, (0x%08X) %s\n", fileLine.c_str(), description.c_str(), hr, StrTrim(Win32ErrCodeToStr(hr)).c_str());
+            TraceW(L"Failure at %s:%s(%d): %s, (0x%08X) %s\n", file, func, line, description, hr, StrTrim(Win32ErrCodeToStr(hr)).c_str());
         }
         assert(false);
         return true;
@@ -36,13 +37,13 @@ bool CheckFailure(HRESULT hr, const std::wstring& fileLine, const std::wstring& 
     return false;
 }
 
-bool CheckFailureLSTATUS(LSTATUS ls, const std::wstring& fileLine, const std::wstring& description) {
+bool CheckFailureLSTATUS(LSTATUS ls, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description) {
     if (ls != ERROR_SUCCESS) {
-        if (description.empty()) {
-            TraceW(L"Failure at %s: (%d) %s\n", fileLine.c_str(), ls, StrTrim(Win32ErrCodeToStr(ls)).c_str());
+        if (!description || !description[0]) {
+            TraceW(L"Failure at %s:%s(%d): (%d) %s\n", file, func, line, ls, StrTrim(Win32ErrCodeToStr(ls)).c_str());
         }
         else {
-            TraceW(L"Failure at %s: %s, (%d) %s\n", fileLine.c_str(), description.c_str(), ls, StrTrim(Win32ErrCodeToStr(ls)).c_str());
+            TraceW(L"Failure at %s:%s(%d): %s, (%d) %s\n", file, func, line, description, ls, StrTrim(Win32ErrCodeToStr(ls)).c_str());
         }
         assert(false);
         return true;
@@ -52,17 +53,17 @@ bool CheckFailureLSTATUS(LSTATUS ls, const std::wstring& fileLine, const std::ws
 
 #endif  // ASHE_WIN
 
-bool CheckFailure(bool result, const std::wstring& fileLine, const std::wstring& description) {
+bool CheckFailureBool(bool result, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description) {
     if (!result) {
-        if (description.empty()) {
-            TraceW(L"Failure at %s\n", fileLine.c_str());
+        if (!description || !description[0]) {
+            TraceW(L"Failure at %s:%s(%d)\n", file, func, line);
         }
         else {
-            TraceW(L"Failure at %s: %s\n", fileLine.c_str(), description.c_str());
+            TraceW(L"Failure at %s:%s(%d): %s\n", file, func, line, description);
         }
         assert(false);
     }
     return !result;
 }
-
+}  // namespace internal
 }  // namespace ashe

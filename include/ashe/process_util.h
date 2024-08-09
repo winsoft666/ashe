@@ -51,7 +51,7 @@ ASHE_API bool CreateNewProcess(const std::wstring& path, const std::wstring& par
 
 ASHE_API bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd = SW_SHOWDEFAULT);
 
-ASHE_API bool Is32BitProcess(HANDLE process, bool& result) noexcept;
+ASHE_API bool Is32BitProcess(HANDLE process) noexcept;
 
 // Require user call free(buf).
 ASHE_API bool GetCurrentExePath(wchar_t** buf);
@@ -64,6 +64,11 @@ ASHE_API std::string GetCurrentExePathA();
 ASHE_API std::wstring GetCurrentExeDirectoryW();
 ASHE_API std::string GetCurrentExeDirectoryA();
 
+ASHE_API bool IsWow64Process(HANDLE process) noexcept;
+ASHE_API bool IsWow64Process(unsigned long pid) noexcept;
+
+ASHE_API bool IsX64Process(unsigned long pid);
+
 // The module must have been loaded by the calling process.
 ASHE_API bool IsPeX64(LPCWSTR pszModulePath = NULL);
 
@@ -71,9 +76,6 @@ ASHE_API BOOL CALLBACK EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType,
 
 ASHE_API bool GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manifests);
 
-#endif
-
-#ifdef ASHE_WIN
 ASHE_API void KillProcessTree(unsigned long pid) noexcept;
 
 ASHE_API bool KillProcess(unsigned long pid) noexcept;
@@ -90,7 +92,7 @@ ASHE_API bool KillProcess(const std::string& exeName) noexcept;
 // Kill all process that EXE file in "dirPath" directory.
 ASHE_API void RecursiveKillProcess(const std::wstring& dirPath, bool excludeSelf) noexcept;
 ASHE_API void RecursiveKillProcess(const std::string& dirPath, bool excludeSelf) noexcept;
-#else
+#else  // !ASHE_WIN
 ASHE_API void KillProcessTree(pid_t id, bool force = false) noexcept;
 ASHE_API bool KillProcess(pid_t id, bool force = false) noexcept;
 

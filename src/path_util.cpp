@@ -146,7 +146,7 @@ std::wstring GetLocalAppDataFolder() noexcept {
 
 bool OpenWinExplorerAndLocate(const std::wstring& path) noexcept {
     bool result = false;
-    ITEMIDLIST* pidl = ILCreateFromPathW(path.c_str());
+    PIDLIST_ABSOLUTE pidl = ILCreateFromPathW(path.c_str());
     if (pidl) {
         result = (S_OK == SHOpenFolderAndSelectItems(pidl, 0, NULL, 0));
         ILFree(pidl);

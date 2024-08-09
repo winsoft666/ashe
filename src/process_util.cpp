@@ -144,19 +144,15 @@ bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCm
     return result;
 }
 
-bool Is32BitProcess(HANDLE process, bool& result) noexcept {
+bool Is32BitProcess(HANDLE process) noexcept {
     if (!process)
         return false;
 
-    bool wow64 = false;
-    if (!IsWow64(process, wow64))
-        return false;
-
+    bool wow64 = IsWow64Process(process);
     if (wow64)
-        result = true;
-    else
-        result = !IsWin64();
-    return true;
+        return true;
+
+    return !IsWin64();
 }
 
 std::wstring GetCurrentExePathW() {
@@ -301,12 +297,42 @@ std::string GetCurrentExeDirectoryA() {
     return result;
 }
 
+bool IsWow64Process(HANDLE process) noexcept {
+    BOOL bIsWow64 = FALSE;
+
+    typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
+    HMODULE hDll = GetModuleHandle(TEXT("kernel32"));
+    if (ASHE_CHECK_FAILURE(hDll != NULL, L"get kernel32 handle failed"))
+        return false;
+
+    LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(hDll, "IsWow64Process");
+    if (ASHE_CHECK_FAILURE(fnIsWow64Process != NULL, L"get IsWow64Process address failed"))
+        return false;
+
+    if (ASHE_CHECK_FAILURE(!!fnIsWow64Process(process, &bIsWow64), L"IsWow64Process failed"))
+        return false;
+
+    return !!bIsWow64;
+}
+
+bool IsWow64Process(unsigned long pid) noexcept {
+    bool result = false;
+    HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+    if (process) {
+        result = IsWow64Process(process);
+        CloseHandle(process);
+    }
+    return result;
+}
+
+bool IsX64Process(unsigned long pid) {
+    return IsWin64() && !IsWow64Process(pid);
+}
+
 bool IsPeX64(LPCWSTR pszModulePath) {
     HMODULE h = GetModuleHandleW(pszModulePath);
-    ASHE_CHECK_FAILURE(!h, L"The module must have been loaded by the calling process.");
-    if (!h) {
+    if (ASHE_CHECK_FAILURE(h, L"the module must have been loaded by the calling process."))
         return false;
-    }
     return PE_OPT_HEADER((CHAR*)h)->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC;
 }
 
