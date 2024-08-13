@@ -26,10 +26,10 @@ void ShowUnexpectedException(const std::exception& e, const wchar_t* file, const
 bool CheckFailureHRESULT(HRESULT hr, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description) {
     if (FAILED(hr)) {
         if (!description || !description[0]) {
-            TraceW(L"Failure at %s:%s(%d): (0x%08X) %s\n", file, func, line, hr, StrTrim(Win32ErrCodeToStr(hr)).c_str());
+            TraceW(L"Failure at %s:%s(%d): (%#x) %s\n", file, func, line, hr, StrTrim(Win32ErrCodeToStr(hr)).c_str());
         }
         else {
-            TraceW(L"Failure at %s:%s(%d): %s, (0x%08X) %s\n", file, func, line, description, hr, StrTrim(Win32ErrCodeToStr(hr)).c_str());
+            TraceW(L"Failure at %s:%s(%d): %s, (%#x) %s\n", file, func, line, description, hr, StrTrim(Win32ErrCodeToStr(hr)).c_str());
         }
         assert(false);
         return true;
