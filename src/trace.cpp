@@ -20,7 +20,7 @@
 #include "ashe/string_helper.h"
 
 namespace ashe {
-void TraceW(const wchar_t* lpFormat, ...) noexcept {
+void TraceW(const wchar_t* lpFormat, ...) {
     if (!lpFormat)
         return;
     std::wstring output;
@@ -38,7 +38,7 @@ void TraceW(const wchar_t* lpFormat, ...) noexcept {
     }
 }
 
-void TraceA(const char* lpFormat, ...) noexcept {
+void TraceA(const char* lpFormat, ...) {
     if (!lpFormat)
         return;
     std::string output;

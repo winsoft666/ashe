@@ -5,7 +5,7 @@ namespace ashe {
 #ifdef ASHE_WIN
 typedef LONG(WINAPI* RtlGetVersion)(LPOSVERSIONINFOEX);
 
-WinVerInfo GetWinVer() noexcept {
+WinVerInfo GetWinVer() {
     WinVerInfo wvf;
     RtlGetVersion fn = nullptr;
     HMODULE hDll = GetModuleHandleA("ntdll.dll");
@@ -41,17 +41,17 @@ WinVerInfo GetWinVer() noexcept {
     return wvf;
 }
 
-bool IsWindowsVistaOrHigher() noexcept {
+bool IsWindowsVistaOrHigher() {
     const WinVerInfo wvi = GetWinVer();
     return (wvi.major >= 6);
 }
 
-bool IsWindows11() noexcept {
+bool IsWindows11() {
     const WinVerInfo wvi = GetWinVer();
     return (wvi.major >= 10 && wvi.build >= 22000);
 }
 
-bool IsWin64() noexcept {
+bool IsWin64() {
 #if 0
 #ifdef ASHE_WIN64  // 64bit process
     return true;

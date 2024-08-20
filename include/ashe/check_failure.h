@@ -33,7 +33,6 @@ namespace ashe {
 #define __L(x) L##x
 
 namespace internal {
-
 #ifdef ASHE_WIN
 // Return true if failure occurred
 bool CheckFailureHRESULT(HRESULT hr, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
@@ -41,13 +40,13 @@ bool CheckFailureLSTATUS(LSTATUS ls, const wchar_t* file, const wchar_t* func, i
 #endif  // ASHE_WIN
 void ShowUnexpectedException(const std::exception& e, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
 bool CheckFailureBool(bool result, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
-
 }  // namespace internal
 
 #ifdef ASHE_WIN
 #define ASHE_CHECK_FAILURE_LSTATUS(ls, desc) internal::CheckFailureLSTATUS(ls, _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
 #define ASHE_CHECK_FAILURE_HRESULT(hr, desc) internal::CheckFailureHRESULT(hr, _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
-#endif
+#endif // ASHE_WIN
+
 #define ASHE_UNEXPECTED_EXCEPTION(e, desc) internal::ShowUnexpectedException((e), _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
 #define ASHE_CHECK_FAILURE(value, desc) internal::CheckFailureBool((value), _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
 

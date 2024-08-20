@@ -22,7 +22,26 @@
 
 namespace ashe {
 #ifdef ASHE_WIN
-bool IsRunAsAdminPrivilege(HANDLE hProcess) noexcept {
+bool EnablePrivilege(LPCTSTR szPrivilege, bool fEnable) {
+    bool fOk = false;
+    HANDLE hToken = NULL;
+
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)) {
+        TOKEN_PRIVILEGES tp;
+        tp.PrivilegeCount = 1;
+        LookupPrivilegeValue(NULL, szPrivilege, &tp.Privileges[0].Luid);
+        tp.Privileges->Attributes = fEnable ? SE_PRIVILEGE_ENABLED : 0;
+
+        AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL);
+        fOk = (GetLastError() == ERROR_SUCCESS);
+
+        CloseHandle(hToken);
+    }
+
+    return fOk;
+}
+
+bool IsRunAsAdminPrivilege(HANDLE hProcess) {
     BOOL fRet = FALSE;
     HANDLE hToken = NULL;
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
@@ -40,7 +59,7 @@ bool IsRunAsAdminPrivilege(HANDLE hProcess) noexcept {
     return !!fRet;
 }
 
-bool IsRunAsAdminPrivilege(DWORD dwPid) noexcept {
+bool IsRunAsAdminPrivilege(DWORD dwPid) {
     HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwPid);
     if (!hProcess)
         return false;
@@ -49,7 +68,7 @@ bool IsRunAsAdminPrivilege(DWORD dwPid) noexcept {
     return ret;
 }
 
-bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) noexcept {
+bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) {
     OSVERSIONINFO VersionTmp;
     VersionTmp.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&VersionTmp);
@@ -144,7 +163,7 @@ bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCm
     return result;
 }
 
-bool Is32BitProcess(HANDLE process) noexcept {
+bool Is32BitProcess(HANDLE process) {
     if (!process)
         return false;
 
@@ -188,34 +207,43 @@ bool GetCurrentExePath(wchar_t** buf) {
     wchar_t* pBuf = NULL;
     DWORD dwBufSize = MAX_PATH;
 
-    do {
-        pBuf = (wchar_t*)malloc((dwBufSize + 1) * sizeof(wchar_t));
-        if (!pBuf)
-            break;
-        memset(pBuf, 0, (dwBufSize + 1) * sizeof(wchar_t));
+    try {
+        do {
+            pBuf = (wchar_t*)malloc((dwBufSize + 1) * sizeof(wchar_t));
+            if (!pBuf)
+                break;
+            memset(pBuf, 0, (dwBufSize + 1) * sizeof(wchar_t));
 
-        DWORD dwGot = GetModuleFileNameW(NULL, pBuf, dwBufSize);
-        if (dwGot == 0) {
-            break;
-        }
+            DWORD dwGot = GetModuleFileNameW(NULL, pBuf, dwBufSize);
+            if (dwGot == 0) {
+                break;
+            }
 
-        if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-            free(pBuf);
-            dwBufSize *= 2;
+            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+                free(pBuf);
+                pBuf = NULL;
+                dwBufSize *= 2;
+            }
+            else {
+                result = true;
+                break;
+            }
+        } while (true);
+
+        if (result) {
+            *buf = pBuf;
         }
         else {
-            result = true;
-            break;
+            if (pBuf) {
+                free(pBuf);
+                pBuf = NULL;
+            }
         }
-    } while (true);
-
-    if (result) {
-        *buf = pBuf;
     }
-    else {
-        if (pBuf) {
-            free(pBuf);
-        }
+    catch (std::exception& e) {
+        ASHE_UNEXPECTED_EXCEPTION(e, L"GetCurrentExePath failed");
+        *buf = NULL;
+        return false;
     }
 
     return result;
@@ -265,39 +293,21 @@ bool GetCurrentExePath(char** buf) {
 
 std::wstring GetCurrentExeDirectoryW() {
     wchar_t* buf = nullptr;
-    if (!GetCurrentExePath(&buf)) {
-        return L"";
-    }
-
-    if (!PathRemoveFileSpecW(buf)) {
-        free(buf);
+    if (ASHE_CHECK_FAILURE(GetCurrentExePath(&buf), L"GetCurrentExePath failed")) {
         return L"";
     }
 
     std::wstring result = buf;
     free(buf);
 
-    return result;
+    return PathGetDirectory(result, 1);
 }
 
 std::string GetCurrentExeDirectoryA() {
-    char* buf = nullptr;
-    if (!GetCurrentExePath(&buf)) {
-        return "";
-    }
-
-    if (!PathRemoveFileSpecA(buf)) {
-        free(buf);
-        return "";
-    }
-
-    std::string result = buf;
-    free(buf);
-
-    return result;
+    return w2a(GetCurrentExeDirectoryW());
 }
 
-bool IsWow64Process(HANDLE process) noexcept {
+bool IsWow64Process(HANDLE process) {
     BOOL bIsWow64 = FALSE;
 
     typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
@@ -315,7 +325,7 @@ bool IsWow64Process(HANDLE process) noexcept {
     return !!bIsWow64;
 }
 
-bool IsWow64Process(unsigned long pid) noexcept {
+bool IsWow64Process(unsigned long pid) {
     bool result = false;
     HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
     if (process) {
@@ -371,7 +381,7 @@ bool GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manif
 }
 
 // Based on http://stackoverflow.com/a/1173396
-void KillProcessTree(unsigned long pid) noexcept {
+void KillProcessTree(unsigned long pid) {
     if (pid == 0)
         return;
 
@@ -399,7 +409,7 @@ void KillProcessTree(unsigned long pid) noexcept {
         TerminateProcess(process_handle, 2);
 }
 
-bool KillProcess(unsigned long pid) noexcept {
+bool KillProcess(unsigned long pid) {
     if (pid == 0)
         return false;
 
@@ -409,7 +419,7 @@ bool KillProcess(unsigned long pid) noexcept {
     return !!TerminateProcess(process_handle, 2);
 }
 
-bool KillProcess(const std::wstring& exeName) noexcept {
+bool KillProcess(const std::wstring& exeName) {
     if (exeName.empty())
         return false;
 
@@ -437,11 +447,11 @@ bool KillProcess(const std::wstring& exeName) noexcept {
     return ret;
 }
 
-bool KillProcess(const std::string& exeName) noexcept {
+bool KillProcess(const std::string& exeName) {
     return KillProcess(a2w(exeName));
 }
 
-void RecursiveKillProcess(const std::wstring& dir, bool excludeSelf) noexcept {
+void RecursiveKillProcess(const std::wstring& dir, bool excludeSelf) {
     size_t len = dir.length();
     TCHAR szTemp[MAX_PATH] = {0};
 
@@ -532,11 +542,11 @@ void RecursiveKillProcess(const std::wstring& dir, bool excludeSelf) noexcept {
     FindClose(fhandle);
 }
 
-void RecursiveKillProcess(const std::string& dir, bool excludeSelf) noexcept {
+void RecursiveKillProcess(const std::string& dir, bool excludeSelf) {
     RecursiveKillProcess(a2w(dir), excludeSelf);
 }
 
-std::wstring GetProcessPathW(unsigned long id) noexcept {
+std::wstring GetProcessPathW(unsigned long id) {
     std::wstring strPath;
     wchar_t szFilename[MAX_PATH] = {0};
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, id);
@@ -561,7 +571,7 @@ std::wstring GetProcessPathW(unsigned long id) noexcept {
     return strPath;
 }
 
-std::string GetProcessPathA(unsigned long id) noexcept {
+std::string GetProcessPathA(unsigned long id) {
     std::string strPath;
     char szFilename[MAX_PATH] = {0};
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, id);
@@ -586,7 +596,7 @@ std::string GetProcessPathA(unsigned long id) noexcept {
     return strPath;
 }
 #else
-void KillProcessTree(pid_t id, bool force) noexcept {
+void KillProcessTree(pid_t id, bool force) {
     if (id <= 0)
         return;
 
@@ -596,13 +606,13 @@ void KillProcessTree(pid_t id, bool force) noexcept {
         ::kill(-id, SIGINT);
 }
 
-bool KillProcess(pid_t id, bool force) noexcept {
+bool KillProcess(pid_t id, bool force) {
     if (force)
         return ::kill(id, SIGTERM) == 0;
     return ::kill(id, SIGINT) == 0;
 }
 
-std::string GetProcessPathA(pid_t id) noexcept {
+std::string GetProcessPathA(pid_t id) {
     std::string cmdLine;
     try {
         std::string cmdPath = std::string("/proc/") + std::to_string(id) + std::string("/cmdline");
@@ -621,7 +631,7 @@ std::string GetProcessPathA(pid_t id) noexcept {
     return cmdLine;
 }
 
-std::wstring GetProcessPathW(pid_t id) noexcept {
+std::wstring GetProcessPathW(pid_t id) {
     std::wstring cmdLine;
     try {
         std::wstring cmdPath = std::wstring(L"/proc/") + std::to_wstring(id) + std::wstring(L"/cmdline");

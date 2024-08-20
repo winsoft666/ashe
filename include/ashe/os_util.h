@@ -17,15 +17,19 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_TRACE_HPP__
-#define ASHE_TRACE_HPP__
+#ifndef ASHE_OS_UTIL_H_
+#define ASHE_OS_UTIL_H_
 #pragma once
 
+#include "ashe/arch.h"
 #include "ashe/config.h"
 
 namespace ashe {
-ASHE_API void TraceW(const wchar_t* lpFormat, ...);
-ASHE_API void TraceA(const char* lpFormat, ...);
+#ifdef ASHE_WIN
+ASHE_API bool OsFastReboot();
+ASHE_API bool OsFastShutdown();
+#else
+#endif
 }  // namespace ashe
 
-#endif  // !ASHE_TRACE_H__
+#endif // !ASHE_OS_UTIL_H_

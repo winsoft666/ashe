@@ -41,17 +41,20 @@
 
 namespace ashe {
 #ifdef ASHE_WIN
-ASHE_API bool IsRunAsAdminPrivilege(HANDLE hProcess) noexcept;
+// Such as: SE_DEBUG_NAME
+ASHE_API bool EnablePrivilege(LPCTSTR szPrivilege, bool fEnable);
 
-ASHE_API bool IsRunAsAdminPrivilege(DWORD dwPid) noexcept;
+ASHE_API bool IsRunAsAdminPrivilege(HANDLE hProcess);
 
-ASHE_API bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow) noexcept;
+ASHE_API bool IsRunAsAdminPrivilege(DWORD dwPid);
+
+ASHE_API bool SetUIPIMsgFilter(HWND hWnd, unsigned int uMessageID, bool bAllow);
 
 ASHE_API bool CreateNewProcess(const std::wstring& path, const std::wstring& param, DWORD* dwPID, HANDLE* pProcess);
 
 ASHE_API bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCmd = SW_SHOWDEFAULT);
 
-ASHE_API bool Is32BitProcess(HANDLE process) noexcept;
+ASHE_API bool Is32BitProcess(HANDLE process);
 
 // Require user call free(buf).
 ASHE_API bool GetCurrentExePath(wchar_t** buf);
@@ -61,11 +64,12 @@ ASHE_API bool GetCurrentExePath(char** buf);
 ASHE_API std::wstring GetCurrentExePathW();
 ASHE_API std::string GetCurrentExePathA();
 
+// End with '\'
 ASHE_API std::wstring GetCurrentExeDirectoryW();
 ASHE_API std::string GetCurrentExeDirectoryA();
 
-ASHE_API bool IsWow64Process(HANDLE process) noexcept;
-ASHE_API bool IsWow64Process(unsigned long pid) noexcept;
+ASHE_API bool IsWow64Process(HANDLE process);
+ASHE_API bool IsWow64Process(unsigned long pid);
 
 ASHE_API bool IsX64Process(unsigned long pid);
 
@@ -76,28 +80,28 @@ ASHE_API BOOL CALLBACK EnumResourceNameCallback(HMODULE hModule, LPCWSTR lpType,
 
 ASHE_API bool GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manifests);
 
-ASHE_API void KillProcessTree(unsigned long pid) noexcept;
+ASHE_API void KillProcessTree(unsigned long pid);
 
-ASHE_API bool KillProcess(unsigned long pid) noexcept;
+ASHE_API bool KillProcess(unsigned long pid);
 
-ASHE_API std::string GetProcessPathA(unsigned long pid) noexcept;
-ASHE_API std::wstring GetProcessPathW(unsigned long pid) noexcept;
+ASHE_API std::string GetProcessPathA(unsigned long pid);
+ASHE_API std::wstring GetProcessPathW(unsigned long pid);
 
 // Kill all process that executed file name is exeName.
 // Return true when all process have been killed.
 // Return false when have one or more process kill failed.
-ASHE_API bool KillProcess(const std::wstring& exeName) noexcept;
-ASHE_API bool KillProcess(const std::string& exeName) noexcept;
+ASHE_API bool KillProcess(const std::wstring& exeName);
+ASHE_API bool KillProcess(const std::string& exeName);
 
 // Kill all process that EXE file in "dirPath" directory.
-ASHE_API void RecursiveKillProcess(const std::wstring& dirPath, bool excludeSelf) noexcept;
-ASHE_API void RecursiveKillProcess(const std::string& dirPath, bool excludeSelf) noexcept;
+ASHE_API void RecursiveKillProcess(const std::wstring& dirPath, bool excludeSelf);
+ASHE_API void RecursiveKillProcess(const std::string& dirPath, bool excludeSelf);
 #else  // !ASHE_WIN
-ASHE_API void KillProcessTree(pid_t id, bool force = false) noexcept;
-ASHE_API bool KillProcess(pid_t id, bool force = false) noexcept;
+ASHE_API void KillProcessTree(pid_t id, bool force = false);
+ASHE_API bool KillProcess(pid_t id, bool force = false);
 
-ASHE_API std::string GetProcessPathA(pid_t id) noexcept;
-ASHE_API std::wstring GetProcessPathW(pid_t id) noexcept;
+ASHE_API std::string GetProcessPathA(pid_t id);
+ASHE_API std::wstring GetProcessPathW(pid_t id);
 #endif
 }  // namespace ashe
 #endif

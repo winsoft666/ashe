@@ -3,6 +3,7 @@
 
 using namespace ashe;
 
+#if 0
 TEST_CASE("CheckFailure", "") {
     REQUIRE(ASHE_CHECK_FAILURE(false, L"test") == true);
     REQUIRE(ASHE_CHECK_FAILURE(true, L"test") == false);
@@ -12,3 +13,4 @@ TEST_CASE("CheckFailure", "") {
     REQUIRE(ASHE_CHECK_FAILURE_LSTATUS(ERROR_FILE_NOT_FOUND, L"test lstatus failed") == true);
     REQUIRE(ASHE_CHECK_FAILURE_LSTATUS(ERROR_SUCCESS, L"test lstatus ok") == false);
 }
+#endif

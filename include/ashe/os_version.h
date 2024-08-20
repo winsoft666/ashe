@@ -81,13 +81,13 @@ typedef struct _WinVerInfo {
 } WinVerInfo;
 
 #ifdef ASHE_WIN
-ASHE_API WinVerInfo GetWinVer() noexcept;
+ASHE_API WinVerInfo GetWinVer();
 
-ASHE_API bool IsWindowsVistaOrHigher() noexcept;
+ASHE_API bool IsWindowsVistaOrHigher();
 
-ASHE_API bool IsWindows11() noexcept;
+ASHE_API bool IsWindows11();
 
-ASHE_API bool IsWin64() noexcept;
+ASHE_API bool IsWin64();
 
 #endif
 

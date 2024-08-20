@@ -19,7 +19,7 @@
 
 namespace ashe {
 #ifdef ASHE_WIN
-std::wstring GetWindowsFolder() noexcept {
+std::wstring GetWindowsFolder() {
     wchar_t szBuf[MAX_PATH] = {0};
     const DWORD result = ::GetWindowsDirectoryW(szBuf, MAX_PATH);
     if (result == 0)
@@ -32,7 +32,7 @@ std::wstring GetWindowsFolder() noexcept {
     return tempPath;
 }
 
-std::wstring GetSystemFolder() noexcept {
+std::wstring GetSystemFolder() {
     wchar_t szBuf[MAX_PATH] = {0};
     const DWORD result = ::GetSystemDirectoryW(szBuf, MAX_PATH);
     if (result == 0)
@@ -45,7 +45,7 @@ std::wstring GetSystemFolder() noexcept {
     return tempPath;
 }
 
-std::wstring GetTempFolder() noexcept {
+std::wstring GetTempFolder() {
     wchar_t szBuf[MAX_PATH] = {0};
     const DWORD result = ::GetTempPathW(MAX_PATH, szBuf);
     if (result == 0)
@@ -58,7 +58,7 @@ std::wstring GetTempFolder() noexcept {
     return tempPath;
 }
 
-std::wstring GetCurrentUserDesktopFolder() noexcept {
+std::wstring GetCurrentUserDesktopFolder() {
     wchar_t szDesktopDir[MAX_PATH] = {0};
     SHGetSpecialFolderPathW(NULL, szDesktopDir, CSIDL_DESKTOPDIRECTORY, 0);
     PathAddBackslashW(szDesktopDir);
@@ -66,7 +66,7 @@ std::wstring GetCurrentUserDesktopFolder() noexcept {
     return szDesktopDir;
 }
 
-std::wstring GetAllUserDesktopFolder() noexcept {
+std::wstring GetAllUserDesktopFolder() {
     wchar_t szDesktopDir[MAX_PATH] = {0};
     SHGetSpecialFolderPathW(NULL, szDesktopDir, CSIDL_COMMON_DESKTOPDIRECTORY, 0);
     PathAddBackslashW(szDesktopDir);
@@ -74,7 +74,7 @@ std::wstring GetAllUserDesktopFolder() noexcept {
     return szDesktopDir;
 }
 
-std::wstring GetCurrentUserProgramsFolder() noexcept {
+std::wstring GetCurrentUserProgramsFolder() {
     wchar_t szDesktopDir[MAX_PATH] = {0};
     SHGetSpecialFolderPathW(NULL, szDesktopDir, CSIDL_PROGRAMS, 0);
     PathAddBackslashW(szDesktopDir);
@@ -82,7 +82,7 @@ std::wstring GetCurrentUserProgramsFolder() noexcept {
     return szDesktopDir;
 }
 
-std::wstring GetAllUserProgramsFolder() noexcept {
+std::wstring GetAllUserProgramsFolder() {
     wchar_t szDesktopDir[MAX_PATH] = {0};
     SHGetSpecialFolderPathW(NULL, szDesktopDir, CSIDL_COMMON_PROGRAMS, 0);
     PathAddBackslashW(szDesktopDir);
@@ -90,7 +90,7 @@ std::wstring GetAllUserProgramsFolder() noexcept {
     return szDesktopDir;
 }
 
-std::wstring GetProgramFilesx86Folder() noexcept {
+std::wstring GetProgramFilesx86Folder() {
     wchar_t szDir[MAX_PATH] = {0};
     SHGetSpecialFolderPathW(NULL, szDir, CSIDL_PROGRAM_FILESX86, 0);
     PathAddBackslashW(szDir);
@@ -98,7 +98,7 @@ std::wstring GetProgramFilesx86Folder() noexcept {
     return szDir;
 }
 
-std::wstring GetProgramFilesFolder() noexcept {
+std::wstring GetProgramFilesFolder() {
     wchar_t szDir[MAX_PATH] = {0};
     SHGetSpecialFolderPathW(NULL, szDir, CSIDL_PROGRAM_FILES, 0);
     PathAddBackslashW(szDir);
@@ -106,7 +106,7 @@ std::wstring GetProgramFilesFolder() noexcept {
     return szDir;
 }
 
-std::wstring GetLocalAppDataFolder() noexcept {
+std::wstring GetLocalAppDataFolder() {
 #if (NTDDI_VERSION < NTDDI_VISTA)
 #ifndef KF_FLAG_CREATE
 #define KF_FLAG_CREATE 0x00008000
@@ -144,7 +144,7 @@ std::wstring GetLocalAppDataFolder() noexcept {
     return tempPath;
 }
 
-bool OpenWinExplorerAndLocate(const std::wstring& path) noexcept {
+bool OpenWinExplorerAndLocate(const std::wstring& path) {
     bool result = false;
     PIDLIST_ABSOLUTE pidl = ILCreateFromPathW(path.c_str());
     if (pidl) {
@@ -154,7 +154,7 @@ bool OpenWinExplorerAndLocate(const std::wstring& path) noexcept {
     return result;
 }
 
-std::wstring GetWinExplorerDisplayName(const std::wstring& path) noexcept {
+std::wstring GetWinExplorerDisplayName(const std::wstring& path) {
     SHFILEINFOW sfi;
     ZeroMemory(&sfi, sizeof(SHFILEINFOW));
     DWORD_PTR dwRet = ::SHGetFileInfoW(path.c_str(), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFOW), SHGFI_DISPLAYNAME);
@@ -204,7 +204,7 @@ std::wstring ReplaceKnownEnvToWow6432(const std::wstring& src) {
     return sl;
 }
 
-std::string ExpandEnvString(const std::string& src, bool disableWow64FsRedirection) noexcept {
+std::string ExpandEnvString(const std::string& src, bool disableWow64FsRedirection) {
     if (src.empty()) {
         return "";
     }
@@ -235,7 +235,7 @@ std::string ExpandEnvString(const std::string& src, bool disableWow64FsRedirecti
     return std::string(&buf[0]);
 }
 
-std::wstring ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection) noexcept {
+std::wstring ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirection) {
     if (src.empty()) {
         return L"";
     }
@@ -268,7 +268,7 @@ std::wstring ExpandEnvString(const std::wstring& src, bool disableWow64FsRedirec
 
 #endif
 
-bool PathIsSurroundQuote(const wchar_t* szPath) noexcept {
+bool PathIsSurroundQuote(const wchar_t* szPath) {
     if (!szPath)
         return false;
 
@@ -283,7 +283,7 @@ bool PathIsSurroundQuote(const wchar_t* szPath) noexcept {
     return false;
 }
 
-bool PathIsSurroundQuote(const std::wstring& path) noexcept {
+bool PathIsSurroundQuote(const std::wstring& path) {
     size_t oldLen = path.length();
     if (oldLen < 2)
         return false;
@@ -294,14 +294,14 @@ bool PathIsSurroundQuote(const std::wstring& path) noexcept {
     return false;
 }
 
-void PathRemoveQuote(wchar_t* szPath) noexcept {
+void PathRemoveQuote(wchar_t* szPath) {
     if (PathIsSurroundQuote(szPath)) {
         szPath[wcslen(szPath) - 1] = 0;
         wcscpy(szPath, szPath + 1);
     }
 }
 
-std::wstring PathRemoveQuote(const std::wstring& path) noexcept {
+std::wstring PathRemoveQuote(const std::wstring& path) {
     if (PathIsSurroundQuote(path)) {
         return path.substr(1, path.length() - 2);
     }
@@ -309,7 +309,7 @@ std::wstring PathRemoveQuote(const std::wstring& path) noexcept {
     return path;
 }
 
-bool PathAddQuote(wchar_t* szPath, size_t buffSize, bool singleQuote) noexcept {
+bool PathAddQuote(wchar_t* szPath, size_t buffSize, bool singleQuote) {
     if (PathIsSurroundQuote(szPath))
         return true;
 
@@ -336,7 +336,7 @@ bool PathAddQuote(wchar_t* szPath, size_t buffSize, bool singleQuote) noexcept {
     return true;
 }
 
-std::wstring PathAddQuote(const std::wstring& path, bool singleQuote) noexcept {
+std::wstring PathAddQuote(const std::wstring& path, bool singleQuote) {
     if (PathIsSurroundQuote(path))
         return path;
 
@@ -344,17 +344,23 @@ std::wstring PathAddQuote(const std::wstring& path, bool singleQuote) noexcept {
     return std::wstring(1, quote) + path + std::wstring(1, quote);
 }
 
-std::wstring GetDirFromPath(const std::wstring& path, int upLevel) noexcept {
+std::wstring PathGetDirectory(const std::wstring& path, int upLevel) {
     try {
         std::wstring dir = path;
         for (int i = 0; i < upLevel; i++) {
             if (dir.empty())
                 break;
+
             size_t offset = std::wstring::npos;
             wchar_t end = dir[dir.size() - 1];
-            if (end == L'\\' || end == L'/')
+            if (end == L'\\' || end == L'/') {
                 offset = dir.size() - 2;
-            dir = dir.substr(0, dir.find_last_of(L"\\/", offset));
+            }
+
+            size_t pos = dir.find_last_of(L"\\/", offset);
+            if (pos != std::wstring::npos)
+                pos += 1;
+            dir = dir.substr(0, pos);
         }
         return dir;
     } catch (std::exception& e) {
@@ -363,7 +369,7 @@ std::wstring GetDirFromPath(const std::wstring& path, int upLevel) noexcept {
     }
 }
 
-std::wstring GetFileNameFromPath(const std::wstring& path) noexcept {
+std::wstring PathGetFileName(const std::wstring& path) {
     try {
         return path.substr(path.find_last_of(L"\\/") + 1);
     } catch (std::exception& e) {
@@ -372,9 +378,10 @@ std::wstring GetFileNameFromPath(const std::wstring& path) noexcept {
     }
 }
 
-std::wstring CombinePath(const std::wstring& path1, const std::wstring& path2) noexcept {
+std::wstring PathJoin(const std::wstring& path1, const std::wstring& path2) {
     if (path1.empty())
         return path2;
+
     if (path2.empty())
         return path1;
 
@@ -399,7 +406,7 @@ std::wstring CombinePath(const std::wstring& path1, const std::wstring& path2) n
     return res;
 }
 
-bool IsExistedPath(const std::wstring& path) noexcept {
+bool PathIsExist(const std::wstring& path) {
 #ifdef ASHE_WIN
     WIN32_FILE_ATTRIBUTE_DATA attrs = {0};
     return GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &attrs) != 0;
@@ -408,7 +415,7 @@ bool IsExistedPath(const std::wstring& path) noexcept {
 #endif
 }
 
-bool IsFilePath(const std::wstring& path) noexcept {
+bool PathIsFile(const std::wstring& path) {
 #ifdef ASHE_WIN
     DWORD attrs = GetFileAttributesW(path.c_str());
     if (attrs != INVALID_FILE_ATTRIBUTES) {
@@ -421,7 +428,7 @@ bool IsFilePath(const std::wstring& path) noexcept {
 #endif
 }
 
-bool IsDirPath(const std::wstring& path) noexcept {
+bool PathIsDirectory(const std::wstring& path) {
 #ifdef ASHE_WIN
     DWORD attrs = GetFileAttributesW(path.c_str());
     if (attrs != INVALID_FILE_ATTRIBUTES) {
