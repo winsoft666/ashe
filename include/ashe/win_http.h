@@ -30,6 +30,8 @@
 #include "ashe/macros.h"
 
 namespace ashe {
+// TODO: Use WinHTTP in asynchronous mode.
+//
 class ASHE_API WinHttp {
    public:
     ASHE_DISALLOW_COPY_MOVE(WinHttp);
@@ -39,6 +41,7 @@ class ASHE_API WinHttp {
     virtual ~WinHttp();
 
     // dwAccessType defined in winhttp.h:
+    // 
     // #define WINHTTP_ACCESS_TYPE_DEFAULT_PROXY 0
     // #define WINHTTP_ACCESS_TYPE_NO_PROXY 1
     // #define WINHTTP_ACCESS_TYPE_NAMED_PROXY 3
@@ -74,7 +77,7 @@ class ASHE_API WinHttp {
 
     bool getResponseRawHeaders(std::wstring& headers);
 
-    bool getResponseHeaders(std::unordered_map<std::wstring, std::wstring> &headerMap);
+    bool getResponseHeaders(std::unordered_map<std::wstring, std::wstring>& headerMap);
 
     bool setRequestHeader(const std::wstring& name, const std::wstring& value);
 
@@ -100,7 +103,7 @@ class ASHE_API WinHttp {
     unsigned long getErrorCode() const;
 
     bool isOperationCancelled() const;
-   
+
    protected:
     void* hSession_ = nullptr;  // HINTERNET
     void* hConnect_ = nullptr;  // HINTERNET

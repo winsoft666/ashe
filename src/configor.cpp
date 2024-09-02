@@ -26,7 +26,7 @@ Configor::Element::Element(Configor* c) :
     c_(c) {
 }
 
-void Configor::Element::set(const std::string& value, const std::size_t i) noexcept {
+void Configor::Element::set(const std::string& value, const std::size_t i) {
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
     if (i >= values_.size()) {
         values_.resize(i + 1);
@@ -37,7 +37,7 @@ void Configor::Element::set(const std::string& value, const std::size_t i) noexc
     c_->saveFile();
 }
 
-void Configor::Element::set(const std::wstring& value, const std::size_t i) noexcept {
+void Configor::Element::set(const std::wstring& value, const std::size_t i) {
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
     if (i >= values_.size()) {
         values_.resize(i + 1);
@@ -48,11 +48,11 @@ void Configor::Element::set(const std::wstring& value, const std::size_t i) noex
     c_->saveFile();
 }
 
-void Configor::Element::set(const int value, const std::size_t i) noexcept {
+void Configor::Element::set(const int value, const std::size_t i) {
     set(std::to_string(value), i);
 }
 
-void Configor::Element::set(const float value, const std::size_t i) noexcept {
+void Configor::Element::set(const float value, const std::size_t i) {
     set(std::to_string(value), i);
 }
 
@@ -85,11 +85,11 @@ Configor::Element& Configor::Element::operator=(const Configor::Element& that) {
     return *this;
 }
 
-std::string Configor::Element::getName() noexcept {
+std::string Configor::Element::getName() {
     return name_;
 }
 
-std::string Configor::Element::getString(const std::size_t i, const std::string& defaultValue) noexcept {
+std::string Configor::Element::getString(const std::size_t i, const std::string& defaultValue) {
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
     if (i >= values_.size()) {
         values_.resize(i + 1);
@@ -99,7 +99,7 @@ std::string Configor::Element::getString(const std::size_t i, const std::string&
     return values_[i];
 }
 
-std::wstring Configor::Element::getWString(const std::size_t i, const std::wstring& defaultValue) noexcept {
+std::wstring Configor::Element::getWString(const std::size_t i, const std::wstring& defaultValue) {
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
     if (i >= values_.size()) {
         values_.resize(i + 1);
@@ -109,8 +109,9 @@ std::wstring Configor::Element::getWString(const std::size_t i, const std::wstri
     return Utf8ToUnicode(values_[i]);
 }
 
-int Configor::Element::getInt(const std::size_t i, int defaultValue) noexcept {
-    if (!exist(i))
+int Configor::Element::getInt(const std::size_t i, int defaultValue) {
+    std::lock_guard<std::recursive_mutex> lg(c_->mutex());
+    if (i >= values_.size())
         return defaultValue;
 
     int ret = defaultValue;
@@ -124,8 +125,9 @@ int Configor::Element::getInt(const std::size_t i, int defaultValue) noexcept {
     return ret;
 }
 
-float Configor::Element::getFloat(const std::size_t i, float defaultValue) noexcept {
-    if (!exist(i))
+float Configor::Element::getFloat(const std::size_t i, float defaultValue) {
+    std::lock_guard<std::recursive_mutex> lg(c_->mutex());
+    if (i >= values_.size())
         return defaultValue;
 
     float ret = defaultValue;
@@ -166,12 +168,17 @@ Configor::Element& Configor::Element::operator[](const std::wstring& name) {
     return children_.back();
 }
 
-bool Configor::Element::exist(const std::size_t i) noexcept {
+std::size_t Configor::Element::valueSize() {
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
-    return i < values_.size();
+    return values_.size();
 }
 
-bool Configor::Element::exists(const std::string& name) noexcept {
+std::size_t Configor::Element::childrenSize() {
+    std::lock_guard<std::recursive_mutex> lg(c_->mutex());
+    return children_.size();
+}
+
+bool Configor::Element::elementExists(const std::string& name) {
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
     for (const auto& e : children_) {
         if (e.name_ == name) {
@@ -182,7 +189,7 @@ bool Configor::Element::exists(const std::string& name) noexcept {
     return false;
 }
 
-void Configor::Element::remove(const std::string& name) noexcept {
+void Configor::Element::removeElement(const std::string& name) {
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
     for (auto i = children_.cbegin(); i != children_.cend(); i++) {
         if ((*i).name_ == name) {
@@ -194,16 +201,23 @@ void Configor::Element::remove(const std::string& name) noexcept {
     }
 }
 
-void Configor::Element::clear() noexcept {
+void Configor::Element::clearElements() {
     std::lock_guard<std::recursive_mutex> lg(c_->mutex());
     children_.clear();
 
     c_->saveFile();
 }
 
+void Configor::Element::clearValues() {
+    std::lock_guard<std::recursive_mutex> lg(c_->mutex());
+    values_.clear();
+
+    c_->saveFile();
+}
+
 // Configor
 
-bool Configor::testString(const char c) noexcept {
+bool Configor::testString(const char c) {
     if (isstring_ && c == '\\') {  // allow mask in strings
         mask_ = !mask_;
 
@@ -225,11 +239,11 @@ std::recursive_mutex& Configor::mutex() {
     return rwMutex_;
 }
 
-bool Configor::accept(const std::string& token) noexcept {
+bool Configor::accept(const std::string& token) {
     return token == get();
 }
 
-bool Configor::expect(const std::string& token) noexcept {
+bool Configor::expect(const std::string& token) {
     if (token != get()) {
         return false;
     }
@@ -238,17 +252,17 @@ bool Configor::expect(const std::string& token) noexcept {
     return true;
 }
 
-void Configor::next() noexcept {
+void Configor::next() {
     if (index_ < tokens_.size() - 1) {
         index_++;
     }
 }
 
-const std::string& Configor::get() noexcept {
+const std::string& Configor::get() {
     return tokens_[index_].token;
 }
 
-void Configor::parseVar(std::vector<Element>& parent) noexcept {
+void Configor::parseVar(std::vector<Element>& parent) {
     Element e(get(), this);
     next();
     if (!expect("="))
@@ -270,7 +284,7 @@ void Configor::parseVar(std::vector<Element>& parent) noexcept {
     parent.push_back(e);
 }
 
-void Configor::parseArray(Element& e) noexcept {
+void Configor::parseArray(Element& e) {
     if (!expect("["))
         return;
 
@@ -296,7 +310,7 @@ void Configor::parseArray(Element& e) noexcept {
     }
 }
 
-void Configor::parseObject(Element& e) noexcept {
+void Configor::parseObject(Element& e) {
     if (!expect("{"))
         return;
 
@@ -312,7 +326,7 @@ void Configor::parseObject(Element& e) noexcept {
     }
 }
 
-void Configor::preprocess(std::istream* file) noexcept {
+void Configor::preprocess(std::istream* file) {
     if (!file)
         return;
 
@@ -343,7 +357,7 @@ void Configor::preprocess(std::istream* file) noexcept {
     }
 }
 
-void Configor::tokenize() noexcept {
+void Configor::tokenize() {
     tokens_.clear();
 
     auto end = delimeter.end();
@@ -390,9 +404,9 @@ void Configor::tokenize() noexcept {
     }
 }
 
-void Configor::parse() noexcept {
+void Configor::parse() {
     index_ = 0;
-    root_.clear();
+    root_.clearElements();
 
     if (tokens_.size() > 0) {
         while (index_ != tokens_.size() - 1) {
@@ -401,7 +415,7 @@ void Configor::parse() noexcept {
     }
 }
 
-bool Configor::isNumeric(const std::string& value) noexcept {
+bool Configor::isNumeric(const std::string& value) {
     for (auto c : value) {
         if (!std::isdigit(c, std::locale()) && c != '.' && c != '-') {
             return false;
@@ -411,7 +425,7 @@ bool Configor::isNumeric(const std::string& value) noexcept {
     return true;
 }
 
-void Configor::writeElement(std::ostream& file, const Element& element, const unsigned int tabs) noexcept {
+void Configor::writeElement(std::ostream& file, const Element& element, const unsigned int tabs) {
     if (!element.values_.size() && !element.children_.size()) {
         return;
     }
@@ -491,7 +505,7 @@ Configor::Configor(std::istream& ss) :
 Configor::~Configor() {
 }
 
-bool Configor::reloadFile() noexcept {
+bool Configor::reloadFile() {
     std::lock_guard<std::recursive_mutex> lg(rwMutex_);
     try {
         if (filePath_.empty())
@@ -519,7 +533,7 @@ bool Configor::reloadFile() noexcept {
     return true;
 }
 
-bool Configor::saveFile() noexcept {
+bool Configor::saveFile() {
     std::lock_guard<std::recursive_mutex> lg(rwMutex_);
     try {
         if (filePath_.empty())
@@ -544,7 +558,7 @@ bool Configor::saveFile() noexcept {
     return true;
 }
 
-bool Configor::saveAsFile(const std::string& path) noexcept {
+bool Configor::saveAsFile(const std::string& path) {
     std::lock_guard<std::recursive_mutex> lg(rwMutex_);
     try {
         if (path.empty())
@@ -571,7 +585,7 @@ bool Configor::saveAsFile(const std::string& path) noexcept {
     return true;
 }
 
-bool Configor::save(std::ostream& ss) noexcept {
+bool Configor::save(std::ostream& ss) {
     std::lock_guard<std::recursive_mutex> lg(rwMutex_);
     try {
         for (const auto& e : root_.children_) {
@@ -593,15 +607,15 @@ Configor::Element& Configor::operator[](const std::wstring& name) {
     return root_[nameu8];
 }
 
-bool Configor::exists(const std::string& name) noexcept {
-    return root_.exists(name);
+bool Configor::elementExists(const std::string& name) {
+    return root_.elementExists(name);
 }
 
-void Configor::remove(const std::string& name) noexcept {
-    root_.remove(name);
+void Configor::removeElement(const std::string& name) {
+    root_.removeElement(name);
 }
 
-void Configor::clear() noexcept {
-    root_.clear();
+void Configor::clearElements() {
+    root_.clearElements();
 }
 }  // namespace ashe

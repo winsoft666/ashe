@@ -71,29 +71,32 @@ class ASHE_API Configor {
         Element(const Element& that);
         Element& operator=(const Element& that);
 
-        void set(const std::string& value, const std::size_t i = 0) noexcept;
-        void set(const std::wstring& value, const std::size_t i = 0) noexcept;
-        void set(const int value, const std::size_t i = 0) noexcept;
-        void set(const float value, const std::size_t i = 0) noexcept;
+        void set(const std::string& value, const std::size_t i = 0);
+        void set(const std::wstring& value, const std::size_t i = 0);
+        void set(const int value, const std::size_t i = 0);
+        void set(const float value, const std::size_t i = 0);
         void operator=(const std::string& value);
         void operator=(const std::wstring& value);
         void operator=(const int value);
         void operator=(const float value);
         void operator=(const double value);
 
-        std::string getName() noexcept;
-        std::string getString(const std::size_t i = 0, const std::string& defaultValue = "") noexcept;
-        std::wstring getWString(const std::size_t i = 0, const std::wstring& defaultValue = L"") noexcept;
-        int getInt(const std::size_t i = 0, int defaultValue = 0) noexcept;
-        float getFloat(const std::size_t i = 0, float defaultValue = 0.f) noexcept;
+        std::string getName();
+        std::string getString(const std::size_t i = 0, const std::string& defaultValue = "");
+        std::wstring getWString(const std::size_t i = 0, const std::wstring& defaultValue = L"");
+        int getInt(const std::size_t i = 0, int defaultValue = 0);
+        float getFloat(const std::size_t i = 0, float defaultValue = 0.f);
 
         Element& operator[](const std::string& name);
         Element& operator[](const std::wstring& name);
 
-        bool exist(const std::size_t i) noexcept;
-        bool exists(const std::string& name) noexcept;
-        void remove(const std::string& name) noexcept;
-        void clear() noexcept;
+        std::size_t valueSize();
+        std::size_t childrenSize();
+
+        bool elementExists(const std::string& name);
+        void removeElement(const std::string& name);
+        void clearElements();
+        void clearValues();
 
        private:
         Configor* c_ = nullptr;
@@ -108,20 +111,20 @@ class ASHE_API Configor {
     virtual ~Configor();
 
     // Only avaliable in file mode.
-    bool reloadFile() noexcept;
+    bool reloadFile();
 
     // Only avaliable in file mode.
-    bool saveFile() noexcept;
+    bool saveFile();
 
-    bool saveAsFile(const std::string& path) noexcept;
-    bool save(std::ostream& ss) noexcept;
+    bool saveAsFile(const std::string& path);
+    bool save(std::ostream& ss);
 
     Element& operator[](const std::string& name);
     Element& operator[](const std::wstring& name);
 
-    bool exists(const std::string& name) noexcept;
-    void remove(const std::string& name) noexcept;
-    void clear() noexcept;
+    bool elementExists(const std::string& name);
+    void removeElement(const std::string& name);
+    void clearElements();
 
    private:
     struct Token {
@@ -146,24 +149,24 @@ class ASHE_API Configor {
     bool mask_ = false;
     std::recursive_mutex rwMutex_;
 
-    bool testString(const char c) noexcept;
+    bool testString(const char c);
     std::recursive_mutex& mutex();
-    bool accept(const std::string& token) noexcept;
-    bool expect(const std::string& token) noexcept;
-    void next() noexcept;
-    const std::string& get() noexcept;
+    bool accept(const std::string& token);
+    bool expect(const std::string& token);
+    void next();
+    const std::string& get();
 
-    void parseVar(std::vector<Element>& parent) noexcept;
-    void parseArray(Element& e) noexcept;
-    void parseObject(Element& e) noexcept;
+    void parseVar(std::vector<Element>& parent);
+    void parseArray(Element& e);
+    void parseObject(Element& e);
 
-    void preprocess(std::istream* file) noexcept;
-    void tokenize() noexcept;
-    void parse() noexcept;
+    void preprocess(std::istream* file);
+    void tokenize();
+    void parse();
 
     // output
-    bool isNumeric(const std::string& value) noexcept;
-    void writeElement(std::ostream& file, const Element& element, const unsigned int tabs = 0) noexcept;
+    bool isNumeric(const std::string& value);
+    void writeElement(std::ostream& file, const Element& element, const unsigned int tabs = 0);
 
     // top level element
     Element root_;
