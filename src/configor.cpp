@@ -406,7 +406,7 @@ void Configor::tokenize() {
 
 void Configor::parse() {
     index_ = 0;
-    root_.clearElements();
+    root_.children_.clear();
 
     if (tokens_.size() > 0) {
         while (index_ != tokens_.size() - 1) {
