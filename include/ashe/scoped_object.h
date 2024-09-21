@@ -21,6 +21,7 @@
 #define SCOPED_OBJECT_HPP__
 #include "ashe/config.h"
 #include "ashe/arch.h"
+#include <thread>
 #ifdef ASHE_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
@@ -35,36 +36,38 @@
 #else
 #endif  // ASHE_WIN
 #include "ashe/macros.h"
+#include "check_failure.h"
 
 namespace ashe {
 #ifdef ASHE_WIN
 // Simple HANDLE wrapper to close it automatically from the destructor.
+//
 class ScopedHandle {
    public:
     ASHE_DISALLOW_COPY_MOVE(ScopedHandle);
-    ScopedHandle(bool isNullInvalid = true) noexcept :
+    explicit ScopedHandle(bool isNullInvalid = true) noexcept :
         kInvalidHandle_(isNullInvalid ? NULL : INVALID_HANDLE_VALUE) {
         handle_ = kInvalidHandle_;
     }
 
     ~ScopedHandle() noexcept { close(); }
 
-    void close() noexcept {
+    void close() {
         if (handle_ != kInvalidHandle_) {
             CloseHandle(handle_);
             handle_ = kInvalidHandle_;
         }
     }
 
-    HANDLE detach() noexcept {
+    HANDLE detach() {
         HANDLE old_handle = handle_;
         handle_ = kInvalidHandle_;
         return old_handle;
     }
 
-    operator HANDLE() const noexcept { return handle_; }
-    HANDLE* operator&() noexcept { return &handle_; }
-    HANDLE invalidHandle() const noexcept { return kInvalidHandle_; }
+    operator HANDLE() const { return handle_; }
+    HANDLE* operator&() { return &handle_; }
+    HANDLE invalidHandle() const { return kInvalidHandle_; }
 
    private:
     const HANDLE kInvalidHandle_;
@@ -76,7 +79,7 @@ class ScopedHandle {
 class ASHE_API ScopedFile {
    public:
     ASHE_DISALLOW_COPY_MOVE(ScopedFile);
-    ScopedFile(FILE* f) noexcept :
+    explicit ScopedFile(FILE* f) noexcept :
         f_(f) {
     }
 
@@ -84,8 +87,8 @@ class ASHE_API ScopedFile {
         close();
     }
 
-    operator FILE*() const noexcept { return f_; }
-    FILE** operator&() noexcept { return &f_; }
+    operator FILE*() const { return f_; }
+    FILE** operator&() { return &f_; }
 
     void close() {
         if (f_) {
@@ -102,12 +105,30 @@ class ASHE_API ScopedComInitialize {
     ASHE_DISALLOW_COPY_MOVE(ScopedComInitialize);
 
     ScopedComInitialize() noexcept {
-        CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+        ASHE_CHECK_FAILURE_HRESULT(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED), L"CoInitializeEx failed");
     }
 
     ~ScopedComInitialize() noexcept {
         ::CoUninitialize();
     }
+};
+
+class ASHE_API ScopedThread {
+   public:
+    ASHE_DISALLOW_COPY_MOVE(ScopedThread);
+
+    explicit ScopedThread(std::thread& t) noexcept :
+        t_(t) {
+    }
+
+    ~ScopedThread() noexcept {
+        if (t_.joinable()) {
+            t_.join();
+        }
+    }
+
+   protected:
+    std::thread& t_;
 };
 }  // namespace ashe
 #endif  // !SCOPED_OBJECT_HPP__
