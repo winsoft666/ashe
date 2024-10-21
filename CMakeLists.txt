@@ -17,43 +17,33 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #################################################################################
 
-cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 
-project(ashe CXX)
-
-set (PACKAGE_VERSION 2.0)
+project(ashe 
+	VERSION 2.1
+	LANGUAGES CXX
+)
 
 configure_file("${CMAKE_SOURCE_DIR}/include/ashe/config.h.in" "${CMAKE_SOURCE_DIR}/include/ashe/config.h")
 
 option(ASHE_BUILD_TESTS "Build tests project" ON)
 option(ASHE_USE_STATIC_CRT "Set to ON to build with static CRT on Windows (/MT)." OFF)
 option(ASHE_BUILD_SHARED_LIBS "Set to ON to build dynamic library." OFF)
-option(EASTL_STD_ITERATOR_CATEGORY_ENABLED "Enable compatibility with std:: iterator categories" OFF)
-
-set(DEBUG_LIBNAME_SUFFIX "-d" CACHE STRING "Optional suffix to append to the library name for a debug build")
-mark_as_advanced(DEBUG_LIBNAME_SUFFIX)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Unicode Support
-add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set (CMAKE_CXX_STANDARD 11)
 
-if(ASHE_BUILD_SHARED_LIBS)
-	set(ASHE_LIB_NAME ashe)
-	set(ASHE_STATIC ON)
-else()
-	set(ASHE_LIB_NAME ashe-static)
-	set(ASHE_STATIC OFF)
+if (MSVC AND ASHE_USE_STATIC_CRT)
+	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
+
 
 add_subdirectory(src)
 
 if(ASHE_BUILD_TESTS)
     add_subdirectory(test)
-    enable_testing()
 endif()

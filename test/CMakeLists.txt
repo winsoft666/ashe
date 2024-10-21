@@ -19,20 +19,16 @@
 
 set (CMAKE_CXX_STANDARD 14)
 
-set(EXE_NAME ashe-test)
-
 file(GLOB TEST_SOURCE_FILES ./*.cpp)
-
-source_group("test" FILES ${TEST_SOURCE_FILES})
 
 include_directories(../include)
 
 add_executable(
-	${EXE_NAME}
+	test
 	${TEST_SOURCE_FILES})
 
-add_dependencies(${EXE_NAME} ${ASHE_LIB_NAME})
-target_link_libraries(${EXE_NAME} ${ASHE_LIB_NAME})
+add_dependencies(test ashe)
+target_link_libraries(test ashe)
 
 # Win32 Console
 if (WIN32 OR _WIN32)

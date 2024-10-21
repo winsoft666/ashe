@@ -21,99 +21,63 @@ file(GLOB_RECURSE HEADERS ../include/*.h)
 file(GLOB_RECURSE SOURCES ./*.cpp)
 
 if(ASHE_BUILD_SHARED_LIBS)
-	add_library(
-		${ASHE_LIB_NAME}
-		SHARED
-		${HEADERS}
-		${SOURCES}
-	)
+	add_library(ashe SHARED ${HEADERS} ${SOURCES})
 
-	target_compile_definitions(${ASHE_LIB_NAME} PRIVATE ASHE_EXPORTS)
-	
-	# set output name prefix/suffix
-	set_target_properties(${ASHE_LIB_NAME} PROPERTIES 
-		OUTPUT_NAME ${ASHE_LIB_NAME}
-		DEBUG_OUTPUT_NAME ${ASHE_LIB_NAME}${DEBUG_LIBNAME_SUFFIX})
+	target_compile_definitions(ashe PRIVATE ASHE_EXPORTS)
 else()
-	add_library(
-		${ASHE_LIB_NAME}
-		STATIC
-		${HEADERS}
-		${SOURCES}
-	)
+	add_library(ashe STATIC ${HEADERS} ${SOURCES})
 
-	target_compile_definitions(${ASHE_LIB_NAME} PUBLIC ASHE_STATIC)
-	
-	# set output name prefix/suffix
-  	set_target_properties(${ASHE_LIB_NAME} PROPERTIES 
-		OUTPUT_NAME ${ASHE_LIB_NAME} 
-		DEBUG_OUTPUT_NAME ${ASHE_LIB_NAME}${DEBUG_LIBNAME_SUFFIX})
-
-	set_target_properties(${ASHE_LIB_NAME} PROPERTIES 
-		INTERFACE_COMPILE_DEFINITIONS ASHE_STATIC)
+	target_compile_definitions(ashe PUBLIC ASHE_STATIC)
 endif()
 
-# include both source and headers in the files tab in Visual Studio
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../include PREFIX "Header Files" FILES ${HEADERS})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source Files" FILES ${SOURCES})
+# set output name prefix/suffix
+set_target_properties(ashe PROPERTIES 
+	OUTPUT_NAME ashe
+	DEBUG_OUTPUT_NAME ashe-d)
 
 if (MSVC)
-  target_compile_definitions(${ASHE_LIB_NAME} PRIVATE _WIN32)
+  target_compile_definitions(ashe PRIVATE 
+  	_WIN32 UNICODE _UNICODE NOMINMAX)
 endif()
 
-if (MSVC AND ASHE_USE_STATIC_CRT)
-	set(CompilerFlags
-		CMAKE_CXX_FLAGS
-		CMAKE_CXX_FLAGS_DEBUG
-		CMAKE_CXX_FLAGS_RELEASE
-		CMAKE_C_FLAGS
-		CMAKE_C_FLAGS_DEBUG
-		CMAKE_C_FLAGS_RELEASE
-		)
-	foreach(CompilerFlag ${CompilerFlags})
-		string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-	endforeach()
-endif()
 
-set_target_properties(${ASHE_LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
-
-target_include_directories(${ASHE_LIB_NAME} 
+target_include_directories(ashe
 	PUBLIC 
 	"$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>"
 )
 
 if(WIN32)
-  set_target_properties(${ASHE_LIB_NAME} PROPERTIES COMPILE_FLAGS "/wd4251")
+	set_target_properties(ashe PROPERTIES COMPILE_FLAGS "/wd4251")
 
-  target_link_libraries(${ASHE_LIB_NAME} PUBLIC 
-	  Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
+	if(ASHE_BUILD_SHARED_LIBS)
+		target_link_libraries(ashe PRIVATE 
+			Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
+	else()
+		target_link_libraries(ashe PUBLIC 
+			Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
+	endif()
 endif()
 
-install(TARGETS ${ASHE_LIB_NAME}
-	EXPORT ashe-targets
+install(TARGETS ashe
+	EXPORT asheConfig
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     OBJECTS DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	INCLUDES DESTINATION include
 )
 
-install(EXPORT ashe-targets
+install(DIRECTORY ../include/ashe DESTINATION include)
+
+install(EXPORT asheConfig
     NAMESPACE ashe::
     DESTINATION share/ashe
 )
 
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ashe-config.cmake.in"
-[[include("${CMAKE_CURRENT_LIST_DIR}/ashe-targets.cmake")
-]])
-configure_file("${CMAKE_CURRENT_BINARY_DIR}/ashe-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/ashe-config.cmake" @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ashe-config.cmake DESTINATION share/ashe)
-
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
     asheConfigVersion.cmake
-    VERSION ${PACKAGE_VERSION}
+    VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/asheConfigVersion.cmake
