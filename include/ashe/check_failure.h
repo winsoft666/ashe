@@ -35,11 +35,11 @@ namespace ashe {
 namespace internal {
 #ifdef ASHE_WIN
 // Return true if failure occurred
-bool CheckFailureHRESULT(HRESULT hr, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
-bool CheckFailureLSTATUS(LSTATUS ls, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
+ASHE_API bool CheckFailureHRESULT(HRESULT hr, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
+ASHE_API bool CheckFailureLSTATUS(LSTATUS ls, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
 #endif  // ASHE_WIN
-void ShowUnexpectedException(const std::exception& e, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
-bool CheckFailureBool(bool result, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
+ASHE_API void ShowUnexpectedException(const std::exception& e, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
+ASHE_API bool CheckFailureBool(bool result, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
 }  // namespace internal
 
 #ifdef ASHE_WIN
