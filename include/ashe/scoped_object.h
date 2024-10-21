@@ -36,7 +36,7 @@
 #else
 #endif  // ASHE_WIN
 #include "ashe/macros.h"
-#include "check_failure.h"
+#include "ashe/check_failure.h"
 
 namespace ashe {
 #ifdef ASHE_WIN
