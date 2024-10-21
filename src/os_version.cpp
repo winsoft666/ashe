@@ -46,9 +46,42 @@ bool IsWindowsVistaOrHigher() {
     return (wvi.major >= 6);
 }
 
-bool IsWindows11() {
+bool IsWindows7() {
     const WinVerInfo wvi = GetWinVer();
-    return (wvi.major >= 10 && wvi.build >= 22000);
+    return (wvi.major == 6 && wvi.minor == 1);
+}
+
+bool IsWindows8OrHigher() {
+    bool result = false;
+    const WinVerInfo wvi = GetWinVer();
+
+    if (wvi.major > 6) {
+        result = true;
+    }
+    else if (wvi.major == 6) {
+        result = (wvi.minor >= 2);
+    }
+
+    return result;
+}
+
+bool IsWindows10OrHigher() {
+    const WinVerInfo wvi = GetWinVer();
+    return (wvi.major >= 10);
+}
+
+bool IsWindows11() {
+    bool result = false;
+    const WinVerInfo wvi = GetWinVer();
+
+    if (wvi.major > 10) {
+         result = true;
+    }
+    else if (wvi.major == 10) {
+        result = (wvi.build >= 22000);
+    }
+
+    return result;
 }
 
 bool IsWin64() {

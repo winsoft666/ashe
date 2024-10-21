@@ -85,6 +85,12 @@ ASHE_API WinVerInfo GetWinVer();
 
 ASHE_API bool IsWindowsVistaOrHigher();
 
+ASHE_API bool IsWindows7();
+
+ASHE_API bool IsWindows8OrHigher();
+
+ASHE_API bool IsWindows10OrHigher();
+
 ASHE_API bool IsWindows11();
 
 ASHE_API bool IsWin64();
