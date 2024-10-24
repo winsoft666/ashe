@@ -30,10 +30,10 @@ else()
 	target_compile_definitions(ashe PUBLIC ASHE_STATIC)
 endif()
 
-# set output name prefix/suffix
+# set output name
 set_target_properties(ashe PROPERTIES 
-	OUTPUT_NAME ashe
-	DEBUG_OUTPUT_NAME ashe-d)
+	OUTPUT_NAME $<IF:$<BOOL:${ASHE_BUILD_SHARED_LIBS}>,ashe,ashe-static>
+	DEBUG_OUTPUT_NAME $<IF:$<BOOL:${ASHE_BUILD_SHARED_LIBS}>,ashe-d,ashe-static-d>)
 
 if (MSVC)
   target_compile_definitions(ashe PRIVATE 
