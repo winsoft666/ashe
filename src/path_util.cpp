@@ -411,7 +411,7 @@ bool PathIsExist(const std::wstring& path) {
     WIN32_FILE_ATTRIBUTE_DATA attrs = {0};
     return GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &attrs) != 0;
 #else
-    return (access(w2u(path).c_str(), 0) == 0);
+    return (access(w2u(path).c_str(), F_OK) == 0);
 #endif
 }
 
@@ -438,6 +438,74 @@ bool PathIsDirectory(const std::wstring& path) {
     return false;
 #else
     // TODO
+#endif
+}
+
+bool MakePath(const std::wstring& path) {
+#ifdef ASHE_WIN
+    wchar_t* pathDup = _wcsdup(path.c_str());
+
+    bool done = false;
+    wchar_t* slash = pathDup;
+
+    while (!done) {
+        slash += wcsspn(slash, L"\\");
+        slash += wcscspn(slash, L"\\");
+
+        done = (*slash == L'\0');
+        *slash = L'\0';
+
+        auto attribute = GetFileAttributes(pathDup);
+        if (attribute == INVALID_FILE_ATTRIBUTES) {
+            if (!CreateDirectory(pathDup, nullptr)) {
+                free(pathDup);
+                return false;
+            }
+        }
+        else if (!(attribute & FILE_ATTRIBUTE_DIRECTORY)) {
+            free(pathDup);
+            return false;
+        }
+
+        *slash = L'\\';
+    }
+    free(pathDup);
+    return true;
+#elif !defined(ASHE_MACOS)
+    std::string u8Path = w2u(path);
+    char* pathDup = strdup(u8Path.c_str());
+
+    struct stat sb = {};
+    bool done = false;
+    char* slash = pathDup;
+
+    while (!done) {
+        slash += strspn(slash, "/");
+        slash += strcspn(slash, "/");
+
+        done = (*slash == '\0');
+        *slash = '\0';
+
+        if (stat(pathDup, &sb) != 0) {
+            if (errno != ENOENT || mkdir(pathDup, 0777) != 0) {
+                // there's report that some Android devices might not have access permission on parent dir
+                if (done) {
+                    free(pathDup);
+                    return false;
+                }
+                goto LContinue;
+            }
+        }
+        else if (!S_ISDIR(sb.st_mode)) {
+            free(pathDup);
+            return false;
+        }
+    LContinue:
+        *slash = '/';
+    }
+    free(pathDup);
+
+    return true;
 #endif
 }
 

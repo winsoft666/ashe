@@ -78,5 +78,7 @@ ASHE_API bool PathIsExist(const std::wstring& path);
 ASHE_API bool PathIsFile(const std::wstring& path);
 
 ASHE_API bool PathIsDirectory(const std::wstring& path);
+
+ASHE_API bool MakePath(const std::wstring& path);
 }  // namespace ashe
 #endif  // !ASHE_PATH_UTIL_HPP_

@@ -20,47 +20,44 @@
 #ifndef ASHE_SINGLETON_CLASS_H_
 #define ASHE_SINGLETON_CLASS_H_
 #pragma once
-#include <mutex>
+
+#include "ashe/at_exit.h"
 
 namespace ashe {
-template <class T>
+#define SINGLETON_DEFINE(TypeName)      \
+    static TypeName* GetInstance() {    \
+        static TypeName type_instance;  \
+        return &type_instance;          \
+    }                                   \
+                                        \
+    TypeName(const TypeName&) = delete; \
+    TypeName& operator=(const TypeName&) = delete
+
+template <class T, bool releaseAtExitManager = false>
 class SingletonClass {
    public:
     static T* Instance() {
-        // double-check
-        if (this_ == nullptr) {
-            std::lock_guard<std::mutex> lg(m_);
-            if (this_ == nullptr) {
-                this_ = new T;
+        static T* instance = nullptr;
+        static std::once_flag oc;
+        std::call_once(oc, [&] {
+            instance = new T();
+            if (releaseAtExitManager) {
+                AtExitManager::RegisterCallback([&]() {
+                    delete instance;
+                    instance = nullptr;
+                });
             }
-        }
-        return this_;
-    }
-
-    static void Release() {
-        if (this_) {
-            std::lock_guard<std::mutex> lg(m_);
-            delete this_;
-            this_ = nullptr;
-        }
+        });
+        return instance;
     }
 
    protected:
-    SingletonClass() {}
+    SingletonClass() = default;
+    virtual ~SingletonClass() = default;
     SingletonClass(const SingletonClass&) = delete;
     SingletonClass& operator=(const SingletonClass&) = delete;
     SingletonClass(SingletonClass&&) = delete;
     SingletonClass& operator=(SingletonClass&&) = delete;
-
-   private:
-    static T* this_;
-    static std::mutex m_;
 };
-
-template <class T>
-T* SingletonClass<T>::this_ = nullptr;
-
-template <class T>
-std::mutex SingletonClass<T>::m_;
 }  // namespace ashe
 #endif  // !ASHE_SINGLETON_CLASS_H_
