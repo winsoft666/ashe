@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <sys/file.h>
 #include <fcntl.h>
+#include <unistd.h>
 #endif
 #include <assert.h>
 #include "ashe/string_helper.h"
