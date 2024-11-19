@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "ashe/process.h"
 #include "ashe/process_util.h"
+#include <thread>
 
 using namespace ashe;
 

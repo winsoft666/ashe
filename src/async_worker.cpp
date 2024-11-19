@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 #endif
+#include <thread>
 
 namespace ashe {
 AsyncWorker::AsyncWorker() :
