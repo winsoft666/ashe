@@ -229,7 +229,7 @@ std::string GetFileSHA256(const std::wstring& filePath) {
         result = sha256.digest();
     } catch (std::exception& e) {
         result.clear();
-        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file sha256 failed");
+        ASHE_UNEXPECTED_EXCEPTION(e, "Get file sha256 failed");
     }
     return result;
 }
@@ -253,7 +253,7 @@ std::string GetDataSHA256(const unsigned char* data, size_t dataSize) {
 
         return sha256.digest();
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"Get data sha256 failed");
+        ASHE_UNEXPECTED_EXCEPTION(e, "Get data sha256 failed");
         return "";
     }
 }

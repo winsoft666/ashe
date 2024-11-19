@@ -198,7 +198,7 @@ std::string GetFileSHA512(const std::wstring& filePath) {
 
         return std::string(buf);
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file sha512 failed");
+        ASHE_UNEXPECTED_EXCEPTION(e, "Get file sha512 failed");
         return "";
     }
 }
@@ -217,7 +217,7 @@ std::string GetDataSHA512(const unsigned char* data, size_t dataSize) {
         }
         return std::string(buf);
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file sha512 failed");
+        ASHE_UNEXPECTED_EXCEPTION(e, "Get file sha512 failed");
         return "";
     }
 }

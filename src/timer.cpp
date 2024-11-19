@@ -82,7 +82,7 @@ void Timer::init() noexcept {
         try {
             run();
         } catch (std::exception& e) {
-            ASHE_UNEXPECTED_EXCEPTION(e, L"Timer init failed");
+            ASHE_UNEXPECTED_EXCEPTION(e, "Timer init failed");
         }
     });
 }
@@ -97,7 +97,7 @@ void Timer::destory() noexcept {
             if (p_->worker_.joinable())
                 p_->worker_.join();
         } catch (std::exception& e) {
-            ASHE_UNEXPECTED_EXCEPTION(e, L"Timer destory failed");
+            ASHE_UNEXPECTED_EXCEPTION(e, "Timer destory failed");
         }
         p_->events_.clear();
         p_->time_events_.clear();

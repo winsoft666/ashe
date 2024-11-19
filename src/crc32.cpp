@@ -87,7 +87,7 @@ std::string GetFileCRC32(const std::wstring& filePath) {
 
         return crc32.digest();
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file crc32 failed");
+        ASHE_UNEXPECTED_EXCEPTION(e, "Get file crc32 failed");
         return "";
     }
 }
@@ -111,7 +111,7 @@ std::string GetDataCRC32(const unsigned char* data, size_t dataSize) {
 
         return crc32.digest();
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"Get data crc32 failed");
+        ASHE_UNEXPECTED_EXCEPTION(e, "Get data crc32 failed");
         return "";
     }
 }

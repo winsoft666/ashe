@@ -241,7 +241,7 @@ bool GetCurrentExePath(wchar_t** buf) {
         }
     }
     catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"GetCurrentExePath failed");
+        ASHE_UNEXPECTED_EXCEPTION(e, "GetCurrentExePath failed");
         *buf = NULL;
         return false;
     }
@@ -293,7 +293,7 @@ bool GetCurrentExePath(char** buf) {
 
 std::wstring GetCurrentExeDirectoryW() {
     wchar_t* buf = nullptr;
-    if (ASHE_CHECK_FAILURE(GetCurrentExePath(&buf), L"GetCurrentExePath failed")) {
+    if (ASHE_CHECK_FAILURE(GetCurrentExePath(&buf), "GetCurrentExePath failed")) {
         return L"";
     }
 
@@ -312,14 +312,14 @@ bool IsWow64Process(HANDLE process) {
 
     typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
     HMODULE hDll = GetModuleHandle(TEXT("kernel32"));
-    if (ASHE_CHECK_FAILURE(hDll != NULL, L"get kernel32 handle failed"))
+    if (ASHE_CHECK_FAILURE(hDll != NULL, "get kernel32 handle failed"))
         return false;
 
     LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(hDll, "IsWow64Process");
-    if (ASHE_CHECK_FAILURE(fnIsWow64Process != NULL, L"get IsWow64Process address failed"))
+    if (ASHE_CHECK_FAILURE(fnIsWow64Process != NULL, "get IsWow64Process address failed"))
         return false;
 
-    if (ASHE_CHECK_FAILURE(!!fnIsWow64Process(process, &bIsWow64), L"IsWow64Process failed"))
+    if (ASHE_CHECK_FAILURE(!!fnIsWow64Process(process, &bIsWow64), "IsWow64Process failed"))
         return false;
 
     return !!bIsWow64;
@@ -341,7 +341,7 @@ bool IsX64Process(unsigned long pid) {
 
 bool IsPeX64(LPCWSTR pszModulePath) {
     HMODULE h = GetModuleHandleW(pszModulePath);
-    if (ASHE_CHECK_FAILURE(h, L"the module must have been loaded by the calling process."))
+    if (ASHE_CHECK_FAILURE(h, "the module must have been loaded by the calling process."))
         return false;
     return PE_OPT_HEADER((CHAR*)h)->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC;
 }

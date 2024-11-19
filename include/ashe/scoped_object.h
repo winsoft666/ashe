@@ -105,7 +105,7 @@ class ASHE_API ScopedComInitialize {
     ASHE_DISALLOW_COPY_MOVE(ScopedComInitialize);
 
     ScopedComInitialize() noexcept {
-        ASHE_CHECK_FAILURE_HRESULT(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED), L"CoInitializeEx failed");
+        ASHE_CHECK_FAILURE_HRESULT(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED), "CoInitializeEx failed");
     }
 
     ~ScopedComInitialize() noexcept {

@@ -32,7 +32,7 @@ std::string GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
 
         return szMd5;
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"Get data md5 failed");
+        ASHE_UNEXPECTED_EXCEPTION(e, "Get data md5 failed");
         return "";
     }
 }
@@ -71,7 +71,7 @@ std::string GetFileMD5(const std::wstring& file_path) {
 
         return szMd5;
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"Get file md5 failed");
+        ASHE_UNEXPECTED_EXCEPTION(e, "Get file md5 failed");
         return "";
     }
 }

@@ -87,7 +87,7 @@ WinSignature::SignVerifyResult WinSignature::verify() {
             break;
 
         default:
-            ASHE_CHECK_FAILURE_LSTATUS(lStatus, L"WinVerifyTrust failed");
+            ASHE_CHECK_FAILURE_LSTATUS(lStatus, "WinVerifyTrust failed");
             break;
     }
 
