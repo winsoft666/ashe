@@ -633,7 +633,7 @@ std::string GetProcessPathA(pid_t id) {
 }
 
 std::wstring GetProcessPathW(pid_t id) {
-    return u2w(GetProcessPathA());
+    return u2w(GetProcessPathA(id));
 }
 #endif
 
