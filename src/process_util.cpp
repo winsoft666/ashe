@@ -9,8 +9,9 @@
 #include <shellapi.h>
 #include <Psapi.h>
 #include "ashe/win_pe.h"
-#elif defined(_GNU_SOURCE)
+#else
 #include <errno.h>
+#include <signal.h>
 #endif
 #include "ashe/macros.h"
 #include "ashe/string_encode.h"
@@ -622,11 +623,11 @@ std::string GetProcessPathA(pid_t id) {
         if (!cmdLine.empty()) {
             // Keep first cmdline item which contains the program path
             size_t pos = cmdLine.find('\0');
-            if (pos != string_type::npos)
+            if (pos != std::string::npos)
                 cmdLine = cmdLine.substr(0, pos);
         }
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"GetProcessPathA");
+        ASHE_UNEXPECTED_EXCEPTION(e, "GetProcessPathA");
     }
     return cmdLine;
 }
@@ -641,11 +642,11 @@ std::wstring GetProcessPathW(pid_t id) {
         if (!cmdLine.empty()) {
             // Keep first cmdline item which contains the program path
             size_t pos = cmdLine.find(L'\0');
-            if (pos != string_type::npos)
+            if (pos != std::wstring::npos)
                 cmdLine = cmdLine.substr(0, pos);
         }
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, L"GetProcessPathW");
+        ASHE_UNEXPECTED_EXCEPTION(e, "GetProcessPathW");
     }
     return cmdLine;
 }
