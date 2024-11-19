@@ -39,7 +39,9 @@ class ASHE_API File {
 
     virtual ~File();
 
-    std::wstring path() const;
+    std::wstring pathW() const;
+
+    std::string pathA() const;
 
     bool isOpen();
 
@@ -133,7 +135,11 @@ class ASHE_API File {
 
    protected:
     FILE* f_ = nullptr;
+#ifdef ASHE_WIN
     std::wstring path_;
+#else
+    std::string path_;
+#endif
     std::recursive_mutex mutex_;
 };
 }  // namespace ashe

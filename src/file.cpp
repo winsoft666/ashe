@@ -23,15 +23,19 @@
 
 namespace ashe {
 
-File::File(const std::wstring& path) :
-    path_(path) {
+File::File(const std::wstring& path) {
+#ifdef ASHE_WIN
+    path_ = path;
+#else
+    path_ = w2u(path);
+#endif
 }
 
 File::File(const std::string& path) {
 #ifdef ASHE_WIN
-    path_ = AnsiToUnicode(path);
+    path_ = a2w(path);
 #else
-    path_ = Utf8ToUnicode(path);
+    path_ = path;
 #endif
 }
 
@@ -39,8 +43,20 @@ File::~File() {
     close();
 }
 
-std::wstring File::path() const {
+std::wstring File::pathW() const {
+#ifdef ASHE_WIN
     return path_;
+#else
+    return u2w(path_);
+#endif
+}
+
+std::string File::pathA() const {
+#ifdef ASHE_WIN
+    return w2a(path_);
+#else
+    return path_;
+#endif
 }
 
 bool File::isOpen() {
@@ -59,9 +75,7 @@ bool File::open(const std::wstring& openMode) {
 #ifdef ASHE_WIN
     _wfopen_s(&f_, path_.c_str(), openMode.c_str());
 #else
-    std::string u8 = UnicodeToUtf8(path_);
-    std::string modeu8 = UnicodeToUtf8(openMode);
-    f_ = fopen(u8.c_str(), modeu8.c_str());
+    f_ = fopen(path_.c_str(), w2u(openMode).c_str());
 #endif
 
     return (f_ != nullptr);
