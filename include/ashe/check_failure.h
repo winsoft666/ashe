@@ -26,29 +26,49 @@
 #ifdef ASHE_WIN
 #include "ashe/windows_lite.h"
 #endif  // ASHE_WIN
+#include "ashe/macros.h"
 #include <string>
 
 namespace ashe {
-#define _L(x) __L(x)
-#define __L(x) L##x
-
 namespace internal {
 #ifdef ASHE_WIN
 // Return true if failure occurred
-ASHE_API bool CheckFailureHRESULT(HRESULT hr, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
-ASHE_API bool CheckFailureLSTATUS(LSTATUS ls, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
+ASHE_API bool CheckFailureHRESULT(HRESULT hr,
+                                  const wchar_t* file,
+                                  const wchar_t* func,
+                                  int line,
+                                  const wchar_t* description);
+ASHE_API bool CheckFailureLSTATUS(LSTATUS ls,
+                                  const wchar_t* file,
+                                  const wchar_t* func,
+                                  int line,
+                                  const wchar_t* description);
 #endif  // ASHE_WIN
-ASHE_API void ShowUnexpectedException(const std::exception& e, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
-ASHE_API bool CheckFailureBool(bool result, const wchar_t* file, const wchar_t* func, int line, const wchar_t* description);
+ASHE_API void ShowUnexpectedException(const std::exception& e,
+                                      const wchar_t* file,
+                                      const wchar_t* func,
+                                      int line,
+                                      const wchar_t* description);
+ASHE_API bool CheckFailureBool(bool result,
+                               const wchar_t* file,
+                               const wchar_t* func,
+                               int line,
+                               const wchar_t* description);
 }  // namespace internal
 
 #ifdef ASHE_WIN
-#define ASHE_CHECK_FAILURE_LSTATUS(ls, desc) internal::CheckFailureLSTATUS(ls, _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
-#define ASHE_CHECK_FAILURE_HRESULT(hr, desc) internal::CheckFailureHRESULT(hr, _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
-#endif // ASHE_WIN
+#define ASHE_CHECK_FAILURE_LSTATUS(ls, desc) \
+    internal::CheckFailureLSTATUS(ls, _L(__FILE__), _L(CURRENT_FUNC_NAME), __LINE__, desc)
 
-#define ASHE_UNEXPECTED_EXCEPTION(e, desc) internal::ShowUnexpectedException((e), _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
-#define ASHE_CHECK_FAILURE(value, desc) internal::CheckFailureBool((value), _L(__FILE__), _L(__FUNCTION__), __LINE__, desc)
+#define ASHE_CHECK_FAILURE_HRESULT(hr, desc) \
+    internal::CheckFailureHRESULT(hr, _L(__FILE__), _L(CURRENT_FUNC_NAME), __LINE__, desc)
+#endif  // ASHE_WIN
+
+#define ASHE_UNEXPECTED_EXCEPTION(e, desc) \
+    internal::ShowUnexpectedException((e), _L(__FILE__), _L(CURRENT_FUNC_NAME), __LINE__, desc)
+
+#define ASHE_CHECK_FAILURE(value, desc) \
+    internal::CheckFailureBool((value), _L(__FILE__), _L(CURRENT_FUNC_NAME), __LINE__, desc)
 
 }  // namespace ashe
 

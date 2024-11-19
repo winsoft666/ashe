@@ -120,4 +120,13 @@
 #define ASHE_UNUSED(x) (void)(x)
 #endif
 
+#define _L(x) __L(x)
+#define __L(x) L##x
+
+#ifdef _MSC_VER
+#define CURRENT_FUNC_NAME __FUNCTION__
+#else
+#define CURRENT_FUNC_NAME __func__
+#endif
+
 #endif  // ! ASHE_MACROS_HPP__
