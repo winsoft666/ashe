@@ -1,5 +1,6 @@
 #include "ashe/config.h"
 #include "ashe/http_util.h"
+#include <string.h>
 #include "ashe/string_helper.h"
 
 namespace ashe {

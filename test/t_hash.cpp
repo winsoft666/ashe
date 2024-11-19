@@ -27,16 +27,16 @@ TEST_CASE("HashTest2", "[file hash]") {
     REQUIRE(file1.writeFrom((void*)str1K.c_str(), str1K.size(), 0) == str1K.size());
     REQUIRE(file1.close());
 #ifdef ASHE_WIN
-    REQUIRE(GetFileCRC32(file1.path()) == "7c5597b9");
-    REQUIRE(GetFileMD5(file1.path()) == "c9a34cfc85d982698c6ac89f76071abd");
-    REQUIRE(GetFileSHA1(file1.path()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
-    REQUIRE(GetFileSHA256(file1.path()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
-    REQUIRE(GetFileSHA512(file1.path()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
+    REQUIRE(GetFileCRC32(file1.pathW()) == "7c5597b9");
+    REQUIRE(GetFileMD5(file1.pathW()) == "c9a34cfc85d982698c6ac89f76071abd");
+    REQUIRE(GetFileSHA1(file1.pathW()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
+    REQUIRE(GetFileSHA256(file1.pathW()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
+    REQUIRE(GetFileSHA512(file1.pathW()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
 #else
-    REQUIRE(GetFileCRC32(file1.path().string()) == "7c5597b9");
-    REQUIRE(GetFileMD5(file1.path().string()) == "c9a34cfc85d982698c6ac89f76071abd");
-    REQUIRE(GetFileSHA1(file1.path().string()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
-    REQUIRE(GetFileSHA256(file1.path().string()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
-    REQUIRE(GetFileSHA512(file1.path().string()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
+    REQUIRE(GetFileCRC32(file1.pathW().string()) == "7c5597b9");
+    REQUIRE(GetFileMD5(file1.pathW().string()) == "c9a34cfc85d982698c6ac89f76071abd");
+    REQUIRE(GetFileSHA1(file1.pathW().string()) == "8eca554631df9ead14510e1a70ae48c70f9b9384");
+    REQUIRE(GetFileSHA256(file1.pathW().string()) == "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a");
+    REQUIRE(GetFileSHA512(file1.pathW().string()) == "74b22492e3b9a86a9c93c23a69f821ebafa429302c1f4054b4bc37356a4bae056d9ccbc6f24093a25704faaa72bd21a5f337ca9ec92f32369d24e6b9fae954d8");
 #endif
 }
