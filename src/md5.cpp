@@ -3,6 +3,7 @@
 #include "ashe/arch.h"
 #include "ashe/byteorder.h"
 #include "ashe/check_failure.h"
+#include "ashe/string_encode.h"
 
 namespace ashe {
 
