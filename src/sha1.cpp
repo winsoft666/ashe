@@ -2,6 +2,7 @@
 #include "ashe/sha1.h"
 #include "ashe/file.h"
 #include "ashe/check_failure.h"
+#include <stdio.h>
 
 namespace ashe {
 
@@ -87,16 +88,33 @@ void SHA1::reportHash(char* szReport, size_t bufSize, unsigned char uReportType)
     unsigned char i = 0;
 
     if (uReportType == (unsigned char)REPORT_HEX) {
+#ifdef ASHE_WIN
         sprintf_s(szReport, bufSize, "%02x", m_digest[0]);
-
-        for (i = 1; i < 20; i++)
-            sprintf_s(szReport, bufSize, "%s%02x", szReport, m_digest[i]);
-    }
-    else if (uReportType == (unsigned char)REPORT_DIGIT) {
-        sprintf_s(szReport, bufSize, "%u", m_digest[0]);
+#else
+        snprintf(szReport, bufSize, "%02x", m_digest[0]);
+#endif
 
         for (i = 1; i < 20; i++) {
+#ifdef ASHE_WIN
+            sprintf_s(szReport, bufSize, "%s%02x", szReport, m_digest[i]);
+#else
+            snprintf(szReport, bufSize, "%s%02x", szReport, m_digest[i]);
+#endif
+        }
+    }
+    else if (uReportType == (unsigned char)REPORT_DIGIT) {
+#ifdef ASHE_WIN
+        sprintf_s(szReport, bufSize, "%u", m_digest[0]);
+#else
+        snprintf(szReport, bufSize, "%u", m_digest[0]);
+#endif
+
+        for (i = 1; i < 20; i++) {
+#ifdef ASHE_WIN
             sprintf_s(szReport, bufSize, "%s%u", szReport, m_digest[i]);
+#else
+            snprintf(szReport, bufSize, "%s%u", szReport, m_digest[i]);
+#endif
         }
     }
 }
