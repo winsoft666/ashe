@@ -106,7 +106,7 @@ ASHE_API bool IsResourceString(const std::wstring& s);
 ASHE_API bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result);
 
 // Get HRESULT/LSTATUS description message.
-ASHE_API std::wstring Win32ErrCodeToStr(long err);
+ASHE_API std::wstring Win32ErrCodeToStr(unsigned long err);
 #endif
 }  // namespace ashe
 #endif  // !ASHE_STRING_HELPER_HPP__

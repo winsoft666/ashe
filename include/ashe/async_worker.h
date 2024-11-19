@@ -24,6 +24,7 @@
 #include "ashe/arch.h"
 #if defined ASHE_WIN || defined ASHE_LINUX
 #include "ashe/config.h"
+#include "ashe/macros.h"
 #include <atomic>
 #include <condition_variable>
 #include <functional>
@@ -32,7 +33,10 @@
 #include <mutex>
 #include <queue>
 #include <string>
-#include "ashe/macros.h"
+#include "ashe/compiler_specific.h"
+#if ASHE_CPP_STANDARD_VER >= 201703L  // >= C++ 17
+#include <type_traits>
+#endif  // ASHE_CPP_STANDARD_VER
 
 namespace ashe {
 class ASHE_API AsyncWorker {
@@ -58,8 +62,14 @@ class ASHE_API AsyncWorker {
     virtual void run();
 
     template <class F, class... Args>
-    auto invoke(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type> {
+    auto invoke(F&& f, Args&&... args)
+#if ASHE_CPP_STANDARD_VER >= 201703L  // >= C++ 17
+        -> std::future<typename std::invoke_result<F, Args...>::type> {
+        using return_type = typename std::invoke_result<F, Args...>::type;
+#else
+        -> std::future<typename std::result_of<F(Args...)>::type> {
         using return_type = typename std::result_of<F(Args...)>::type;
+#endif
         auto task = std::make_shared<std::packaged_task<return_type()>>(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 

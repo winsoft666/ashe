@@ -17,44 +17,45 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_EVENT_HPP__
-#define ASHE_EVENT_HPP__
-#pragma once
+#ifndef ASHE_SYSTEM_ERROR_H_
+#define ASHE_SYSTEM_ERROR_H_
 
 #include "ashe/config.h"
-#include <mutex>
-#include <condition_variable>
-#include "ashe/macros.h"
+#include "ashe/arch.h"
+#include <string>
 
 namespace ashe {
-class ASHE_API Event {
+class SystemError {
    public:
-    Event(bool isSet = false) noexcept;
+#if defined(ASHE_WIN)
+    using Code = unsigned long;
+#elif defined(ASHE_LINUX) || defined(ASHE_MACOS)
+    using Code = int;
+#else
+#error Platform support not implemented
+#endif
 
-    ~Event() = default;
+    explicit SystemError(Code code);
+    ~SystemError() = default;
 
-    void set();
-    void set(int64_t d);
+    SystemError(const SystemError& other) = default;
+    SystemError& operator=(const SystemError& other) = default;
 
-    void unset();
-    void unset(int64_t d);
+    // Alias for GetLastError() on Windows and errno on POSIX. Avoids having to pull in Windows.h
+    // just for GetLastError() and DWORD.
+    static SystemError last();
 
-    // equal unset()
-    void reset();
-    void reset(int64_t d);
+    // Returns an error code.
+    Code code() const;
 
-    bool isSet() const;
+    // Returns a string description of the error in UTF-8 encoding.
+    std::string toString();
 
-    // infinite when millseconds < 0.
-    bool wait(int64_t millseconds = -1);
-    bool wait(int64_t& d, int64_t millseconds = -1);
-   protected:
-    bool is_set_ = false;
-    int64_t data_ = 0;
-    std::mutex set_lock_;
-    std::condition_variable setted_event_;
+    static std::string toString(Code code);
 
-    ASHE_DISALLOW_COPY_MOVE(Event);
+   private:
+    Code code_;
 };
 }  // namespace ashe
-#endif  //!ASHE_EVENT_HPP__
+
+#endif  // ASHE_SYSTEM_ERROR_H_

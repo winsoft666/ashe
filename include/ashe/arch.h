@@ -29,19 +29,8 @@
 #endif
 #elif defined(__APPLE__)
 #define ASHE_MACOS 1
-#include <TargetConditionals.h>
-#if defined(TARGET_IPHONE_SIMULATOR)
-#elif defined(TARGET_OS_IPHONE)
-#elif defined(TARGET_OS_MAC)
-#else
-#error "Unknown Apple platform"
-#endif
 #elif defined(__linux__) || defined(linux) || defined(__linux)
 #define ASHE_LINUX 1
-#elif defined(__unix__) || defined(unix) || defined(__unix)
-#define ASHE_UNIX 1
-#elif defined(_POSIX_VERSION)
-#define ASHE_POSIX 1
 #else
 #error "Unknown compiler"
 #endif
@@ -58,6 +47,7 @@
 #define ASHE_ARCH_LITTLE_ENDIAN 1
 #elif defined(_M_ARM64) || defined(__aarch64__)
 #define ASHE_ARCH_ARM_FAMILY 1
+#define ARCH_ARCH_ARM64 1
 #define ASHE_ARCH_64_BITS 1
 #define ASHE_ARCH_LITTLE_ENDIAN 1
 #elif defined(_M_IX86) || defined(__i386__)

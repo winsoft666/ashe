@@ -49,6 +49,7 @@ target_include_directories(ashe
 
 if(WIN32)
 	set_target_properties(ashe PROPERTIES COMPILE_FLAGS "/wd4251")
+	target_compile_options(ashe PUBLIC "/Zc:__cplusplus")
 
 	if(ASHE_BUILD_SHARED_LIBS)
 		target_link_libraries(ashe PRIVATE 

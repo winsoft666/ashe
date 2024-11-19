@@ -35,6 +35,10 @@
 #include <functional>
 #include <stdexcept>
 #include "ashe/macros.h"
+#include "ashe/compiler_specific.h"
+#if ASHE_CPP_STANDARD_VER >= 201703L  // >= C++ 17
+#include <type_traits>
+#endif  // ASHE_CPP_STANDARD_VER
 
 namespace ashe {
 class ASHE_API ThreadPool {
@@ -45,8 +49,13 @@ class ASHE_API ThreadPool {
     // add new work item to the pool
     template <class F, class... Args>
     auto enqueue(F&& f, Args&&... args)
+#if ASHE_CPP_STANDARD_VER >= 201703L  // >= C++ 17
+        -> std::future<typename std::invoke_result<F, Args...>::type> {
+        using return_type = typename std::invoke_result<F, Args...>::type;
+#else
         -> std::future<typename std::result_of<F(Args...)>::type> {
         using return_type = typename std::result_of<F(Args...)>::type;
+#endif
 
         auto task = std::make_shared<std::packaged_task<return_type()>>(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...));

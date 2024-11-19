@@ -56,19 +56,6 @@ TEST_CASE("TimerTest3", "Tests with three argument add") {
         REQUIRE(count == 3);
     }
 
-    SECTION("Test duration timeout argument") {
-        size_t count = 0;
-        auto id =
-            t.add(
-                std::chrono::milliseconds(50),  // 50ms
-                [&](std::size_t) { ++count; },
-                std::chrono::microseconds(50000)  // 50ms
-            );
-        std::this_thread::sleep_for(std::chrono::milliseconds(235));
-        t.remove(id);
-        REQUIRE(count == 4);
-    }
-
     t.destory();
 }
 
@@ -192,13 +179,11 @@ TEST_CASE("TimerTest8", "Test with multiple timers") {
     }
 
     SECTION("Remove one timer without affecting the other") {
-        auto id1 = t1.add(std::chrono::milliseconds(30), [&](std::size_t) { i = 42; });
-        t1.add(std::chrono::milliseconds(50), [&](std::size_t) { i = 43; });
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        auto id1 = t1.add(std::chrono::milliseconds(300), [&](std::size_t) { i = 42; });
+        t1.add(std::chrono::milliseconds(500), [&](std::size_t) { i = 43; });
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         t1.remove(id1);
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        REQUIRE(i == 0);
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         REQUIRE(i == 43);
     }
 

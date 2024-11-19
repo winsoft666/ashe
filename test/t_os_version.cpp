@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "ashe/os_version.h"
+#include "ashe/macros.h"
 
 TEST_CASE("OsVersionTest") {
     using namespace ashe;

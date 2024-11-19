@@ -770,7 +770,7 @@ bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
     return true;
 }
 
-std::wstring Win32ErrCodeToStr(LONG err) {
+std::wstring Win32ErrCodeToStr(unsigned long err) {
     std::wstring result;
     LPWSTR buffer = NULL;
     DWORD dwRet = FormatMessageW(

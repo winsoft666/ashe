@@ -112,35 +112,6 @@
 #define IS_FLAG_SET(var, flag) (((var) & (flag)) == (flag))
 #endif  // !IS_FLAG_SET
 
-#if defined(_MSC_VER) && _MSC_VER >= 1500  // MSVC 2008
-/// Indicates that the following function is deprecated.
-#define ASHE_DEPRECATED(message) __declspec(deprecated(message))
-#elif defined(__clang__) && defined(__has_feature)
-#if __has_feature(attribute_deprecated_with_message)
-#define ASHE_DEPRECATED(message) __attribute__((deprecated(message)))
-#endif
-#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
-#define ASHE_DEPRECATED(message) __attribute__((deprecated(message)))
-#elif defined(__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
-#define ASHE_DEPRECATED(message) __attribute__((__deprecated__))
-#endif
-
-#if !defined(ASHE_DEPRECATED)
-#define ASHE_DEPRECATED(message)
-#endif  // ! ASHE_DEPRECATED
-
-#ifndef ASHE_NODISCARD
-#if __cplusplus >= 201703L
-#define ASHE_NODISCARD [[nodiscard]]
-#elif defined(_MSC_VER) && _MSC_VER >= 1700
-#define ASHE_NODISCARD _Check_return_
-#elif defined(__clang__)
-#define ASHE_NODISCARD __attribute__((warn_unused_result))
-#else
-#define ASHE_NODISCARD
-#endif
-#endif
-
 #ifndef STD_ASYNC_IS_RUNNING
 #define STD_ASYNC_IS_RUNNING(x) ((x).valid() && (x).wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
 #endif
