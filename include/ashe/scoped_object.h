@@ -73,7 +73,6 @@ class ScopedHandle {
     const HANDLE kInvalidHandle_;
     HANDLE handle_;
 };
-#else
 #endif
 
 class ASHE_API ScopedFile {
@@ -100,6 +99,7 @@ class ASHE_API ScopedFile {
     FILE* f_ = nullptr;
 };
 
+#ifdef ASHE_WIN
 class ASHE_API ScopedComInitialize {
    public:
     ASHE_DISALLOW_COPY_MOVE(ScopedComInitialize);
@@ -112,6 +112,7 @@ class ASHE_API ScopedComInitialize {
         ::CoUninitialize();
     }
 };
+#endif
 
 class ASHE_API ScopedThread {
    public:
