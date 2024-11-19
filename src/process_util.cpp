@@ -13,6 +13,7 @@
 #else
 #include <errno.h>
 #include <signal.h>
+#include <fstream>
 #endif
 #include "ashe/macros.h"
 #include "ashe/string_encode.h"
