@@ -15,6 +15,7 @@
 #endif
 #include "ashe/os_version.h"
 #include "ashe/string_helper.h"
+#include "ashe/string_encode.h"
 #include "ashe/check_failure.h"
 
 namespace ashe {
