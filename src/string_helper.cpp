@@ -9,6 +9,7 @@
 #include <iterator>
 #include <sstream>
 #include <cassert>
+#include <cstring>
 #ifdef ASHE_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
