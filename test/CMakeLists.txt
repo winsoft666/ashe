@@ -31,9 +31,9 @@ add_dependencies(test ashe)
 target_link_libraries(test ashe)
 
 # Win32 Console
-if (WIN32 OR _WIN32)
-	set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
-	set_target_properties(${EXE_NAME} PROPERTIES COMPILE_DEFINITIONS "_CONSOLE")
+if (MSVC)
+	set_target_properties(test PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
+	set_target_properties(test PROPERTIES COMPILE_DEFINITIONS "_CONSOLE")
 else()
-   target_link_libraries(${EXE_NAME} pthread)
+   target_link_libraries(test pthread)
 endif()
