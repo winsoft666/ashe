@@ -1,5 +1,8 @@
 #include "ashe/version.h"
 #include <assert.h>
+#include <algorithm>
+#include <cwchar>
+#include <cstdlib>
 
 namespace ashe {
 Version::Version(const std::string& s) {
@@ -13,7 +16,7 @@ Version::Version(const std::string& s) {
                                     }) == v.end();
     if (valid) {
         for (const auto& c : v) {
-            verElems_.push_back(atoi(c.c_str()));
+            verElems_.push_back(std::strtol(c.c_str(), nullptr, 10));
         }
     }
 }
@@ -29,7 +32,7 @@ Version::Version(const std::wstring& s) {
                                     }) == v.end();
     if (valid) {
         for (const auto& c : v) {
-            verElems_.push_back(_wtoi(c.c_str()));
+            verElems_.push_back(std::wcstol(c.c_str(), nullptr, 10));
         }
     }
 }
