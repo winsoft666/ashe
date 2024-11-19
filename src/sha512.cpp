@@ -2,6 +2,8 @@
 #include "ashe/sha512.h"
 #include "ashe/file.h"
 #include "ashe/check_failure.h"
+#include <cstdio>
+#include <cstring>
 
 namespace ashe {
 SHA512::uint64 SHA512::getSha512K(int i) {
@@ -193,8 +195,13 @@ std::string GetFileSHA512(const std::wstring& filePath) {
 
         char buf[2 * SHA512::DIGEST_SIZE + 1];
         buf[2 * SHA512::DIGEST_SIZE] = 0;
-        for (int i = 0; i < SHA512::DIGEST_SIZE; i++)
+        for (int i = 0; i < SHA512::DIGEST_SIZE; i++) {
+#ifdef ASHE_WIN
             sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
+#else
+            snprintf(buf + i * 2, 3, "%02x", (int)(digest[i]));
+#endif
+        }
 
         return std::string(buf);
     } catch (std::exception& e) {
@@ -213,7 +220,11 @@ std::string GetDataSHA512(const unsigned char* data, size_t dataSize) {
 
         char buf[2 * SHA512::DIGEST_SIZE + 1] = {0};
         for (unsigned int i = 0; i < SHA512::DIGEST_SIZE; i++) {
+#ifdef ASHE_WIN
             sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
+#else
+            snprintf(buf + i * 2, 3, "%02x", (int)(digest[i]));
+#endif
         }
         return std::string(buf);
     } catch (std::exception& e) {

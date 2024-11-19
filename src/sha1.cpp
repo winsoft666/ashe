@@ -3,6 +3,7 @@
 #include "ashe/file.h"
 #include "ashe/check_failure.h"
 #include <stdio.h>
+#include <cstring>
 
 namespace ashe {
 
