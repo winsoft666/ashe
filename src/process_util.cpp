@@ -9,6 +9,7 @@
 #include <shellapi.h>
 #include <Psapi.h>
 #include "ashe/win_pe.h"
+#include "ashe/os_version.h"
 #else
 #include <errno.h>
 #include <signal.h>
@@ -16,7 +17,6 @@
 #include "ashe/macros.h"
 #include "ashe/string_encode.h"
 #include "ashe/path_util.h"
-#include "ashe/os_version.h"
 #include "ashe/check_failure.h"
 
 #pragma warning(disable : 4996)
@@ -633,22 +633,7 @@ std::string GetProcessPathA(pid_t id) {
 }
 
 std::wstring GetProcessPathW(pid_t id) {
-    std::wstring cmdLine;
-    try {
-        std::wstring cmdPath = std::wstring(L"/proc/") + std::to_wstring(id) + std::wstring(L"/cmdline");
-        std::wifstream cmdFile(cmdPath.c_str());
-
-        std::getline(cmdFile, cmdLine);
-        if (!cmdLine.empty()) {
-            // Keep first cmdline item which contains the program path
-            size_t pos = cmdLine.find(L'\0');
-            if (pos != std::wstring::npos)
-                cmdLine = cmdLine.substr(0, pos);
-        }
-    } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, "GetProcessPathW");
-    }
-    return cmdLine;
+    return u2w(GetProcessPathA());
 }
 #endif
 

@@ -751,6 +751,7 @@ bool Process::kill(bool force) noexcept {
             return ::kill(data_.id, SIGTERM) == 0;
         return ::kill(data_.id, SIGINT) == 0;
     }
+    return false;
 }
 
 void Process::killProcessTree(bool force) noexcept {
