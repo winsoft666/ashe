@@ -10,16 +10,31 @@
 #include <Windows.h>
 #endif
 #include <tchar.h>
-#include <Atlbase.h>
 #include <comdef.h>
 #include <taskschd.h>
 #include <strsafe.h>
 #include <assert.h>
 
-#pragma comment(lib, "taskschd.lib")
-
 namespace ashe {
 namespace win {
+
+class ScopedBSTR {
+   public:
+    ScopedBSTR(const wchar_t* v) {
+        if (v)
+            s_ = SysAllocString(v);
+    }
+    ~ScopedBSTR() {
+        if (s_) {
+            SysFreeString(s_);
+        }
+    }
+
+    operator BSTR() const { return s_; }
+
+    BSTR s_ = nullptr;
+};
+
 class ScheduleTask::Private {
    public:
     ITaskService* m_lpITS = NULL;
@@ -59,9 +74,8 @@ bool ScheduleTask::deleteTask(const wchar_t* pszTaskName) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
-    CComVariant variantTaskName(NULL);
-    variantTaskName = pszTaskName;
-    HRESULT hr = p_->m_lpRootFolder->DeleteTask(variantTaskName.bstrVal, 0);
+    ScopedBSTR variantTaskName(pszTaskName);
+    HRESULT hr = p_->m_lpRootFolder->DeleteTask(variantTaskName, 0);
     if (FAILED(hr)) {
         return false;
     }
@@ -73,9 +87,8 @@ bool ScheduleTask::deleteFolder(const wchar_t* pszFolderName) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
-    CComVariant variantFolderName(NULL);
-    variantFolderName = pszFolderName;
-    HRESULT hr = p_->m_lpRootFolder->DeleteFolder(variantFolderName.bstrVal, 0);
+    ScopedBSTR variantFolderName(pszFolderName);
+    HRESULT hr = p_->m_lpRootFolder->DeleteFolder(variantFolderName, 0);
     if (FAILED(hr)) {
         return false;
     }
@@ -87,10 +100,10 @@ bool ScheduleTask::deleteFolder(const wchar_t* pszFolderName) {
 // Action number is 1
 //
 bool ScheduleTask::createLoginTriggerTask(const wchar_t* pszTaskName,
-                                             const wchar_t* pszProgramPath,
-                                             const wchar_t* pszParameters,
-                                             const wchar_t* pszDescription,
-                                             const wchar_t* pszAuthor) {
+                                          const wchar_t* pszProgramPath,
+                                          const wchar_t* pszParameters,
+                                          const wchar_t* pszDescription,
+                                          const wchar_t* pszAuthor) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
@@ -104,17 +117,15 @@ bool ScheduleTask::createLoginTriggerTask(const wchar_t* pszTaskName,
     }
 
     IRegistrationInfo* pRegInfo = NULL;
-    CComVariant variantAuthor(NULL);
-    variantAuthor = pszAuthor;
-    CComVariant variantDescription(NULL);
-    variantDescription = pszDescription;
+    ScopedBSTR variantAuthor(pszAuthor);
+    ScopedBSTR variantDescription(pszDescription);
     hr = pTaskDefinition->get_RegistrationInfo(&pRegInfo);
     if (FAILED(hr)) {
         return false;
     }
 
-    hr = pRegInfo->put_Author(variantAuthor.bstrVal);
-    hr = pRegInfo->put_Description(variantDescription.bstrVal);
+    hr = pRegInfo->put_Author(variantAuthor);
+    hr = pRegInfo->put_Description(variantDescription);
     pRegInfo->Release();
 
     IPrincipal* pPrincipal = NULL;
@@ -151,8 +162,9 @@ bool ScheduleTask::createLoginTriggerTask(const wchar_t* pszTaskName,
         IAction* pAction = NULL;
         hr = pActionCollect->Create(TASK_ACTION_EXEC, &pAction);
 
-        CComVariant variantProgramPath(NULL);
-        CComVariant variantParameters(NULL);
+        ScopedBSTR variantProgramPath(pszProgramPath);
+        ScopedBSTR variantParameters(pszParameters);
+
         IExecAction* pExecAction = NULL;
         hr = pAction->QueryInterface(IID_IExecAction, (PVOID*)(&pExecAction));
         if (FAILED(hr)) {
@@ -161,10 +173,8 @@ bool ScheduleTask::createLoginTriggerTask(const wchar_t* pszTaskName,
         }
         pAction->Release();
 
-        variantProgramPath = pszProgramPath;
-        variantParameters = pszParameters;
-        pExecAction->put_Path(variantProgramPath.bstrVal);
-        pExecAction->put_Arguments(variantParameters.bstrVal);
+        pExecAction->put_Path(variantProgramPath);
+        pExecAction->put_Arguments(variantParameters);
         pExecAction->Release();
     }
 
@@ -183,10 +193,9 @@ bool ScheduleTask::createLoginTriggerTask(const wchar_t* pszTaskName,
     }
 
     IRegisteredTask* pRegisteredTask = NULL;
-    CComVariant variantTaskName(NULL);
-    variantTaskName = pszTaskName;
+    ScopedBSTR variantTaskName(pszTaskName);
     hr = p_->m_lpRootFolder->RegisterTaskDefinition(
-        variantTaskName.bstrVal, pTaskDefinition, TASK_CREATE_OR_UPDATE, _variant_t(), _variant_t(),
+        variantTaskName, pTaskDefinition, TASK_CREATE_OR_UPDATE, _variant_t(), _variant_t(),
         TASK_LOGON_INTERACTIVE_TOKEN, _variant_t(""), &pRegisteredTask);
     if (FAILED(hr)) {
         pTaskDefinition->Release();
@@ -203,12 +212,10 @@ bool ScheduleTask::isExist(const wchar_t* pszTaskName) {
         return false;
     }
     HRESULT hr = S_OK;
-    CComVariant variantTaskName(NULL);
-    CComVariant variantEnable(NULL);
-    variantTaskName = pszTaskName;
+    ScopedBSTR variantTaskName(pszTaskName);
     IRegisteredTask* pRegisteredTask = NULL;
 
-    hr = p_->m_lpRootFolder->GetTask(variantTaskName.bstrVal, &pRegisteredTask);
+    hr = p_->m_lpRootFolder->GetTask(variantTaskName, &pRegisteredTask);
     if (FAILED(hr) || (NULL == pRegisteredTask)) {
         return false;
     }
@@ -222,12 +229,10 @@ bool ScheduleTask::isTaskValid(const wchar_t* pszTaskName) {
         return false;
     }
     HRESULT hr = S_OK;
-    CComVariant variantTaskName(NULL);
-    CComVariant variantEnable(NULL);
-    variantTaskName = pszTaskName;
+    ScopedBSTR variantTaskName(pszTaskName);
     IRegisteredTask* pRegisteredTask = NULL;
 
-    hr = p_->m_lpRootFolder->GetTask(variantTaskName.bstrVal, &pRegisteredTask);
+    hr = p_->m_lpRootFolder->GetTask(variantTaskName, &pRegisteredTask);
     if (FAILED(hr) || (NULL == pRegisteredTask)) {
         return false;
     }
@@ -252,18 +257,18 @@ bool ScheduleTask::run(const wchar_t* pszTaskName, const wchar_t* pszParam) {
         return false;
     }
     HRESULT hr = S_OK;
-    CComVariant variantTaskName(NULL);
-    CComVariant variantParameters(NULL);
-    variantTaskName = pszTaskName;
-    variantParameters = pszParam;
+    ScopedBSTR variantTaskName(pszTaskName);
 
     IRegisteredTask* pRegisteredTask = NULL;
-    hr = p_->m_lpRootFolder->GetTask(variantTaskName.bstrVal, &pRegisteredTask);
+    hr = p_->m_lpRootFolder->GetTask(variantTaskName, &pRegisteredTask);
     if (FAILED(hr) || (NULL == pRegisteredTask)) {
         return false;
     }
 
-    hr = pRegisteredTask->Run(variantParameters, NULL);
+    VARIANT var;
+    var.vt = VT_LPWSTR;
+    var.bstrVal = (BSTR)pszParam;
+    hr = pRegisteredTask->Run(var, NULL);
     if (FAILED(hr)) {
         pRegisteredTask->Release();
         return false;
@@ -273,59 +278,51 @@ bool ScheduleTask::run(const wchar_t* pszTaskName, const wchar_t* pszParam) {
     return true;
 }
 
-bool ScheduleTask::isEnable(const wchar_t* pszTaskName) {
+bool ScheduleTask::isEnabled(const wchar_t* pszTaskName) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
     HRESULT hr = S_OK;
-    CComVariant variantTaskName(NULL);
-    CComVariant variantEnable(NULL);
-    variantTaskName = pszTaskName;
+    ScopedBSTR variantTaskName(pszTaskName);
     IRegisteredTask* pRegisteredTask = NULL;
 
-    hr = p_->m_lpRootFolder->GetTask(variantTaskName.bstrVal, &pRegisteredTask);
+    hr = p_->m_lpRootFolder->GetTask(variantTaskName, &pRegisteredTask);
     if (FAILED(hr) || (NULL == pRegisteredTask)) {
         return false;
     }
 
-    pRegisteredTask->get_Enabled(&variantEnable.boolVal);
+    VARIANT_BOOL enabled = VARIANT_FALSE;
+    pRegisteredTask->get_Enabled(&enabled);
     pRegisteredTask->Release();
-    if (ATL_VARIANT_FALSE == variantEnable.boolVal) {
-        return false;
-    }
 
-    return true;
+    return (enabled == VARIANT_TRUE);
 }
 
-bool ScheduleTask::setEnable(const wchar_t* pszTaskName, bool bEnable) {
+bool ScheduleTask::setEnabled(const wchar_t* pszTaskName, bool bEnable) {
     if (NULL == p_->m_lpRootFolder) {
         return false;
     }
     HRESULT hr = S_OK;
-    CComVariant variantTaskName(NULL);
-    CComVariant variantEnable(NULL);
-    variantTaskName = pszTaskName;
-    variantEnable = bEnable;
+    ScopedBSTR variantTaskName(pszTaskName);
     IRegisteredTask* pRegisteredTask = NULL;
 
-    hr = p_->m_lpRootFolder->GetTask(variantTaskName.bstrVal, &pRegisteredTask);
+    hr = p_->m_lpRootFolder->GetTask(variantTaskName, &pRegisteredTask);
     if (FAILED(hr) || (NULL == pRegisteredTask)) {
         return false;
     }
 
-    pRegisteredTask->put_Enabled(variantEnable.boolVal);
+    pRegisteredTask->put_Enabled(bEnable ? VARIANT_TRUE : VARIANT_FALSE);
     pRegisteredTask->Release();
 
     return true;
 }
 
-bool ScheduleTask::getProgramPath(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszProgramPath) {
+bool ScheduleTask::getProgramPath(const wchar_t* pszTaskName, long lActionIndex, std::wstring& programPath) {
     if (NULL == p_->m_lpRootFolder)
         return false;
 
     HRESULT hr = S_OK;
-    CComVariant variantTaskName(NULL);
-    variantTaskName = pszTaskName;
+    ScopedBSTR variantTaskName(pszTaskName);
     IRegisteredTask* pRegisteredTask = NULL;
     ITaskDefinition* pTaskDefinition = NULL;
     IActionCollection* pActionColl = NULL;
@@ -334,7 +331,7 @@ bool ScheduleTask::getProgramPath(const wchar_t* pszTaskName, long lActionIndex,
 
     bool bRet = false;
     do {
-        hr = p_->m_lpRootFolder->GetTask(variantTaskName.bstrVal, &pRegisteredTask);
+        hr = p_->m_lpRootFolder->GetTask(variantTaskName, &pRegisteredTask);
         if (FAILED(hr) || (NULL == pRegisteredTask))
             break;
 
@@ -354,12 +351,14 @@ bool ScheduleTask::getProgramPath(const wchar_t* pszTaskName, long lActionIndex,
         if (FAILED(hr) || !pExecAction)
             break;
 
-        CComVariant variantTaskStr(NULL);
-        hr = pExecAction->get_Path(&variantTaskStr.bstrVal);
+        BSTR path = NULL;
+        hr = pExecAction->get_Path(&path);
         if (FAILED(hr))
             break;
 
-        StringCchCopyW(pszProgramPath, MAX_PATH, variantTaskStr.bstrVal);
+        if (path)
+            programPath = path;
+
         bRet = true;
     } while (false);
 
@@ -381,13 +380,12 @@ bool ScheduleTask::getProgramPath(const wchar_t* pszTaskName, long lActionIndex,
     return bRet;
 }
 
-bool ScheduleTask::getParameters(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszParameters) {
+bool ScheduleTask::getParameters(const wchar_t* pszTaskName, long lActionIndex, std::wstring& parameters) {
     if (NULL == p_->m_lpRootFolder)
         return false;
 
     HRESULT hr = S_OK;
-    CComVariant variantTaskName(NULL);
-    variantTaskName = pszTaskName;
+    ScopedBSTR variantTaskName(pszTaskName);
     IRegisteredTask* pRegisteredTask = NULL;
     ITaskDefinition* pTaskDefinition = NULL;
     IActionCollection* pActionColl = NULL;
@@ -396,7 +394,7 @@ bool ScheduleTask::getParameters(const wchar_t* pszTaskName, long lActionIndex, 
 
     bool bRet = false;
     do {
-        hr = p_->m_lpRootFolder->GetTask(variantTaskName.bstrVal, &pRegisteredTask);
+        hr = p_->m_lpRootFolder->GetTask(variantTaskName, &pRegisteredTask);
         if (FAILED(hr) || (NULL == pRegisteredTask))
             break;
 
@@ -416,12 +414,14 @@ bool ScheduleTask::getParameters(const wchar_t* pszTaskName, long lActionIndex, 
         if (FAILED(hr) || !pExecAction)
             break;
 
-        CComVariant variantTaskStr(NULL);
-        hr = pExecAction->get_Arguments(&variantTaskStr.bstrVal);
+        BSTR arg = NULL;
+        hr = pExecAction->get_Arguments(&arg);
         if (FAILED(hr))
             break;
 
-        StringCchCopyW(pszParameters, MAX_PATH, variantTaskStr.bstrVal);
+        if (arg) {
+            parameters = arg;
+        }
         bRet = true;
     } while (false);
 

@@ -24,6 +24,9 @@
 #include "ashe/config.h"
 #include "ashe/arch.h"
 #include "ashe/macros.h"
+#include <string>
+
+#pragma comment(lib, "taskschd.lib")
 
 namespace ashe {
 namespace win {
@@ -54,13 +57,13 @@ class ASHE_API ScheduleTask {
 
     bool run(const wchar_t* pszTaskName, const wchar_t* pszParam);
 
-    bool isEnable(const wchar_t* pszTaskName);
+    bool isEnabled(const wchar_t* pszTaskName);
 
-    bool setEnable(const wchar_t* pszTaskName, bool bEnable);
+    bool setEnabled(const wchar_t* pszTaskName, bool bEnable);
 
-    bool getProgramPath(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszProgramPath);
+    bool getProgramPath(const wchar_t* pszTaskName, long lActionIndex, std::wstring& programPath);
 
-    bool getParameters(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszParameters);
+    bool getParameters(const wchar_t* pszTaskName, long lActionIndex, std::wstring& parameters);
 
    protected:
     class Private;
