@@ -1,0 +1,71 @@
+﻿/*******************************************************************************
+*    C++ Common Library
+*    ---------------------------------------------------------------------------
+*    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
+*
+*    This program is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+******************************************************************************/
+
+#ifndef ASHE_WIN_SCHEDULE_TASK_HPP__
+#define ASHE_WIN_SCHEDULE_TASK_HPP__
+#pragma once
+
+#include "ashe/config.h"
+#include "ashe/arch.h"
+#include "ashe/macros.h"
+
+namespace ashe {
+namespace win {
+class ASHE_API ScheduleTask {
+   public:
+    ASHE_DISALLOW_COPY_MOVE(ScheduleTask);
+
+    ScheduleTask();
+
+    virtual ~ScheduleTask();
+
+    bool deleteTask(const wchar_t* pszTaskName);
+
+    bool deleteFolder(const wchar_t* pszFolderName);
+
+    // ITrigger type is TASK_TRIGGER_LOGON
+    // Action number is 1
+    //
+    bool createLoginTriggerTask(const wchar_t* pszTaskName,
+                                const wchar_t* pszProgramPath,
+                                const wchar_t* pszParameters,
+                                const wchar_t* pszDescription,
+                                const wchar_t* pszAuthor);
+
+    bool isExist(const wchar_t* pszTaskName);
+
+    bool isTaskValid(const wchar_t* pszTaskName);
+
+    bool run(const wchar_t* pszTaskName, const wchar_t* pszParam);
+
+    bool isEnable(const wchar_t* pszTaskName);
+
+    bool setEnable(const wchar_t* pszTaskName, bool bEnable);
+
+    bool getProgramPath(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszProgramPath);
+
+    bool getParameters(const wchar_t* pszTaskName, long lActionIndex, wchar_t* pszParameters);
+
+   protected:
+    class Private;
+    Private* p_ = nullptr;
+};
+}  // namespace win
+}  // namespace ashe
+#endif  // !ASHE_WIN_SCHEDULE_TASK_HPP__

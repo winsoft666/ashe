@@ -1,31 +1,36 @@
 #include "catch.hpp"
+#include "ashe/arch.h"
+
+#ifdef ASHE_WIN
 #include "ashe/path_util.h"
-#include "ashe/win_shellink_creator.h"
+#include "ashe/win/shellink_creator.h"
+
+using namespace ashe;
+using namespace ashe::win;
 
 #if 0
-#ifdef ASHE_WIN
 TEST_CASE("ShellinkCreator", "") {
-    std::wstring lnkPath = ashe::GetCurrentUserDesktopFolder() + L"test.lnk";
+    std::wstring lnkPath = GetCurrentUserDesktopFolder() + L"test.lnk";
 
-    ashe::WinShellinkCreator::ShellLinkProperties prop;
+    ShellinkCreator::ShellLinkProperties prop;
     prop.setTarget(L"C:\\abc\\a.exe");
     prop.setWorkingDir(L"C:\\abc\\");
 
-    bool ret = ashe::WinShellinkCreator::CreateShellLink(lnkPath,
+    bool ret = ShellinkCreator::CreateShellLink(lnkPath,
                                                          prop,
-                                                         ashe::WinShellinkCreator::OperationOption::SHORTCUT_UPDATE_EXISTING);
+                                                         ShellinkCreator::OperationOption::SHORTCUT_UPDATE_EXISTING);
     REQUIRE(!ret);
 
-    ret = ashe::WinShellinkCreator::CreateShellLink(lnkPath,
+    ret = ShellinkCreator::CreateShellLink(lnkPath,
                                                     prop,
-                                                    ashe::WinShellinkCreator::OperationOption::SHORTCUT_CREATE_ALWAYS);
+                                                    ShellinkCreator::OperationOption::SHORTCUT_CREATE_ALWAYS);
     REQUIRE(ret);
 
     prop.setTarget(L"C:\\abcd\\b.exe");
     prop.setWorkingDir(L"C:\\abcd\\");
-    ret = ashe::WinShellinkCreator::CreateShellLink(lnkPath,
+    ret = ShellinkCreator::CreateShellLink(lnkPath,
                                                     prop,
-                                                    ashe::WinShellinkCreator::OperationOption::SHORTCUT_CREATE_ALWAYS);
+                                                    ShellinkCreator::OperationOption::SHORTCUT_CREATE_ALWAYS);
     REQUIRE(ret);
 }
 

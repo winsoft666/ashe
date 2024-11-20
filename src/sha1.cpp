@@ -85,38 +85,24 @@ void SHA1::final() {
 }
 
 // Get the final hash as a pre-formatted string
-void SHA1::reportHash(char* szReport, size_t bufSize, unsigned char uReportType) {
+void SHA1::reportHash(char* szReport, size_t bufSize) {
     unsigned char i = 0;
 
-    if (uReportType == (unsigned char)REPORT_HEX) {
 #ifdef ASHE_WIN
-        sprintf_s(szReport, bufSize, "%02x", m_digest[0]);
+    sprintf_s(szReport, bufSize, "%02x", m_digest[0]);
 #else
-        snprintf(szReport, bufSize, "%02x", m_digest[0]);
+    snprintf(szReport, bufSize, "%02x", m_digest[0]);
 #endif
 
-        for (i = 1; i < 20; i++) {
-#ifdef ASHE_WIN
-            sprintf_s(szReport, bufSize, "%s%02x", szReport, m_digest[i]);
-#else
-            snprintf(szReport, bufSize, "%s%02x", szReport, m_digest[i]);
-#endif
-        }
-    }
-    else if (uReportType == (unsigned char)REPORT_DIGIT) {
-#ifdef ASHE_WIN
-        sprintf_s(szReport, bufSize, "%u", m_digest[0]);
-#else
-        snprintf(szReport, bufSize, "%u", m_digest[0]);
-#endif
+    bufSize -= 2;
 
-        for (i = 1; i < 20; i++) {
+    for (i = 1; i < 20; i++) {
 #ifdef ASHE_WIN
-            sprintf_s(szReport, bufSize, "%s%u", szReport, m_digest[i]);
+        sprintf_s(szReport + i * 2, bufSize, "%02x", m_digest[i]);
 #else
-            snprintf(szReport, bufSize, "%s%u", szReport, m_digest[i]);
+        snprintf(szReport + i * 2, bufSize, "%02x", m_digest[i]);
 #endif
-        }
+        bufSize -= 2;
     }
 }
 
@@ -151,7 +137,7 @@ std::string GetFileSHA1(const std::wstring& filePath) {
         sha1.final();
 
         char szSHA1[256] = {0};
-        sha1.reportHash(szSHA1, 255, SHA1::REPORT_HEX);
+        sha1.reportHash(szSHA1, 255);
 
         result = szSHA1;
     } catch (std::exception& e) {
@@ -179,7 +165,7 @@ std::string GetDataSHA1(const unsigned char* data, size_t dataSize) {
         sha1.final();
 
         char szSHA1[256] = {0};
-        sha1.reportHash(szSHA1, 255, SHA1::REPORT_HEX);
+        sha1.reportHash(szSHA1, 255);
 
         return szSHA1;
     } catch (std::exception& e) {

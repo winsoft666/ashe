@@ -3,6 +3,8 @@
 
 using namespace ashe;
 
+#ifdef ASHE_WIN
 TEST_CASE("ScopedObject", "") {
     ScopedComInitialize com;
 }
+#endif

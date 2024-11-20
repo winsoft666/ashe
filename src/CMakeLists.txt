@@ -17,15 +17,32 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #################################################################################
 
-file(GLOB_RECURSE HEADERS ../include/*.h)
-file(GLOB_RECURSE SOURCES ./*.cpp)
+file(GLOB WIN_HEADERS LIST_DIRECTORIES false ../include/ashe/win/*.h)
+file(GLOB HEADERS LIST_DIRECTORIES false ../include/ashe/*.h)
+file(GLOB WIN_SOURCES LIST_DIRECTORIES false ./win/*.cpp)
+file(GLOB SOURCES LIST_DIRECTORIES false ./*.cpp)
+
+source_group("Header Files" FILES ${HEADERS})
+source_group("Source Files" FILES ${SOURCES})
+
+if(WIN32)
+	source_group("Header Files\\win" FILES ${WIN_HEADERS})
+	source_group("Source Files\\win" FILES ${WIN_SOURCES})
+endif()
 
 if(ASHE_BUILD_SHARED_LIBS)
-	add_library(ashe SHARED ${HEADERS} ${SOURCES})
-
+	if(WIN32)
+		add_library(ashe SHARED ${HEADERS} ${WIN_HEADERS} ${SOURCES} ${WIN_SOURCES})
+	else()
+		add_library(ashe SHARED ${HEADERS} ${SOURCES})
+	endif()
 	target_compile_definitions(ashe PRIVATE ASHE_EXPORTS)
 else()
-	add_library(ashe STATIC ${HEADERS} ${SOURCES})
+	if(WIN32)
+		add_library(ashe STATIC ${HEADERS} ${WIN_HEADERS} ${SOURCES} ${WIN_SOURCES})
+	else()
+		add_library(ashe STATIC ${HEADERS} ${SOURCES})
+	endif()
 
 	target_compile_definitions(ashe PUBLIC ASHE_STATIC)
 endif()
@@ -35,7 +52,7 @@ set_target_properties(ashe PROPERTIES
 	OUTPUT_NAME $<IF:$<BOOL:${ASHE_BUILD_SHARED_LIBS}>,ashe,ashe-static>
 	DEBUG_OUTPUT_NAME $<IF:$<BOOL:${ASHE_BUILD_SHARED_LIBS}>,ashe-d,ashe-static-d>)
 
-if (MSVC)
+if (WIN32)
   target_compile_definitions(ashe PRIVATE 
   	_WIN32 UNICODE _UNICODE NOMINMAX)
 endif()

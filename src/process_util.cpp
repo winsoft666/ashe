@@ -8,7 +8,7 @@
 #include <TlHelp32.h>
 #include <shellapi.h>
 #include <Psapi.h>
-#include "ashe/win_pe.h"
+#include "ashe/win/pe_util.h"
 #include "ashe/os_version.h"
 #else
 #include <errno.h>

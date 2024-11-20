@@ -1,15 +1,18 @@
 #include "catch.hpp"
-#include "ashe/shellink_parser.h"
+#include "ashe/arch.h"
+#ifdef ASHE_WIN
+#include "ashe/win/shellink_parser.h"
+
+using namespace ashe::win;
 
 #if 0
-#ifdef ASHE_WIN
 TEST_CASE("shellink-parse", "") {
     std::wstring lnkPath = LR"()";
 
     if (!lnkPath.empty()) {
-        ashe::ShellinkParser wsl;
-        ashe::ShellinkParser::ShellinkErr err = wsl.load(lnkPath);
-        CHECK(err == ashe::ShellinkParser::ShellinkErr::SHLLINK_ERR_NONE);
+        ShellinkParser wsl;
+        ShellinkParser::ShellinkErr err = wsl.load(lnkPath);
+        CHECK(err == ShellinkParser::ShellinkErr::SHLLINK_ERR_NONE);
 
         std::wstring displayName = wsl.getDescription();
         CHECK(displayName == L"");

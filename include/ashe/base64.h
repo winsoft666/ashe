@@ -33,6 +33,7 @@
 #endif  // ASHE_CPP_STANDARD_VER >= 201703L
 #include <algorithm>
 #include <stdexcept>
+#include <cstdint>
 
 namespace ashe {
 class ASHE_API Base64 {

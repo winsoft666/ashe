@@ -7,12 +7,12 @@ using namespace ashe;
 
 #ifdef ASHE_WIN
 TEST_CASE("PathUtil-ExpandEnvString", "") {
-    std::wstring expand = ashe::ExpandEnvString(L"%ProgramFiles%", true);
+    std::wstring expand = ExpandEnvString(L"%ProgramFiles%", true);
     CHECK(expand == L"C:\\Program Files");
 
-    expand = ashe::ExpandEnvString(L"%ProgramFiles%", false);
-    if (ashe::IsWin64()) {
-        bool is32Bit = ashe::Is32BitProcess(GetCurrentProcess());
+    expand = ExpandEnvString(L"%ProgramFiles%", false);
+    if (IsWin64()) {
+        bool is32Bit = Is32BitProcess(GetCurrentProcess());
 
         if (is32Bit)
             CHECK(expand == L"C:\\Program Files (x86)");
@@ -20,8 +20,6 @@ TEST_CASE("PathUtil-ExpandEnvString", "") {
             CHECK(expand == L"C:\\Program Files");
     }
 }
-
-#endif
 
 TEST_CASE("PathUtil-PathGetDirectory", "") {
     REQUIRE(PathGetDirectory(L"C:\\Program Files (x86)\\a b\\u_1 2.txt") == L"C:\\Program Files (x86)\\a b\\");
@@ -61,3 +59,10 @@ TEST_CASE("PathUtil-PathJoin", "") {
     REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b", L"") == L"C:\\Program Files (x86)\\a b");
     REQUIRE(PathJoin(L"", L"c d\\q.txt") == L"c d\\q.txt");
 }
+#else
+TEST_CASE("PathUtil-PathJoin", "") {
+    REQUIRE(PathJoin(L"/root/a b", L"c d/q.txt") == L"/root/a b/c d/q.txt");
+    REQUIRE(PathJoin(L"/root/a b/", L"c d/q.txt") == L"/root/a b/c d/q.txt");
+    REQUIRE(PathJoin(L"", L"c d/q.txt") == L"c d/q.txt");
+}
+#endif

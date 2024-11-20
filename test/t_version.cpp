@@ -1,13 +1,15 @@
 #include "catch.hpp"
 #include "ashe/version.h"
 
+using namespace ashe;
+
 // Test: Version compare
 //
 TEST_CASE("VersionCompareTest") {
-    ashe::Version v1("1.2.3.4");
-    ashe::Version v2("4.3.2");
-    ashe::Version v3(L"4.3.2.1");
-    ashe::Version v4 = v3;
+    Version v1("1.2.3.4");
+    Version v2("4.3.2");
+    Version v3(L"4.3.2.1");
+    Version v4 = v3;
 
     REQUIRE(v1.isValid());
     REQUIRE(v2.isValid());

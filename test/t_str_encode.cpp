@@ -1,4 +1,4 @@
-#include "catch.hpp"
+ï»¿#include "catch.hpp"
 #include "ashe/string_encode.h"
 #include "ashe/base64.h"
 #include "ashe/compiler_specific.h"
@@ -7,11 +7,11 @@
 //
 TEST_CASE("StringEncodeTest") {
 #if ASHE_CPP_STANDARD_VER >= 202002L
-    std::string u8str = reinterpret_cast<const char*>(u8"ÖÐ¹úchina");
+    std::string u8str = reinterpret_cast<const char*>(u8"ä¸­å›½china");
 #else
-    const std::string u8str = u8"ÖÐ¹úchina";
+    const std::string u8str = u8"ä¸­å›½china";
 #endif
-    const std::wstring wstr = L"ÖÐ¹úchina";
+    const std::wstring wstr = L"ä¸­å›½china";
     REQUIRE(ashe::Utf8ToUnicode(u8str) == wstr);
     REQUIRE(ashe::UnicodeToUtf8(wstr) == u8str);
 }

@@ -23,6 +23,7 @@
 #include "ashe/config.h"
 #include "ashe/arch.h"
 #include <string>
+#include <cstdint>
 
 namespace ashe {
 class ASHE_API UUID {

@@ -1,7 +1,7 @@
 #include "ashe/os_util.h"
 #include "ashe/process_util.h"
 #ifdef ASHE_WIN
-#include "ashe/windows_lite.h"
+#include "ashe/win/windows_lite.h"
 #endif  // ASHE_WIN
 
 namespace ashe {

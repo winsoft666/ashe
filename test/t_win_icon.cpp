@@ -1,5 +1,9 @@
 #include "catch.hpp"
-#include "ashe/win_icon_helper.h"
+#include "ashe/arch.h"
+#ifdef ASHE_WIN
+#include "ashe/win/icon_helper.h"
+
+using namespace ashe::win;
 
 #if 0
 
@@ -95,4 +99,5 @@ TEST_CASE("IconTest-load-file-icon", "") {
         CHECK(WinIcon::SaveToFile({hIcon}, L"file_icon.ico"));
     }
 }
+#endif
 #endif

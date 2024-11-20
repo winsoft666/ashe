@@ -1,13 +1,15 @@
 #include "catch.hpp"
-#include "ashe/win_signature.h"
+#include "ashe/arch.h"
+#ifdef ASHE_WIN
+#include "ashe/win/signature.h"
+
+using namespace ashe::win;
 
 #if 0
-#ifdef ASHE_WIN
-TEST_CASE("WinSignature") {
-    using namespace ashe;
-    WinSignature sign(L"D:\\MicrosoftEdgeWebview2Setup.exe");
+TEST_CASE("Signature") {
+    Signature sign(L"D:\\MicrosoftEdgeWebview2Setup.exe");
 
-    WinSignature::SignVerifyResult ret = sign.verify();
+    Signature::SignVerifyResult ret = sign.verify();
 
     std::wstring signer = sign.getSigner();
 }

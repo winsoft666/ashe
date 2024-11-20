@@ -24,7 +24,7 @@
 #include "ashe/arch.h"
 #include "ashe/config.h"
 #ifdef ASHE_WIN
-#include "ashe/windows_lite.h"
+#include "ashe/win/windows_lite.h"
 #endif  // ASHE_WIN
 #include "ashe/macros.h"
 #include <string>

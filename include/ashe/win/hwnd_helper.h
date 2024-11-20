@@ -17,52 +17,18 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_SHA1_HPP__
-#define ASHE_SHA1_HPP__
+#ifndef ASHE_WIN_HWND_HPP_
+#define ASHE_WIN_HWND_HPP_
+#pragma once
+
 #include "ashe/config.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <string>
 #include "ashe/arch.h"
-#include "ashe/file.h"
+#include "ashe/win/windows_lite.h"
 
 namespace ashe {
-class ASHE_API SHA1 {
+class ASHE_API HwndHelper {
    public:
-    SHA1();
-    ~SHA1();
-
-    void reset();
-
-    // Use this function to hash in binary data and strings
-    void update(const unsigned char* data, unsigned int len);
-
-    void final();
-
-    // Get the final hash as a pre-formatted string
-    void reportHash(char* szReport, size_t bufSize);
-
-    // Get the raw message digest
-    void getHash(unsigned char* uDest);
-
-   private:
-    typedef union {
-        unsigned char c[64];
-        uint32_t l[16];
-    } SHA1_WORKSPACE_BLOCK;
-
-    void transform(uint32_t state[5], const unsigned char buffer[64]);
-
-    uint32_t m_state[5];
-    uint32_t m_count[2];
-    unsigned char m_buffer[64];
-    unsigned char m_digest[20];
+    static bool BelongToSameProcess(HWND hwndA, HWND hwndB);
 };
-
-ASHE_API std::string GetFileSHA1(const std::wstring& filePath);
-
-ASHE_API std::string GetDataSHA1(const unsigned char* data, size_t dataSize);
-
 }  // namespace ashe
-#endif  // !ASHE_SHA1_HPP__
+#endif  // !ASHE_WIN_HWND_HPP_

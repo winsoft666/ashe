@@ -9,9 +9,9 @@ using namespace ashe;
 //
 TEST_CASE("ProcessTest") {
 #ifdef ASHE_WIN
-    ashe::Process proc(
+    Process proc(
         L"cmd.exe",
-        ashe::Process::string_type(),
+        Process::string_type(),
         [](const char* bytes, size_t n) {
             const std::string str(bytes, n);
             printf("%s", str.c_str());
@@ -35,9 +35,9 @@ TEST_CASE("ProcessTest") {
     proc.killProcessTree();
     REQUIRE(proc.getExitStatus() > 0);
 #else
-    ashe::Process proc(
+    Process proc(
         "bash",
-        ashe::Process::string_type(),
+        Process::string_type(),
         [](const char* bytes, size_t n) {
             const std::string str(bytes, n);
             printf("%s", str.c_str());

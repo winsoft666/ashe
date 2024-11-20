@@ -2,7 +2,7 @@
 #include "ashe/string_helper.h"
 
 #ifdef ASHE_WIN
-#include "ashe/windows_lite.h"
+#include "ashe/win/windows_lite.h"
 #include "ashe/string_encode.h"
 #elif defined(ASHE_LINUX) || defined(ASHE_MACOS)
 #include <cstring>

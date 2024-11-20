@@ -1,0 +1,69 @@
+﻿/*******************************************************************************
+*    C++ Common Library
+*    ---------------------------------------------------------------------------
+*    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
+*
+*    This program is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+******************************************************************************/
+
+#ifndef ASHE_WIN_INI_HPP_
+#define ASHE_WIN_INI_HPP_
+#pragma once
+
+#include "ashe/config.h"
+#include "ashe/arch.h"
+#include <string>
+
+namespace ashe {
+namespace win {
+class ASHE_API Ini {
+   public:
+    Ini() = default;
+
+    Ini(const std::wstring& file_path);
+
+    Ini(std::wstring&& file_path);
+
+    ~Ini() = default;
+
+    void setIniFilePath(const std::wstring& file_path) noexcept;
+
+    std::wstring iniFilePath() const noexcept;
+
+    bool readInt(const std::wstring& item, const std::wstring& sub_item, unsigned int& result) noexcept;
+
+    unsigned int readIntWithDefault(const std::wstring& item,
+                                    const std::wstring& subItem,
+                                    unsigned int defaultValue) noexcept;
+
+    std::wstring readStringWithDefault(const std::wstring& item,
+                                       const std::wstring& subItem,
+                                       const std::wstring& defaultValue) noexcept;
+
+    bool readString(const std::wstring& item,
+                    const std::wstring& subItem,
+                    std::wstring& result) noexcept;
+
+    bool writeInt(const std::wstring& item, const std::wstring& subItem, unsigned int value) noexcept;
+
+    bool writeString(const std::wstring& item,
+                     const std::wstring& subItem,
+                     const std::wstring& value) noexcept;
+
+   protected:
+    std::wstring iniFilePath_;
+};
+}  // namespace win
+}  // namespace ashe
+#endif  // !ASHE_WIN_INI_HPP_

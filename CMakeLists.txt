@@ -21,7 +21,7 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 
 project(ashe 
-	VERSION 2.4
+	VERSION 2.5
 	LANGUAGES CXX
 )
 
@@ -40,7 +40,6 @@ set (CMAKE_CXX_STANDARD 11)
 if (MSVC AND ASHE_USE_STATIC_CRT)
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
-
 
 add_subdirectory(src)
 
