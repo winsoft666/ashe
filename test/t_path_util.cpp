@@ -20,6 +20,24 @@ TEST_CASE("PathUtil-ExpandEnvString", "") {
             CHECK(expand == L"C:\\Program Files");
     }
 }
+#endif
+
+#ifdef ASHE_WIN
+TEST_CASE("PathUtil-PathJoin", "") {
+    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b", L"c d\\q.txt") == L"C:\\Program Files (x86)\\a b\\c d\\q.txt");
+    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b\\", L"\\c d\\q.txt") == L"C:\\Program Files (x86)\\a b\\c d\\q.txt");
+    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b", L"\\c d\\q.txt") == L"C:\\Program Files (x86)\\a b\\c d\\q.txt");
+    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b/", L"\\c d\\q.txt") == L"C:\\Program Files (x86)\\a b/c d\\q.txt");
+    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b", L"") == L"C:\\Program Files (x86)\\a b");
+    REQUIRE(PathJoin(L"", L"c d\\q.txt") == L"c d\\q.txt");
+}
+#else
+TEST_CASE("PathUtil-PathJoin", "") {
+    REQUIRE(PathJoin(L"/root/a b", L"c d/q.txt") == L"/root/a b/c d/q.txt");
+    REQUIRE(PathJoin(L"/root/a b/", L"c d/q.txt") == L"/root/a b/c d/q.txt");
+    REQUIRE(PathJoin(L"", L"c d/q.txt") == L"c d/q.txt");
+}
+#endif
 
 TEST_CASE("PathUtil-PathGetDirectory", "") {
     REQUIRE(PathGetDirectory(L"C:\\Program Files (x86)\\a b\\u_1 2.txt") == L"C:\\Program Files (x86)\\a b\\");
@@ -51,18 +69,22 @@ TEST_CASE("PathUtil-PathGetFileName", "") {
     REQUIRE(PathGetFileName(L"u_1 2.") == L"u_1 2.");
 }
 
-TEST_CASE("PathUtil-PathJoin", "") {
-    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b", L"c d\\q.txt") == L"C:\\Program Files (x86)\\a b\\c d\\q.txt");
-    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b\\", L"\\c d\\q.txt") == L"C:\\Program Files (x86)\\a b\\c d\\q.txt");
-    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b", L"\\c d\\q.txt") == L"C:\\Program Files (x86)\\a b\\c d\\q.txt");
-    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b/", L"\\c d\\q.txt") == L"C:\\Program Files (x86)\\a b/c d\\q.txt");
-    REQUIRE(PathJoin(L"C:\\Program Files (x86)\\a b", L"") == L"C:\\Program Files (x86)\\a b");
-    REQUIRE(PathJoin(L"", L"c d\\q.txt") == L"c d\\q.txt");
+#ifdef ASHE_WIN
+TEST_CASE("PathUtil-AddBackslash", "") {
+    REQUIRE(PathAddSlach(L"C:\\Program Files (x86)\\a b") == L"C:\\Program Files (x86)\\a b\\");
+    REQUIRE(PathAddSlach(L"C:\\Program Files (x86)\\a b\\") == L"C:\\Program Files (x86)\\a b\\");
+    REQUIRE(PathAddSlach(L"C:\\Program Files (x86)\\a b/") == L"C:\\Program Files (x86)\\a b/");
 }
 #else
-TEST_CASE("PathUtil-PathJoin", "") {
-    REQUIRE(PathJoin(L"/root/a b", L"c d/q.txt") == L"/root/a b/c d/q.txt");
-    REQUIRE(PathJoin(L"/root/a b/", L"c d/q.txt") == L"/root/a b/c d/q.txt");
-    REQUIRE(PathJoin(L"", L"c d/q.txt") == L"c d/q.txt");
+TEST_CASE("PathUtil-AddBackslash", "") {
+    REQUIRE(PathAddSlach(L"/root/a/b c") == L"/root/a/b c/");
+    REQUIRE(PathAddSlach(L"/root/a/b c/") == L"/root/a/b c/");
+    REQUIRE(PathAddSlach(L"/root/a/b c\\") == L"/root/a/b c\\");
 }
 #endif
+
+TEST_CASE("PathUtil-RemoveBackslash", "") {
+    REQUIRE(PathRemoveSlach(L"C:\\Program Files (x86)\\a b") == L"C:\\Program Files (x86)\\a b");
+    REQUIRE(PathRemoveSlach(L"C:\\Program Files (x86)\\a b\\") == L"C:\\Program Files (x86)\\a b");
+    REQUIRE(PathRemoveSlach(L"C:\\Program Files (x86)\\a b/") == L"C:\\Program Files (x86)\\a b");
+}

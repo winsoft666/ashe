@@ -73,6 +73,10 @@ ASHE_API std::wstring PathGetFileName(const std::wstring& path);
 
 ASHE_API std::wstring PathJoin(const std::wstring& path1, const std::wstring& path2);
 
+ASHE_API std::wstring PathAddSlach(const std::wstring& path);
+
+ASHE_API std::wstring PathRemoveSlach(const std::wstring& path);
+
 ASHE_API bool PathIsExist(const std::wstring& path);
 
 ASHE_API bool PathIsFile(const std::wstring& path);

@@ -407,6 +407,33 @@ std::wstring PathJoin(const std::wstring& path1, const std::wstring& path2) {
     return res;
 }
 
+std::wstring PathAddSlach(const std::wstring& path) {
+    std::wstring result = path;
+    if (result.empty())
+        return result;
+
+    wchar_t end = result[result.size() - 1];
+    if (end != L'\\' && end != L'/') {
+#ifdef ASHE_WIN
+        result += L"\\";
+#else
+        result += L"/";
+#endif
+    }
+    return result;
+}
+
+std::wstring PathRemoveSlach(const std::wstring& path) {
+    if (path.empty())
+        return std::wstring();
+
+    wchar_t end = path[path.size() - 1];
+    if (end == L'\\' || end == L'/') {
+        return path.substr(0, path.size() - 1);
+    }
+    return path;
+}
+
 bool PathIsExist(const std::wstring& path) {
 #ifdef ASHE_WIN
     WIN32_FILE_ATTRIBUTE_DATA attrs = {0};
