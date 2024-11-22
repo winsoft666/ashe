@@ -17,35 +17,15 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WIN_FIREWALL_HPP_
-#define WIN_FIREWALL_HPP_
+#ifndef ASHE_WIN_PERSISTENT_UUID_H_
+#define ASHE_WIN_PERSISTENT_UUID_H_
 #pragma once
-
-#include "ashe/config.h"
-#include "ashe/arch.h"
-#include "ashe/win/windows_lite.h"
-#include <netfw.h>
+#include <string>
 
 namespace ashe {
 namespace win {
-class Firewall {
-   public:
-    HRESULT initialize();
-    void cleanup();
-
-    HRESULT isOn(OUT bool* fwOn);
-    HRESULT turnOn();
-    HRESULT turnOff();
-
-    HRESULT isAppEnabled(IN const wchar_t* fwProcessImageFileName, OUT bool* fwAppEnabled);
-    HRESULT addApp(IN const wchar_t* fwProcessImageFileName, IN const wchar_t* fwName);
-
-    HRESULT isPortEnabled(IN long portNumber, IN NET_FW_IP_PROTOCOL ipProtocol, OUT bool* fwPortEnabled);
-    HRESULT addPort(IN long portNumber, IN NET_FW_IP_PROTOCOL ipProtocol, IN const wchar_t* name);
-
-   private:
-    INetFwProfile* fwProfile_ = NULL;
-};
-}  // namespace win
+bool GetPersistentUUID(std::wstring& uuid);
+}
 }  // namespace ashe
-#endif  // !WIN_FIREWALL_HPP_
+
+#endif  // !ASHE_WIN_PERSISTENT_UUID_H_
