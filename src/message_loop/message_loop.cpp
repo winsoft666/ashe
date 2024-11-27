@@ -25,17 +25,17 @@ MessageLoop::MessageLoop(Type type) :
 
     switch (type) {
         //case Type::ASIO:
-        //    pump_ = std::make_unique<MessagePumpForAsio>();
+        //    pump_ = std::make_shared<MessagePumpForAsio>();
         //    break;
 
 #if defined(ASHE_WIN)
         case Type::WIN:
-            pump_ = std::make_unique<MessagePumpForWin>();
+            pump_ = std::make_shared<MessagePumpForWin>();
             break;
 #endif  // defined(ASHE_WIN)
 
         default:
-            pump_ = std::make_unique<MessagePumpDefault>();
+            pump_ = std::make_shared<MessagePumpDefault>();
             break;
     }
 }

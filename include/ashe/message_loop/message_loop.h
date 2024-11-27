@@ -22,7 +22,7 @@ class ASHE_API MessageLoop final : public MessagePump::Delegate {
    public:
     enum class Type {
         DEFAULT,
-        ASIO,
+        //ASIO,
 #if defined(ASHE_WIN)
         WIN
 #endif  // defined(ASHE_WIN)

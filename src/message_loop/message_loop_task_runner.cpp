@@ -15,35 +15,55 @@ bool MessageLoopTaskRunner::belongsToCurrentThread() const {
 }
 
 void MessageLoopTaskRunner::postTask(Callback callback) {
+#if ASHE_CPP_STANDARD_VER >= 201703L
     std::shared_lock<std::shared_mutex> lock(loopLock_);
+#else
+    std::lock_guard<std::mutex> lock(loopLock_);
+#endif
 
     if (loop_)
         loop_->postTask(std::move(callback));
 }
 
 void MessageLoopTaskRunner::postDelayedTask(Callback callback, const Milliseconds& delay) {
+#if ASHE_CPP_STANDARD_VER >= 201703L
     std::shared_lock<std::shared_mutex> lock(loopLock_);
+#else
+    std::lock_guard<std::mutex> lock(loopLock_);
+#endif
 
     if (loop_)
         loop_->postDelayedTask(std::move(callback), delay);
 }
 
 void MessageLoopTaskRunner::postNonNestableTask(Callback callback) {
+#if ASHE_CPP_STANDARD_VER >= 201703L
     std::shared_lock<std::shared_mutex> lock(loopLock_);
+#else
+    std::lock_guard<std::mutex> lock(loopLock_);
+#endif
 
     if (loop_)
         loop_->postNonNestableTask(std::move(callback));
 }
 
 void MessageLoopTaskRunner::postNonNestableDelayedTask(Callback callback, const Milliseconds& delay) {
+#if ASHE_CPP_STANDARD_VER >= 201703L
     std::shared_lock<std::shared_mutex> lock(loopLock_);
+#else
+    std::lock_guard<std::mutex> lock(loopLock_);
+#endif
 
     if (loop_)
         loop_->postNonNestableDelayedTask(std::move(callback), delay);
 }
 
 void MessageLoopTaskRunner::postQuit() {
+#if ASHE_CPP_STANDARD_VER >= 201703L
     std::shared_lock<std::shared_mutex> lock(loopLock_);
+#else
+    std::lock_guard<std::mutex> lock(loopLock_);
+#endif
 
     if (loop_)
         loop_->postTask(loop_->quitClosure());
@@ -57,8 +77,11 @@ MessageLoopTaskRunner::MessageLoopTaskRunner(MessageLoop* loop) :
 
 // Called directly by MessageLoop::~MessageLoop.
 void MessageLoopTaskRunner::willDestroyCurrentMessageLoop() {
+#if ASHE_CPP_STANDARD_VER >= 201703L
     std::unique_lock<std::shared_mutex> lock(loopLock_);
+#else
+    std::unique_lock<std::mutex> lock(loopLock_);
+#endif
     loop_ = nullptr;
 }
-
 }  // namespace ashe

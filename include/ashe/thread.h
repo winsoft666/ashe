@@ -74,7 +74,7 @@ class ASHE_API Thread {
         STOPPED
     };
 
-    std::atomic<State> state_ = State::STOPPED;
+    std::atomic<State> state_ = {State::STOPPED};
 
     std::thread thread_;
 

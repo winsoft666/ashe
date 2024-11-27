@@ -3,10 +3,15 @@
 #pragma once
 
 #include "ashe/config.h"
+#include "ashe/compiler_specific.h"
 #include "ashe/message_loop/task_runner.h"
 #include "ashe/message_loop/message_loop.h"
 #include "ashe/message_loop/pending_task.h"
+#if ASHE_CPP_STANDARD_VER >= 201703L
 #include <shared_mutex>
+#else
+#include <mutex>
+#endif
 #include <thread>
 
 namespace ashe {
@@ -31,7 +36,11 @@ class ASHE_API MessageLoopTaskRunner final : public TaskRunner {
     void willDestroyCurrentMessageLoop();
 
     MessageLoop* loop_;
+#if ASHE_CPP_STANDARD_VER >= 201703L
     mutable std::shared_mutex loopLock_;
+#else
+    mutable std::mutex loopLock_;
+#endif
     std::thread::id threadId_;
 
     ASHE_DISALLOW_COPY(MessageLoopTaskRunner);
