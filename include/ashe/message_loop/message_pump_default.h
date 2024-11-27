@@ -2,14 +2,14 @@
 #define ASHE_MESSAGE_LOOP_MESSAGE_PUMP_DEFAULT_H_
 #pragma once
 
+#include "ashe/config.h"
 #include "ashe/macros.h"
 #include <condition_variable>
 #include <mutex>
 #include "ashe/message_loop/message_pump.h"
 
 namespace ashe {
-
-class MessagePumpDefault final : public MessagePump {
+class ASHE_API MessagePumpDefault final : public MessagePump {
    public:
     MessagePumpDefault() = default;
     ~MessagePumpDefault() final = default;

@@ -61,7 +61,6 @@ namespace ashe {
 // Thread-safe.
 class ASHE_API Configor {
    public:
-    ASHE_DISALLOW_COPY_MOVE(Configor);
     class ASHE_API Element {
         friend Configor;
 
@@ -172,6 +171,8 @@ class ASHE_API Configor {
     Element root_;
 
     std::string filePath_;
+
+    ASHE_DISALLOW_COPY_MOVE(Configor);
 };
 }  // namespace ashe
 #endif  // !ASHE_CONFIGOR_HPP__

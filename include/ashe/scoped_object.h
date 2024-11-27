@@ -44,7 +44,6 @@ namespace ashe {
 //
 class ScopedHandle {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ScopedHandle);
     explicit ScopedHandle(bool isNullInvalid = true) noexcept :
         kInvalidHandle_(isNullInvalid ? NULL : INVALID_HANDLE_VALUE) {
         handle_ = kInvalidHandle_;
@@ -72,12 +71,12 @@ class ScopedHandle {
    private:
     const HANDLE kInvalidHandle_;
     HANDLE handle_;
+    ASHE_DISALLOW_COPY_MOVE(ScopedHandle);
 };
 #endif
 
 class ASHE_API ScopedFile {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ScopedFile);
     explicit ScopedFile(FILE* f) noexcept :
         f_(f) {
     }
@@ -97,13 +96,14 @@ class ASHE_API ScopedFile {
     }
 
     FILE* f_ = nullptr;
+
+   private:
+    ASHE_DISALLOW_COPY_MOVE(ScopedFile);
 };
 
 #ifdef ASHE_WIN
 class ASHE_API ScopedComInitialize {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ScopedComInitialize);
-
     ScopedComInitialize() noexcept {
         ASHE_CHECK_FAILURE_HRESULT(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED), "CoInitializeEx failed");
     }
@@ -111,13 +111,14 @@ class ASHE_API ScopedComInitialize {
     ~ScopedComInitialize() noexcept {
         ::CoUninitialize();
     }
+
+   private:
+    ASHE_DISALLOW_COPY_MOVE(ScopedComInitialize);
 };
 #endif
 
 class ASHE_API ScopedThread {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ScopedThread);
-
     explicit ScopedThread(std::thread& t) noexcept :
         t_(t) {
     }
@@ -130,6 +131,9 @@ class ASHE_API ScopedThread {
 
    protected:
     std::thread& t_;
+
+   private:
+    ASHE_DISALLOW_COPY_MOVE(ScopedThread);
 };
 }  // namespace ashe
 #endif  // !SCOPED_OBJECT_HPP__

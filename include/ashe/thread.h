@@ -2,6 +2,7 @@
 #define ASHE_THREAD_H_
 #pragma once
 
+#include "ashe/config.h"
 #include "ashe/arch.h"
 #include "ashe/message_loop/message_loop.h"
 #include <atomic>
@@ -9,7 +10,7 @@
 #include <thread>
 
 namespace ashe {
-class Thread {
+class ASHE_API Thread {
    public:
     Thread() = default;
     ~Thread();
@@ -28,12 +29,12 @@ class Thread {
     };
 
     // Starts the thread.
-    void start(MessageLoop::Type message_loop_type, Delegate* delegate = nullptr);
+    void start(MessageLoop::Type messageLoopType, Delegate* delegate = nullptr);
 
     // Signals the thread to exit in the near future.
     void stopSoon();
 
-    // Signals the thread to exit and returns once the thread has exited.  
+    // Signals the thread to exit and returns once the thread has exited.
     // After this method returns, the Thread object is completely reset and may be used
     // as if it were newly constructed (i.e., Start may be called again).
     // Stop may be called multiple times and is simply ignored if the thread is already stopped.
@@ -42,8 +43,8 @@ class Thread {
     void join();
 
     inline bool isRunning() const { return running_; }
-    inline MessageLoop* messageLoop() const { return message_loop_; }
-    inline std::shared_ptr<TaskRunner> taskRunner() const { return message_loop_ ? message_loop_->taskRunner() : nullptr; }
+    inline MessageLoop* messageLoop() const { return messageLoop_; }
+    inline std::shared_ptr<TaskRunner> taskRunner() const { return messageLoop_ ? messageLoop_->taskRunner() : nullptr; }
 
 #if defined(ASHE_WIN)
     inline uint32_t threadId() const { return thread_id_; }
@@ -83,10 +84,10 @@ class Thread {
 
     // True while inside of Run().
     bool running_ = false;
-    std::mutex running_lock_;
-    std::condition_variable running_event_;
+    std::mutex runningLock_;
+    std::condition_variable runningEvent_;
 
-    MessageLoop* message_loop_ = nullptr;
+    MessageLoop* messageLoop_ = nullptr;
 
     ASHE_DISALLOW_COPY(Thread);
 };

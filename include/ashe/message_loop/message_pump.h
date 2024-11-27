@@ -2,10 +2,11 @@
 #define ASHE_MESSAGE_LOOP_MESSAGE_PUMP_H_
 #pragma once
 
+#include "ashe/config.h"
 #include <chrono>
 
 namespace ashe {
-class MessagePump {
+class ASHE_API MessagePump {
    public:
     using Clock = std::chrono::high_resolution_clock;
     using TimePoint = std::chrono::time_point<Clock>;
@@ -23,11 +24,11 @@ class MessagePump {
         // Called from within run() in response to scheduleDelayedWork or when the message pump
         // would otherwise sleep waiting for more work. Returns true to indicate that delayed work
         // was done. doIdleWork will not be called if doDelayedWork returns true. Upon return
-        // |next_delayed_work_time| indicates the time when doDelayedWork should be called again.
-        // If |next_delayed_work_time| is null (per Time::is_null), then the queue of future
+        // |nextDelayedWorkTime| indicates the time when doDelayedWork should be called again.
+        // If |nextDelayedWorkTime| is null (per Time::is_null), then the queue of future
         // delayed work (timer events) is currently empty, and no additional calls to this function
         // need to be scheduled.
-        virtual bool doDelayedWork(TimePoint* next_delayed_work_time) = 0;
+        virtual bool doDelayedWork(TimePoint* nextDelayedWorkTime) = 0;
 
         // Called from within run() just before the message pump goes to sleep.
         // Returns true to indicate that idle work was done.

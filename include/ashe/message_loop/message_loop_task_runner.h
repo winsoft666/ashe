@@ -2,6 +2,7 @@
 #define ASHE_MESSAGE_LOOP_MESSAGE_LOOP_TASK_RUNNER_H_
 #pragma once
 
+#include "ashe/config.h"
 #include "ashe/message_loop/task_runner.h"
 #include "ashe/message_loop/message_loop.h"
 #include "ashe/message_loop/pending_task.h"
@@ -9,7 +10,7 @@
 #include <thread>
 
 namespace ashe {
-class MessageLoopTaskRunner final : public TaskRunner {
+class ASHE_API MessageLoopTaskRunner final : public TaskRunner {
    public:
     static std::shared_ptr<TaskRunner> current();
 
@@ -30,8 +31,8 @@ class MessageLoopTaskRunner final : public TaskRunner {
     void willDestroyCurrentMessageLoop();
 
     MessageLoop* loop_;
-    mutable std::shared_mutex loop_lock_;
-    std::thread::id thread_id_;
+    mutable std::shared_mutex loopLock_;
+    std::thread::id threadId_;
 
     ASHE_DISALLOW_COPY(MessageLoopTaskRunner);
 };

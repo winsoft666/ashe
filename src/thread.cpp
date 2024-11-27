@@ -7,30 +7,30 @@ Thread::~Thread() {
     stop();
 }
 
-void Thread::start(MessageLoop::Type message_loop_type, Delegate* delegate) {
-    ASHE_CHECK_FAILURE(!message_loop_, nullptr);
+void Thread::start(MessageLoop::Type messageLoopType, Delegate* delegate) {
+    ASHE_CHECK_FAILURE(!messageLoop_, nullptr);
 
     delegate_ = delegate;
     state_ = State::STARTING;
 
-    thread_ = std::thread(&Thread::threadMain, this, message_loop_type);
+    thread_ = std::thread(&Thread::threadMain, this, messageLoopType);
 
-    std::unique_lock<std::mutex> lock(running_lock_);
+    std::unique_lock<std::mutex> lock(runningLock_);
     while (!running_)
-        running_event_.wait(lock);
+        runningEvent_.wait(lock);
 
     state_ = State::STARTED;
 
-    ASHE_CHECK_FAILURE(message_loop_, nullptr);
+    ASHE_CHECK_FAILURE(messageLoop_, nullptr);
 }
 
 void Thread::stopSoon() {
-    if (state_ == State::STOPPING || !message_loop_)
+    if (state_ == State::STOPPING || !messageLoop_)
         return;
 
     state_ = State::STOPPING;
 
-    message_loop_->postTask(message_loop_->quitClosure());
+    messageLoop_->postTask(messageLoop_->quitClosure());
 }
 
 void Thread::stop() {
@@ -40,14 +40,14 @@ void Thread::stop() {
     stopSoon();
 
 #if defined(ASHE_WIN)
-    if (message_loop_ && message_loop_->type() == MessageLoop::Type::WIN)
+    if (messageLoop_ && messageLoop_->type() == MessageLoop::Type::WIN)
         PostThreadMessageW(thread_id_, WM_QUIT, 0, 0);
 #endif  // defined(ASHE_WIN)
 
     join();
 
     // The thread should NULL message_loop_ on exit.
-    ASHE_CHECK_FAILURE(!message_loop_, nullptr);
+    ASHE_CHECK_FAILURE(!messageLoop_, nullptr);
 
     delegate_ = nullptr;
 }
@@ -73,7 +73,7 @@ void Thread::threadMain(MessageLoop::Type message_loop_type) {
     MessageLoop message_loop(message_loop_type);
 
     // Complete the initialization of our Thread object.
-    message_loop_ = &message_loop;
+    messageLoop_ = &message_loop;
 
 #if defined(ASHE_WIN)
     ScopedComInitialize com_initializer;
@@ -86,21 +86,21 @@ void Thread::threadMain(MessageLoop::Type message_loop_type) {
         delegate_->onBeforeThreadRunning();
 
     {
-        std::unique_lock<std::mutex> lock(running_lock_);
+        std::unique_lock<std::mutex> lock(runningLock_);
         running_ = true;
     }
 
-    running_event_.notify_one();
+    runningEvent_.notify_one();
 
     if (delegate_) {
-        delegate_->onThreadRunning(message_loop_);
+        delegate_->onThreadRunning(messageLoop_);
     }
     else {
-        message_loop_->run();
+        messageLoop_->run();
     }
 
     {
-        std::unique_lock<std::mutex> lock(running_lock_);
+        std::unique_lock<std::mutex> lock(runningLock_);
         running_ = false;
     }
 
@@ -109,7 +109,7 @@ void Thread::threadMain(MessageLoop::Type message_loop_type) {
         delegate_->onAfterThreadRunning();
 
     // We can't receive messages anymore.
-    message_loop_ = nullptr;
+    messageLoop_ = nullptr;
 }
 
 #if defined(ASHE_WIN)

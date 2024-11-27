@@ -2,12 +2,13 @@
 #define ASHE_MESSAGE_LOOP_TASK_RUNNNER_H_
 #pragma once
 
+#include "ashe/config.h"
 #include <chrono>
 #include <functional>
 #include <memory>
 
 namespace ashe {
-class TaskRunner : public std::enable_shared_from_this<TaskRunner> {
+class ASHE_API TaskRunner : public std::enable_shared_from_this<TaskRunner> {
    public:
     virtual ~TaskRunner() = default;
 

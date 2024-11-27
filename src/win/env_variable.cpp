@@ -1,6 +1,5 @@
 #include "ashe/config.h"
-#include "ashe/env_variable.h"
-#ifdef ASHE_WIN
+#include "ashe/win/env_variable.h"
 #include <limits>
 #include <assert.h>
 #ifndef _INC_WINDOWS
@@ -18,6 +17,7 @@
 #endif
 
 namespace ashe {
+namespace win {
 namespace {
 UINT const kBroadcastTimeout = 100;  // in milliseconds
 wchar_t const* userEnvSubKey = L"Environment";
@@ -376,5 +376,5 @@ unsigned int EnvHelper::PathRemove(EnvScope scope, wchar_t const* path) {
 
     return count;
 }
+}  // namespace win
 }  // namespace ashe
-#endif

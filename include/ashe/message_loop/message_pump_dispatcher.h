@@ -2,6 +2,7 @@
 #define ASHE_MESSAGE_LOOP_MESSAGE_PUMP_DISPATCHER_H_
 #pragma once
 
+#include "ashe/config.h"
 #include "ashe/arch.h"
 
 #if defined(ASHE_WIN)
@@ -17,7 +18,6 @@ class NSEvent;
 #endif  // OS_*
 
 namespace ashe {
-
 #if defined(ASHE_WIN)
 using NativeEvent = MSG;
 #elif defined(ASHE_LINUX)
@@ -34,9 +34,8 @@ using NativeEvent = NSEvent*;
 // every message is passed to Dispatcher's Dispatch method for dispatch. It is
 // up to the Dispatcher whether or not to dispatch the event.
 //
-// The nested loop is exited by either posting a quit, or returning false
-// from Dispatch.
-class MessagePumpDispatcher {
+// The nested loop is exited by either posting a quit, or returning false from Dispatch.
+class ASHE_API MessagePumpDispatcher {
    public:
     virtual ~MessagePumpDispatcher() = default;
 

@@ -129,14 +129,14 @@ std::shared_ptr<TaskRunner> MessageLoop::taskRunner() const {
 }
 
 void MessageLoop::runTask(const PendingTask& pending_task) {
-    ASHE_CHECK_FAILURE(nestable_tasks_allowed_, nullptr);
+    ASHE_CHECK_FAILURE(nestableTasksAllowed_, nullptr);
 
     // Execute the task and assume the worst: It is probably not reentrant.
-    nestable_tasks_allowed_ = false;
+    nestableTasksAllowed_ = false;
 
     pending_task.callback();
 
-    nestable_tasks_allowed_ = true;
+    nestableTasksAllowed_ = true;
 }
 
 bool MessageLoop::deferOrRunPendingTask(const PendingTask& pending_task) {
@@ -149,7 +149,7 @@ bool MessageLoop::deferOrRunPendingTask(const PendingTask& pending_task) {
 
     // We couldn't run the task now because we're in a nested message loop
     // and the task isn't nestable.
-    deferred_non_nestable_work_queue_.emplace(pending_task);
+    deferredNonNestableWorkQueue_.emplace(pending_task);
     return false;
 }
 
@@ -157,7 +157,7 @@ void MessageLoop::addToDelayedWorkQueue(PendingTask* pending_task) {
     // Move to the delayed work queue.  Initialize the sequence number before inserting into the
     // delayed_work_queue_. The sequence number is used to faciliate FIFO sorting when two tasks
     // have the same delayed_run_time value.
-    delayed_work_queue_.emplace(std::move(pending_task->callback),
+    delayedWorkQueue_.emplace(std::move(pending_task->callback),
                                 pending_task->delayed_run_time,
                                 pending_task->nestable,
                                 next_sequence_num_++);
@@ -170,11 +170,11 @@ void MessageLoop::addToIncomingQueue(
     bool empty = false;
 
     {
-        std::lock_guard<std::mutex> lock(incoming_queue_lock_);
+        std::lock_guard<std::mutex> lock(incomingQueueLock_);
 
-        empty = incoming_queue_.empty();
+        empty = incomingQueue_.empty();
 
-        incoming_queue_.emplace(std::move(callback),
+        incomingQueue_.emplace(std::move(callback),
                                 calculateDelayedRuntime(delay),
                                 nestable);
     }
@@ -190,13 +190,13 @@ void MessageLoop::reloadWorkQueue() {
     if (!work_queue_.empty())
         return;
 
-    std::lock_guard<std::mutex> lock(incoming_queue_lock_);
+    std::lock_guard<std::mutex> lock(incomingQueueLock_);
 
-    if (incoming_queue_.empty())
+    if (incomingQueue_.empty())
         return;
 
-    incoming_queue_.Swap(&work_queue_);
-    ASHE_CHECK_FAILURE(incoming_queue_.empty(), nullptr);
+    incomingQueue_.Swap(&work_queue_);
+    ASHE_CHECK_FAILURE(incomingQueue_.empty(), nullptr);
 }
 
 bool MessageLoop::deletePendingTasks() {
@@ -213,15 +213,15 @@ bool MessageLoop::deletePendingTasks() {
         }
     }
 
-    did_work |= !deferred_non_nestable_work_queue_.empty();
+    did_work |= !deferredNonNestableWorkQueue_.empty();
 
-    while (!deferred_non_nestable_work_queue_.empty())
-        deferred_non_nestable_work_queue_.pop();
+    while (!deferredNonNestableWorkQueue_.empty())
+        deferredNonNestableWorkQueue_.pop();
 
-    did_work |= !delayed_work_queue_.empty();
+    did_work |= !delayedWorkQueue_.empty();
 
-    while (!delayed_work_queue_.empty())
-        delayed_work_queue_.pop();
+    while (!delayedWorkQueue_.empty())
+        delayedWorkQueue_.pop();
 
     return did_work;
 }
@@ -236,7 +236,7 @@ MessageLoop::TimePoint MessageLoop::calculateDelayedRuntime(const Milliseconds& 
 }
 
 bool MessageLoop::doWork() {
-    if (!nestable_tasks_allowed_) {
+    if (!nestableTasksAllowed_) {
         // Task can't be executed right now.
         return false;
     }
@@ -253,7 +253,7 @@ bool MessageLoop::doWork() {
             work_queue_.pop();
 
             if (pending_task.delayed_run_time != TimePoint()) {
-                const bool reschedule = delayed_work_queue_.empty();
+                const bool reschedule = delayedWorkQueue_.empty();
 
                 addToDelayedWorkQueue(&pending_task);
 
@@ -272,9 +272,9 @@ bool MessageLoop::doWork() {
     return false;
 }
 
-bool MessageLoop::doDelayedWork(TimePoint* next_delayed_work_time) {
-    if (!nestable_tasks_allowed_ || delayed_work_queue_.empty()) {
-        recent_time_ = *next_delayed_work_time = TimePoint();
+bool MessageLoop::doDelayedWork(TimePoint* nextDelayedWorkTime) {
+    if (!nestableTasksAllowed_ || delayedWorkQueue_.empty()) {
+        recent_time_ = *nextDelayedWorkTime = TimePoint();
         return false;
     }
 
@@ -284,31 +284,31 @@ bool MessageLoop::doDelayedWork(TimePoint* next_delayed_work_time) {
     // As a result, the more we fall behind (and have a lot of ready-to-run delayed tasks), the more
     // efficient we'll be at handling the tasks.
 
-    TimePoint next_run_time = delayed_work_queue_.top().delayed_run_time;
+    TimePoint nextRunTime = delayedWorkQueue_.top().delayed_run_time;
 
-    if (next_run_time > recent_time_) {
+    if (nextRunTime > recent_time_) {
         recent_time_ = Clock::now();
-        if (next_run_time > recent_time_) {
-            *next_delayed_work_time = next_run_time;
+        if (nextRunTime > recent_time_) {
+            *nextDelayedWorkTime = nextRunTime;
             return false;
         }
     }
 
-    PendingTask pending_task = delayed_work_queue_.top();
-    delayed_work_queue_.pop();
+    PendingTask pending_task = delayedWorkQueue_.top();
+    delayedWorkQueue_.pop();
 
-    if (!delayed_work_queue_.empty())
-        *next_delayed_work_time = delayed_work_queue_.top().delayed_run_time;
+    if (!delayedWorkQueue_.empty())
+        *nextDelayedWorkTime = delayedWorkQueue_.top().delayed_run_time;
 
     return deferOrRunPendingTask(pending_task);
 }
 
 bool MessageLoop::doIdleWork() {
-    if (deferred_non_nestable_work_queue_.empty())
+    if (deferredNonNestableWorkQueue_.empty())
         return false;
 
-    PendingTask pending_task = deferred_non_nestable_work_queue_.front();
-    deferred_non_nestable_work_queue_.pop();
+    PendingTask pending_task = deferredNonNestableWorkQueue_.front();
+    deferredNonNestableWorkQueue_.pop();
 
     runTask(pending_task);
     return true;

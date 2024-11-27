@@ -25,7 +25,7 @@
 #include <string>
 
 namespace ashe {
-class SystemError {
+class ASHE_API SystemError {
    public:
 #if defined(ASHE_WIN)
     using Code = unsigned long;

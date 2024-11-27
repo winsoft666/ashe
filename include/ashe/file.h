@@ -32,8 +32,6 @@
 namespace ashe {
 class ASHE_API File {
    public:
-    ASHE_DISALLOW_COPY_MOVE(File);
-
     File(const std::wstring& path);
     File(const std::string& path);
 
@@ -141,6 +139,8 @@ class ASHE_API File {
     std::string path_;
 #endif
     std::recursive_mutex mutex_;
+
+    ASHE_DISALLOW_COPY_MOVE(File);
 };
 }  // namespace ashe
 #endif  // !ASHE_FILE_UTIL_HPP_

@@ -31,8 +31,6 @@ namespace ashe {
 namespace win {
 class ASHE_API CriticalSection {
    public:
-    ASHE_DISALLOW_COPY_MOVE(CriticalSection);
-
     CriticalSection() noexcept;
     ~CriticalSection() noexcept;
     void enter() const noexcept;
@@ -42,12 +40,12 @@ class ASHE_API CriticalSection {
    private:
     class Private;
     Private* p_ = nullptr;
+
+    ASHE_DISALLOW_COPY_MOVE(CriticalSection);
 };
 
 class ASHE_API ScopedWinCriticalSection {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ScopedWinCriticalSection);
-
     explicit ScopedWinCriticalSection(const CriticalSection* pCS) noexcept :
         crit_(pCS) {
         if (crit_) {
@@ -63,6 +61,7 @@ class ASHE_API ScopedWinCriticalSection {
 
    private:
     const CriticalSection* const crit_;
+    ASHE_DISALLOW_COPY_MOVE(ScopedWinCriticalSection);
 };
 }  // namespace win
 }  // namespace ashe

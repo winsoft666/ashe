@@ -11,39 +11,39 @@ std::shared_ptr<TaskRunner> MessageLoopTaskRunner::current() {
 }
 
 bool MessageLoopTaskRunner::belongsToCurrentThread() const {
-    return thread_id_ == std::this_thread::get_id();
+    return threadId_ == std::this_thread::get_id();
 }
 
 void MessageLoopTaskRunner::postTask(Callback callback) {
-    std::shared_lock<std::shared_mutex> lock(loop_lock_);
+    std::shared_lock<std::shared_mutex> lock(loopLock_);
 
     if (loop_)
         loop_->postTask(std::move(callback));
 }
 
 void MessageLoopTaskRunner::postDelayedTask(Callback callback, const Milliseconds& delay) {
-    std::shared_lock<std::shared_mutex> lock(loop_lock_);
+    std::shared_lock<std::shared_mutex> lock(loopLock_);
 
     if (loop_)
         loop_->postDelayedTask(std::move(callback), delay);
 }
 
 void MessageLoopTaskRunner::postNonNestableTask(Callback callback) {
-    std::shared_lock<std::shared_mutex> lock(loop_lock_);
+    std::shared_lock<std::shared_mutex> lock(loopLock_);
 
     if (loop_)
         loop_->postNonNestableTask(std::move(callback));
 }
 
 void MessageLoopTaskRunner::postNonNestableDelayedTask(Callback callback, const Milliseconds& delay) {
-    std::shared_lock<std::shared_mutex> lock(loop_lock_);
+    std::shared_lock<std::shared_mutex> lock(loopLock_);
 
     if (loop_)
         loop_->postNonNestableDelayedTask(std::move(callback), delay);
 }
 
 void MessageLoopTaskRunner::postQuit() {
-    std::shared_lock<std::shared_mutex> lock(loop_lock_);
+    std::shared_lock<std::shared_mutex> lock(loopLock_);
 
     if (loop_)
         loop_->postTask(loop_->quitClosure());
@@ -51,13 +51,13 @@ void MessageLoopTaskRunner::postQuit() {
 
 MessageLoopTaskRunner::MessageLoopTaskRunner(MessageLoop* loop) :
     loop_(loop),
-    thread_id_(std::this_thread::get_id()) {
+    threadId_(std::this_thread::get_id()) {
     // Nothing
 }
 
 // Called directly by MessageLoop::~MessageLoop.
 void MessageLoopTaskRunner::willDestroyCurrentMessageLoop() {
-    std::unique_lock<std::shared_mutex> lock(loop_lock_);
+    std::unique_lock<std::shared_mutex> lock(loopLock_);
     loop_ = nullptr;
 }
 

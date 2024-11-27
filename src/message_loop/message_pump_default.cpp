@@ -3,7 +3,7 @@
 
 namespace ashe {
 void MessagePumpDefault::run(Delegate* delegate) {
-    ASHE_CHECK_FAILURE(!keep_running_, "Quit must have been called outside of Run!");
+    ASHE_CHECK_FAILURE(keep_running_, "Quit must have been called outside of Run!");
 
     for (;;) {
         bool did_work = delegate->doWork();

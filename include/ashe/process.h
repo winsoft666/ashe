@@ -40,7 +40,6 @@ namespace ashe {
 //
 class ASHE_API Process {
    public:
-    ASHE_DISALLOW_COPY_MOVE(Process);
     /// Additional parameters to Process constructors.
     struct Config {
         /// Buffer size for reading stdout and stderr. Default is 131072 (128 kB).
@@ -193,6 +192,8 @@ class ASHE_API Process {
 #endif
     void async_read() noexcept;
     void close_fds() noexcept;
+
+    ASHE_DISALLOW_COPY_MOVE(Process);
 };
 }  // namespace ashe
 #endif  // !ASHE_PROCESS_HPP__

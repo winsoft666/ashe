@@ -23,11 +23,10 @@
 
 #include "ashe/config.h"
 #include "ashe/arch.h"
-#ifdef ASHE_WIN
 #include <string>
 
 namespace ashe {
-
+namespace win {
 // environment variable scopes:
 enum EnvScope {
     es_invalid,  // Unspecified (do not use this value)
@@ -82,6 +81,7 @@ class ASHE_API EnvVar {
     void copy(EnvVar const& other);
 
     void destroy();
+
    private:
     std::wstring name_;   // The environment variable's name.
     EnvScope scope_;      // Scope of the environment variable (user or system).
@@ -165,7 +165,7 @@ class ASHE_API EnvHelper {
     // Return value: Returns the number of matching instances that were removed.
     static unsigned int PathRemove(EnvScope scope, wchar_t const* path);
 };
+}  // namespace win
 }  // namespace ashe
 
-#endif
 #endif

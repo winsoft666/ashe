@@ -2,6 +2,7 @@
 #define ASHE_MESSAGE_LOOP_PENDING_TASK_H_
 #pragma once
 
+#include "ashe/config.h"
 #include <chrono>
 #include <functional>
 #include <queue>
@@ -9,7 +10,7 @@
 namespace ashe {
 // Contains data about a pending task. Stored in TaskQueue and DelayedTaskQueue for use by classes
 // that queue and execute tasks.
-class PendingTask {
+class ASHE_API PendingTask {
    public:
     using Callback = std::function<void()>;
     using Clock = std::chrono::high_resolution_clock;
@@ -37,7 +38,7 @@ class PendingTask {
 };
 
 // Wrapper around std::queue specialized for PendingTask which adds a Swap helper method.
-class TaskQueue : public std::queue<PendingTask> {
+class ASHE_API TaskQueue : public std::queue<PendingTask> {
    public:
     void Swap(TaskQueue* queue) {
         c.swap(queue->c);  // Calls std::deque::swap.

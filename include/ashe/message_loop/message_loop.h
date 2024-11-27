@@ -2,6 +2,7 @@
 #define ASHE_MESSAGE_LOOP_MESSAGE_LOOP_H_
 
 #include "ashe/arch.h"
+#include "ashe/config.h"
 #include "ashe/macros.h"
 #include "ashe/message_loop/task_runner.h"
 #include "ashe/message_loop/message_pump.h"
@@ -17,7 +18,7 @@ class MessagePumpForAsio;
 class MessagePumpForWin;
 class Thread;
 
-class MessageLoop final : public MessagePump::Delegate {
+class ASHE_API MessageLoop final : public MessagePump::Delegate {
    public:
     enum class Type {
         DEFAULT,
@@ -89,7 +90,7 @@ class MessageLoop final : public MessagePump::Delegate {
 
     // MessagePump::Delegate methods:
     bool doWork() final;
-    bool doDelayedWork(TimePoint* next_delayed_work_time) final;
+    bool doDelayedWork(TimePoint* nextDelayedWorkTime) final;
     bool doIdleWork() final;
 
     const Type type_;
@@ -98,7 +99,7 @@ class MessageLoop final : public MessagePump::Delegate {
     TimePoint recent_time_;
 
     // Contains delayed tasks, sorted by their 'delayed_run_time' property.
-    DelayedTaskQueue delayed_work_queue_;
+    DelayedTaskQueue delayedWorkQueue_;
 
     // A list of tasks that need to be processed by this instance.  Note that this queue is only
     // accessed (push/pop) by our current thread.
@@ -106,16 +107,16 @@ class MessageLoop final : public MessagePump::Delegate {
 
     // A queue of non-nestable tasks that we had to defer because when it came time to execute them
     // we were in a nested message loop. They will execute once we're out of nested message loops.
-    TaskQueue deferred_non_nestable_work_queue_;
+    TaskQueue deferredNonNestableWorkQueue_;
 
     // A recursion block that prevents accidentally running additional tasks when insider a
     // (accidentally induced?) nested message pump.
-    bool nestable_tasks_allowed_ = true;
+    bool nestableTasksAllowed_ = true;
 
     std::shared_ptr<MessagePump> pump_;
 
-    TaskQueue incoming_queue_;
-    std::mutex incoming_queue_lock_;
+    TaskQueue incomingQueue_;
+    std::mutex incomingQueueLock_;
 
     // The next sequence number to use for delayed tasks.
     int next_sequence_num_ = 0;

@@ -4,13 +4,13 @@
 
 #include "ashe/arch.h"
 #ifdef ASHE_WIN
+#include "ashe/config.h"
 #include "ashe/message_loop/message_pump.h"
 #include "ashe/message_loop/message_pump_dispatcher.h"
 #include "ashe/win/message_window.h"
 
 namespace ashe {
-
-class MessagePumpForWin final : public MessagePump {
+class ASHE_API MessagePumpForWin final : public MessagePump {
    public:
     MessagePumpForWin();
     ~MessagePumpForWin() final;
@@ -67,7 +67,6 @@ class MessagePumpForWin final : public MessagePump {
 
     ASHE_DISALLOW_COPY(MessagePumpForWin);
 };
-
 }  // namespace ashe
 #endif  // ASHE_WIN
 
