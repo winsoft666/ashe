@@ -18,12 +18,18 @@
 #################################################################################
 
 file(GLOB WIN_HEADERS LIST_DIRECTORIES false ../include/ashe/win/*.h)
+file(GLOB MESSAGE_LOOP_HEADERS LIST_DIRECTORIES false ../include/ashe/message_loop/*.h)
 file(GLOB HEADERS LIST_DIRECTORIES false ../include/ashe/*.h)
+
 file(GLOB WIN_SOURCES LIST_DIRECTORIES false ./win/*.cpp)
+file(GLOB MESSAGE_LOOP_SOURCES LIST_DIRECTORIES false ./message_loop/*.cpp)
 file(GLOB SOURCES LIST_DIRECTORIES false ./*.cpp)
 
 source_group("Header Files" FILES ${HEADERS})
 source_group("Source Files" FILES ${SOURCES})
+
+source_group("Header Files\\message_loop" FILES ${MESSAGE_LOOP_HEADERS})
+source_group("Source Files\\message_loop" FILES ${MESSAGE_LOOP_SOURCES})
 
 if(WIN32)
 	source_group("Header Files\\win" FILES ${WIN_HEADERS})
@@ -32,16 +38,16 @@ endif()
 
 if(ASHE_BUILD_SHARED_LIBS)
 	if(WIN32)
-		add_library(ashe SHARED ${HEADERS} ${WIN_HEADERS} ${SOURCES} ${WIN_SOURCES})
+		add_library(ashe SHARED ${HEADERS} ${WIN_HEADERS} ${SOURCES} ${WIN_SOURCES} ${MESSAGE_LOOP_HEADERS} ${MESSAGE_LOOP_SOURCES})
 	else()
-		add_library(ashe SHARED ${HEADERS} ${SOURCES})
+		add_library(ashe SHARED ${HEADERS} ${SOURCES} ${MESSAGE_LOOP_HEADERS} ${MESSAGE_LOOP_SOURCES})
 	endif()
 	target_compile_definitions(ashe PRIVATE ASHE_EXPORTS)
 else()
 	if(WIN32)
-		add_library(ashe STATIC ${HEADERS} ${WIN_HEADERS} ${SOURCES} ${WIN_SOURCES})
+		add_library(ashe STATIC ${HEADERS} ${WIN_HEADERS} ${SOURCES} ${WIN_SOURCES} ${MESSAGE_LOOP_HEADERS} ${MESSAGE_LOOP_SOURCES})
 	else()
-		add_library(ashe STATIC ${HEADERS} ${SOURCES})
+		add_library(ashe STATIC ${HEADERS} ${SOURCES} ${MESSAGE_LOOP_HEADERS} ${MESSAGE_LOOP_SOURCES})
 	endif()
 
 	target_compile_definitions(ashe PUBLIC ASHE_STATIC)
