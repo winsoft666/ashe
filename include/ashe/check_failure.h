@@ -62,6 +62,18 @@ ASHE_API bool CheckFailureBool(bool result,
 
 #define ASHE_CHECK_FAILURE_HRESULT(hr, desc) \
     internal::CheckFailureHRESULT(hr, __FILE__, __func__, __LINE__, desc)
+
+#if (defined _DEBUG) || (defined DEBUG)
+#define ASHE_D_CHECK_FAILURE_LSTATUS(ls, desc) \
+    internal::CheckFailureLSTATUS(ls, __FILE__, __func__, __LINE__, desc)
+
+#define ASHE_D_CHECK_FAILURE_HRESULT(hr, desc) \
+    internal::CheckFailureHRESULT(hr, __FILE__, __func__, __LINE__, desc)
+#else  // _DEBUG
+#define ASHE_D_CHECK_FAILURE_LSTATUS(ls, desc)
+
+#define ASHE_D_CHECK_FAILURE_HRESULT(hr, desc)
+#endif
 #endif  // ASHE_WIN
 
 #define ASHE_UNEXPECTED_EXCEPTION(e, desc) \
@@ -69,6 +81,18 @@ ASHE_API bool CheckFailureBool(bool result,
 
 #define ASHE_CHECK_FAILURE(value, desc) \
     internal::CheckFailureBool((value), __FILE__, __func__, __LINE__, desc)
+
+#if (defined _DEBUG) || (defined DEBUG)
+#define ASHE_D_UNEXPECTED_EXCEPTION(e, desc) \
+    internal::ShowUnexpectedException((e), __FILE__, __func__, __LINE__, desc)
+
+#define ASHE_D_CHECK_FAILURE(value, desc) \
+    internal::CheckFailureBool((value), __FILE__, __func__, __LINE__, desc)
+#else  // _DEBUG
+#define ASHE_D_UNEXPECTED_EXCEPTION(e, desc)
+
+#define ASHE_D_CHECK_FAILURE(value, desc)
+#endif
 
 }  // namespace ashe
 

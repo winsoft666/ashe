@@ -1,3 +1,22 @@
+/*******************************************************************************
+*    C++ Common Library
+*    ---------------------------------------------------------------------------
+*    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
+*
+*    This program is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+******************************************************************************/
+
 #ifndef ASHE_MESSAGE_LOOP_MESSAGE_PUMP_DEFAULT_H_
 #define ASHE_MESSAGE_LOOP_MESSAGE_PUMP_DEFAULT_H_
 #pragma once
@@ -22,16 +41,16 @@ class ASHE_API MessagePumpDefault final : public MessagePump {
 
    private:
     // This flag is set to false when run() should return.
-    bool keep_running_ = true;
+    bool keepRunning_ = true;
 
     // Used to sleep until there is more work to do.
     std::condition_variable event_;
 
     bool have_work_ = false;
-    std::mutex have_work_lock_;
+    std::mutex haveWorkLock_;
 
     // The time at which we should call doDelayedWork.
-    TimePoint delayed_work_time_;
+    TimePoint delayedWorkTime_;
 
     ASHE_DISALLOW_COPY(MessagePumpDefault);
 };

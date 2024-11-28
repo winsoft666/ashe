@@ -3,29 +3,29 @@
 
 namespace ashe {
 void MessagePumpDefault::run(Delegate* delegate) {
-    ASHE_CHECK_FAILURE(keep_running_, "Quit must have been called outside of Run!");
+    ASHE_CHECK_FAILURE(keepRunning_, "Quit must have been called outside of Run!");
 
     for (;;) {
         bool did_work = delegate->doWork();
-        if (!keep_running_)
+        if (!keepRunning_)
             break;
 
-        did_work |= delegate->doDelayedWork(&delayed_work_time_);
-        if (!keep_running_)
+        did_work |= delegate->doDelayedWork(&delayedWorkTime_);
+        if (!keepRunning_)
             break;
 
         if (did_work)
             continue;
 
         did_work = delegate->doIdleWork();
-        if (!keep_running_)
+        if (!keepRunning_)
             break;
 
         if (did_work)
             continue;
 
-        if (delayed_work_time_ == TimePoint()) {
-            std::unique_lock<std::mutex> lock(have_work_lock_);
+        if (delayedWorkTime_ == TimePoint()) {
+            std::unique_lock<std::mutex> lock(haveWorkLock_);
 
             while (!have_work_)
                 event_.wait(lock);
@@ -34,10 +34,10 @@ void MessagePumpDefault::run(Delegate* delegate) {
         }
         else {
             Milliseconds delay = std::chrono::duration_cast<Milliseconds>(
-                delayed_work_time_ - Clock::now());
+                delayedWorkTime_ - Clock::now());
 
             if (delay > Milliseconds::zero()) {
-                std::unique_lock<std::mutex> lock(have_work_lock_);
+                std::unique_lock<std::mutex> lock(haveWorkLock_);
 
                 do {
                     if (event_.wait_for(lock, delay) == std::cv_status::timeout)
@@ -48,7 +48,7 @@ void MessagePumpDefault::run(Delegate* delegate) {
 
                     // Recalculate the waiting interval.
                     delay = std::chrono::duration_cast<Milliseconds>(
-                        delayed_work_time_ - Clock::now());
+                        delayedWorkTime_ - Clock::now());
                 } while (delay > Milliseconds::zero());
 
                 have_work_ = false;
@@ -56,21 +56,21 @@ void MessagePumpDefault::run(Delegate* delegate) {
             else {
                 // It looks like delayed_work_time_ indicates a time in the past, so we need to
                 // call doDelayedWork now.
-                delayed_work_time_ = TimePoint();
+                delayedWorkTime_ = TimePoint();
             }
         }
     }
 
-    keep_running_ = true;
+    keepRunning_ = true;
 }
 
 void MessagePumpDefault::quit() {
-    keep_running_ = false;
+    keepRunning_ = false;
 }
 
 void MessagePumpDefault::scheduleWork() {
     {
-        std::lock_guard<std::mutex> lock(have_work_lock_);
+        std::lock_guard<std::mutex> lock(haveWorkLock_);
         have_work_ = true;
     }
 
@@ -82,6 +82,6 @@ void MessagePumpDefault::scheduleDelayedWork(const TimePoint& delayed_work_time)
     // We know that we can't be blocked on Wait right now since this method can
     // only be called on the same thread as Run, so we only need to update our
     // record of how long to sleep when we do sleep.
-    delayed_work_time_ = delayed_work_time;
+    delayedWorkTime_ = delayed_work_time;
 }
 }  // namespace ashe

@@ -35,6 +35,10 @@
 #error "Unknown compiler"
 #endif
 
+#if ASHE_MACOS || ASHE_LINUX
+#define ASHE_POSIX 1
+#endif
+
 // Processor architecture detection.
 // For more info on what's defined, see:
 //   http://msdn.microsoft.com/en-us/library/b0084kay.aspx
