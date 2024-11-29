@@ -1,5 +1,5 @@
 #include "ashe/rand_util.h"
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 #ifdef ASHE_POSIX
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -29,7 +29,7 @@ class URandomFd {
    public:
     URandomFd() :
         fd_(HANDLE_EINTR(open("/dev/urandom", kOpenFlags))) {
-        ASHE_CHECK_FAILURE(fd_ >= 0, "Cannot open /dev/urandom");
+        DCHECK(fd_ >= 0) << "Cannot open /dev/urandom";
     }
 
     ~URandomFd() { close(fd_); }
@@ -53,11 +53,11 @@ BOOL WINAPI ProcessPrng(PBYTE pbData, SIZE_T cbData);
 // avoid opening a handle to \\Device\KsecDD in the renderer.
 decltype(&ProcessPrng) GetProcessPrng() {
     HMODULE hmod = LoadLibraryW(L"bcryptprimitives.dll");
-    ASHE_D_CHECK_FAILURE(hmod, nullptr);
+    DCHECK(hmod);
     decltype(&ProcessPrng) process_prng_fn =
         reinterpret_cast<decltype(&ProcessPrng)>(
             GetProcAddress(hmod, "ProcessPrng"));
-    ASHE_D_CHECK_FAILURE(process_prng_fn, nullptr);
+    DCHECK(process_prng_fn);
     return process_prng_fn;
 }
 
@@ -66,7 +66,7 @@ void RandBytes2(void* output, size_t output_length) {
     BOOL success =
         process_prng_fn(static_cast<BYTE*>(output), output_length);
     // ProcessPrng is documented to always return TRUE.
-    ASHE_D_CHECK_FAILURE(success, nullptr);
+    DCHECK(success);
 }
 
 void RandBytes(void* output, size_t output_length) {
@@ -108,7 +108,7 @@ void RandBytes(void* output, size_t output_length) {
     // kernels, we can get rid of this /dev/urandom branch altogether.
     const int urandom_fd = GetUrandomFD();
     const bool success = ReadFromFD(urandom_fd, output, output_length);
-    ASHE_D_CHECK_FAILURE(success, nullptr);
+    DCHECK(success);
 }
 #else
 #error Unsupport platform
@@ -121,7 +121,7 @@ uint64_t RandUint64() {
 }
 
 uint64_t RandGenerator(uint64_t range) {
-    ASHE_D_CHECK_FAILURE(range > 0u, nullptr);
+    DCHECK(range > 0u);
     // We must discard random results above this number, as they would
     // make the random generator non-uniform (consider e.g. if
     // MAX_UINT64 was 7 and |range| was 5, then a result of 1 would be twice
@@ -138,15 +138,15 @@ uint64_t RandGenerator(uint64_t range) {
 }
 
 int RandInt(int min, int max) {
-    ASHE_D_CHECK_FAILURE(min != max, nullptr);
+    DCHECK(min != max);
 
     uint64_t range = static_cast<uint64_t>(max) - static_cast<uint64_t>(min) + 1;
     // |range| is at most UINT_MAX + 1, so the result of RandGenerator(range)
     // is at most UINT_MAX.  Hence it's safe to cast it from uint64_t to int64_t.
     int result =
         static_cast<int>(min + static_cast<int64_t>(RandGenerator(range)));
-    ASHE_D_CHECK_FAILURE(result >= min, nullptr);
-    ASHE_D_CHECK_FAILURE(result <= max, nullptr);
+    DCHECK(result >= min);
+    DCHECK(result <= max);
     return result;
 }
 
@@ -179,7 +179,7 @@ float BitsToOpenEndedUnitIntervalF(uint64_t bits) {
 }
 
 std::string RandBytesAsString(size_t length) {
-    ASHE_D_CHECK_FAILURE(length > 0u, nullptr);
+    DCHECK(length > 0u);
     std::string result(length, '\0');
     RandBytes((void*)result.data(), length);
     return result;

@@ -52,7 +52,7 @@ class ASHE_API MessagePumpDefault final : public MessagePump {
     // The time at which we should call doDelayedWork.
     TimePoint delayedWorkTime_;
 
-    ASHE_DISALLOW_COPY(MessagePumpDefault);
+    ASHE_DISALLOW_COPY_AND_ASSIGN(MessagePumpDefault);
 };
 
 }  // namespace ashe

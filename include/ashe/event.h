@@ -54,7 +54,7 @@ class ASHE_API Event {
     std::mutex set_lock_;
     std::condition_variable setted_event_;
 
-    ASHE_DISALLOW_COPY_MOVE(Event);
+    ASHE_DISALLOW_COPY_AND_MOVE(Event);
 };
 }  // namespace ashe
 #endif  //!ASHE_EVENT_HPP__

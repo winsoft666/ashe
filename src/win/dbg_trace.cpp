@@ -1,8 +1,6 @@
 #include "ashe/config.h"
-#include "ashe/trace.h"
-#include "ashe/arch.h"
+#include "ashe/win/dbg_trace.h"
 #include <memory>
-#ifdef ASHE_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -13,13 +11,10 @@
 #include <Windows.h>
 #endif
 #include <strsafe.h>
-#else
-#include <string>
-#include <stdarg.h>
-#endif
 #include "ashe/string_helper.h"
 
 namespace ashe {
+namespace win {
 void TraceW(const wchar_t* lpFormat, ...) {
     if (!lpFormat)
         return;
@@ -30,11 +25,7 @@ void TraceW(const wchar_t* lpFormat, ...) {
     va_end(args);
 
     if (ret) {
-#ifdef ASHE_WIN
         OutputDebugStringW(output.c_str());
-#else
-        printf("%ls", output.c_str());
-#endif
     }
 }
 
@@ -48,11 +39,8 @@ void TraceA(const char* lpFormat, ...) {
     va_end(args);
 
     if (ret) {
-#ifdef ASHE_WIN
         OutputDebugStringA(output.c_str());
-#else
-        printf("%s", output.c_str());
-#endif
     }
 }
+}  // namespace win
 }  // namespace ashe

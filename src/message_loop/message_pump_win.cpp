@@ -1,6 +1,6 @@
 #include "ashe/message_loop/message_pump_win.h"
 #ifdef ASHE_WIN
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 
 namespace ashe {
 
@@ -15,7 +15,7 @@ MessagePumpForWin::MessagePumpForWin() {
                   this,
                   std::placeholders::_1, std::placeholders::_2,
                   std::placeholders::_3, std::placeholders::_4));
-    ASHE_CHECK_FAILURE(succeeded, nullptr);
+    DCHECK(succeeded);
 }
 
 MessagePumpForWin::~MessagePumpForWin() {
@@ -26,7 +26,6 @@ void MessagePumpForWin::run(Delegate* delegate) {
 }
 
 void MessagePumpForWin::quit() {
-    ASHE_CHECK_FAILURE(state_, nullptr);
     state_->should_quit = true;
 }
 
@@ -68,7 +67,7 @@ void MessagePumpForWin::scheduleDelayedWork(const TimePoint& delayed_work_time) 
     delayed_work_time_ = delayed_work_time;
 
     int delay_msec = currentDelay();
-    ASHE_CHECK_FAILURE(delay_msec > 0, nullptr);
+    DCHECK(delay_msec > 0);
     if (delay_msec < USER_TIMER_MINIMUM)
         delay_msec = USER_TIMER_MINIMUM;
 
@@ -205,7 +204,7 @@ void MessagePumpForWin::waitForWork() {
             wait_flags = 0;
         }
 
-        ASHE_CHECK_FAILURE(WAIT_FAILED != result, nullptr);
+        DCHECK(WAIT_FAILED != result);
     }
 }
 
@@ -302,11 +301,11 @@ bool MessagePumpForWin::processPumpReplacementMessage() {
     const bool have_message = (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE) != FALSE);
 
     // Expect no message or a message different than kMsgHaveWork.
-    ASHE_CHECK_FAILURE((!have_message || kMsgHaveWork != msg.message || msg.hwnd != message_window_.hwnd()), nullptr);
+    DCHECK((!have_message || kMsgHaveWork != msg.message || msg.hwnd != message_window_.hwnd()));
 
     // Since we discarded a kMsgHaveWork message, we must update the flag.
     int old_have_work = InterlockedExchange(&work_state_, READY);
-    ASHE_CHECK_FAILURE(old_have_work, nullptr);
+    DCHECK(old_have_work);
 
     // We don't need a special time slice if we didn't have_message to process.
     if (!have_message)

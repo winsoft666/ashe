@@ -24,10 +24,13 @@
 #include <stdio.h>
 #include <mutex>
 #include <string>
+#include <vector>
 #include "ashe/macros.h"
+#ifdef ASHE_WIN
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_
 #endif  // !_WINSOCKAPI_
+#endif  // ASHE_WIN
 
 namespace ashe {
 class ASHE_API File {
@@ -86,7 +89,7 @@ class ASHE_API File {
 
     bool flush();
 
-    bool exist() const;
+    bool isExist() const;
 
     bool canRW() const;
 
@@ -120,8 +123,7 @@ class ASHE_API File {
 
     // Must be call open(...) first!
     // This function will NOT change file pointer position.
-    // readAll function will malloc memory, caller need free it.
-    size_t readAll(void** buffer);
+    bool readAll(std::vector<uint8_t>& buffer);
 
     // Must be call open(...) first!
     // This function will NOT change file pointer position.
@@ -140,7 +142,7 @@ class ASHE_API File {
 #endif
     std::recursive_mutex mutex_;
 
-    ASHE_DISALLOW_COPY_MOVE(File);
+    ASHE_DISALLOW_COPY_AND_MOVE(File);
 };
 }  // namespace ashe
 #endif  // !ASHE_FILE_UTIL_HPP_

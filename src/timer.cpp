@@ -8,7 +8,7 @@
 #include <vector>
 #include <stack>
 #include <set>
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 
 namespace ashe {
 namespace timer_detail {
@@ -82,7 +82,7 @@ void Timer::init() noexcept {
         try {
             run();
         } catch (std::exception& e) {
-            ASHE_UNEXPECTED_EXCEPTION(e, "Timer init failed");
+            DLOG(LS_FATAL) << "exception occurred: " << e.what();
         }
     });
 }
@@ -97,7 +97,7 @@ void Timer::destory() noexcept {
             if (p_->worker_.joinable())
                 p_->worker_.join();
         } catch (std::exception& e) {
-            ASHE_UNEXPECTED_EXCEPTION(e, "Timer destory failed");
+            DLOG(LS_FATAL) << "exception occurred: " << e.what();
         }
         p_->events_.clear();
         p_->time_events_.clear();

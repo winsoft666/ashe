@@ -22,6 +22,7 @@
 #include "ashe/config.h"
 #include "ashe/arch.h"
 #include <thread>
+#include <stdio.h>
 #ifdef ASHE_WIN
 #ifndef _INC_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
@@ -36,7 +37,6 @@
 #else
 #endif  // ASHE_WIN
 #include "ashe/macros.h"
-#include "ashe/check_failure.h"
 
 namespace ashe {
 #ifdef ASHE_WIN
@@ -71,7 +71,7 @@ class ScopedHandle {
    private:
     const HANDLE kInvalidHandle_;
     HANDLE handle_;
-    ASHE_DISALLOW_COPY_MOVE(ScopedHandle);
+    ASHE_DISALLOW_COPY_AND_MOVE(ScopedHandle);
 };
 #endif
 
@@ -98,14 +98,14 @@ class ASHE_API ScopedFile {
     FILE* f_ = nullptr;
 
    private:
-    ASHE_DISALLOW_COPY_MOVE(ScopedFile);
+    ASHE_DISALLOW_COPY_AND_MOVE(ScopedFile);
 };
 
 #ifdef ASHE_WIN
 class ASHE_API ScopedComInitialize {
    public:
     ScopedComInitialize() noexcept {
-        ASHE_CHECK_FAILURE_HRESULT(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED), "CoInitializeEx failed");
+        CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
     }
 
     ~ScopedComInitialize() noexcept {
@@ -113,7 +113,7 @@ class ASHE_API ScopedComInitialize {
     }
 
    private:
-    ASHE_DISALLOW_COPY_MOVE(ScopedComInitialize);
+    ASHE_DISALLOW_COPY_AND_MOVE(ScopedComInitialize);
 };
 #endif
 
@@ -133,7 +133,7 @@ class ASHE_API ScopedThread {
     std::thread& t_;
 
    private:
-    ASHE_DISALLOW_COPY_MOVE(ScopedThread);
+    ASHE_DISALLOW_COPY_AND_MOVE(ScopedThread);
 };
 }  // namespace ashe
 #endif  // !SCOPED_OBJECT_HPP__

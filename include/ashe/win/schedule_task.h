@@ -32,7 +32,7 @@ namespace ashe {
 namespace win {
 class ASHE_API ScheduleTask {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ScheduleTask);
+    ASHE_DISALLOW_COPY_AND_MOVE(ScheduleTask);
 
     ScheduleTask();
 

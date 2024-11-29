@@ -36,7 +36,7 @@ class MessageWindow {
 
     THREAD_CHECKER(thread_checker_);
 
-    ASHE_DISALLOW_COPY(MessageWindow);
+    ASHE_DISALLOW_COPY_AND_ASSIGN(MessageWindow);
 };
 }  // namespace win
 }  // namespace ashe

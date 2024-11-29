@@ -17,15 +17,17 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_TRACE_HPP__
-#define ASHE_TRACE_HPP__
+#ifndef ASHE_WIN_DBG_TRACE_H__
+#define ASHE_WIN_DBG_TRACE_H__
 #pragma once
 
 #include "ashe/config.h"
 
 namespace ashe {
+namespace win {
 ASHE_API void TraceW(const wchar_t* lpFormat, ...);
 ASHE_API void TraceA(const char* lpFormat, ...);
+}  // namespace win
 }  // namespace ashe
 
-#endif  // !ASHE_TRACE_H__
+#endif  // !ASHE_WIN_DBG_TRACE_H__

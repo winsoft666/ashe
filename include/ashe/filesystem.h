@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -17,35 +17,23 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_CONFIG_HPP__
-#define ASHE_CONFIG_HPP__
+#ifndef ASHE_FILE_SYSTEM_H_
+#define ASHE_FILE_SYSTEM_H_
 #pragma once
 
-#define ASHE_VERSION "@PROJECT_VERSION@"
+#include "ashe/compiler_specific.h"
 
-#ifdef ASHE_STATIC
-#define ASHE_API
+#if ASHE_CPP_STANDARD_VER >= 201703L
+#include <filesystem>
+
+namespace ashe {
+namespace filesystem = std::filesystem;
+}
 #else
-#if defined(ASHE_EXPORTS)
-#if defined(_MSC_VER)
-#define ASHE_API __declspec(dllexport)
-#else
-#define ASHE_API
-#endif
-#else
-#if defined(_MSC_VER)
-#define ASHE_API __declspec(dllimport)
-#pragma warning(disable: 4251)
-#else
-#define ASHE_API
-#endif
-#endif
-#endif
+#include "ashe/ghc/filesystem.hpp"
 
-
-#ifdef _MSC_VER
-#include "ashe/win/dll_mt_warning.h"
+namespace ashe {
+namespace filesystem = ghc::filesystem;
+}
 #endif
-
-
-#endif //!ASHE_CONFIG_HPP__
+#endif  // !ASHE_FILE_SYSTEM_H_

@@ -1,7 +1,7 @@
 #include "ashe/config.h"
 #include "ashe/sha512.h"
 #include "ashe/file.h"
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 #include <cstdio>
 #include <cstring>
 
@@ -205,7 +205,7 @@ std::string GetFileSHA512(const std::wstring& filePath) {
 
         return std::string(buf);
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, "Get file sha512 failed");
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
         return "";
     }
 }
@@ -228,7 +228,7 @@ std::string GetDataSHA512(const unsigned char* data, size_t dataSize) {
         }
         return std::string(buf);
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, "Get file sha512 failed");
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
         return "";
     }
 }

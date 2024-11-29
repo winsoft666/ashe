@@ -2,7 +2,7 @@
 #include "ashe/message_loop/message_loop_task_runner.h"
 //#include "ashe/message_loop/message_pump_asio.h"
 #include "ashe/message_loop/message_pump_default.h"
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 #if defined(ASHE_WIN)
 #include "ashe/message_loop/message_pump_win.h"
 #endif  // defined(ASHE_WIN)
@@ -17,11 +17,11 @@ MessageLoop* MessageLoop::current() {
 
 MessageLoop::MessageLoop(Type type) :
     type_(type) {
-    ASHE_CHECK_FAILURE(!current(), "should only have one message loop per thread");
+    DCHECK(!current()) << "should only have one message loop per thread";
 
     message_loop_for_current_thread = this;
 
-    proxy_.reset(new MessageLoopTaskRunner(this));
+    taskRunnerProxy_.reset(new MessageLoopTaskRunner(this));
 
     switch (type) {
         //case Type::ASIO:
@@ -41,7 +41,7 @@ MessageLoop::MessageLoop(Type type) :
 }
 
 MessageLoop::~MessageLoop() {
-    ASHE_CHECK_FAILURE(this == current(), nullptr);
+    DCHECK(this == current());
 
     // Clean up any unprocessed tasks, but take care: deleting a task could result in the addition
     // of more tasks (e.g., via DeleteSoon). We set a limit on the number of times we will allow a
@@ -59,16 +59,16 @@ MessageLoop::~MessageLoop() {
             break;
     }
 
-    ASHE_CHECK_FAILURE(!did_work, nullptr);
+    DCHECK(!did_work);
 
-    proxy_->willDestroyCurrentMessageLoop();
-    proxy_ = nullptr;
+    taskRunnerProxy_->willDestroyCurrentMessageLoop();
+    taskRunnerProxy_ = nullptr;
 
     message_loop_for_current_thread = nullptr;
 }
 
 void MessageLoop::run(Dispatcher* dispatcher) {
-    ASHE_CHECK_FAILURE(this == current(), nullptr);
+    DCHECK(this == current());
 
 #if defined(ASHE_WIN)
     if (dispatcher && type() == Type::WIN) {
@@ -83,7 +83,7 @@ void MessageLoop::run(Dispatcher* dispatcher) {
 }
 
 void MessageLoop::quit() {
-    ASHE_CHECK_FAILURE(this == current(), nullptr);
+    DCHECK(this == current());
     pump_->quit();
 }
 
@@ -92,24 +92,24 @@ PendingTask::Callback MessageLoop::quitClosure() {
 }
 
 void MessageLoop::postTask(PendingTask::Callback callback) {
-    ASHE_CHECK_FAILURE(callback != nullptr, nullptr);
+    DCHECK(callback != nullptr);
     addToIncomingQueue(std::move(callback), Milliseconds::zero(), true);
 }
 
 void MessageLoop::postDelayedTask(PendingTask::Callback callback, const Milliseconds& delay) {
-    ASHE_CHECK_FAILURE(callback != nullptr, nullptr);
+    DCHECK(callback != nullptr);
     addToIncomingQueue(std::move(callback), delay, true);
 }
 
 void MessageLoop::postNonNestableTask(PendingTask::Callback callback) {
-    ASHE_CHECK_FAILURE(callback != nullptr, nullptr);
+    DCHECK(callback != nullptr);
     addToIncomingQueue(std::move(callback), Milliseconds::zero(), false);
 }
 
 void MessageLoop::postNonNestableDelayedTask(
     PendingTask::Callback callback,
     const Milliseconds& delay) {
-    ASHE_CHECK_FAILURE(callback != nullptr, nullptr);
+    DCHECK(callback != nullptr);
     addToIncomingQueue(std::move(callback), delay, false);
 }
 
@@ -125,11 +125,11 @@ MessagePumpForWin* MessageLoop::pumpWin() const {
 //}
 
 std::shared_ptr<TaskRunner> MessageLoop::taskRunner() const {
-    return proxy_;
+    return taskRunnerProxy_;
 }
 
 void MessageLoop::runTask(const PendingTask& pending_task) {
-    ASHE_CHECK_FAILURE(nestableTasksAllowed_, nullptr);
+    DCHECK(nestableTasksAllowed_);
 
     // Execute the task and assume the worst: It is probably not reentrant.
     nestableTasksAllowed_ = false;
@@ -196,7 +196,7 @@ void MessageLoop::reloadWorkQueue() {
         return;
 
     incomingQueue_.Swap(&work_queue_);
-    ASHE_CHECK_FAILURE(incomingQueue_.empty(), nullptr);
+    DCHECK(incomingQueue_.empty());
 }
 
 bool MessageLoop::deletePendingTasks() {

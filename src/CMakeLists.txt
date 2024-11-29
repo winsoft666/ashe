@@ -53,6 +53,10 @@ else()
 	target_compile_definitions(ashe PUBLIC ASHE_STATIC)
 endif()
 
+if(ASHE_USE_STATIC_CRT)
+	target_compile_definitions(ashe PUBLIC ASHE_USE_STATIC_CRT)
+endif()
+
 # set output name
 set_target_properties(ashe PROPERTIES 
 	OUTPUT_NAME $<IF:$<BOOL:${ASHE_BUILD_SHARED_LIBS}>,ashe,ashe-static>

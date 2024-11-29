@@ -43,7 +43,7 @@
 namespace ashe {
 class ASHE_API ThreadPool {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ThreadPool);
+    ASHE_DISALLOW_COPY_AND_MOVE(ThreadPool);
     ThreadPool(size_t threads);
 
     // add new work item to the pool

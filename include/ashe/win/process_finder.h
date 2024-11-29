@@ -41,7 +41,7 @@ namespace ashe {
 namespace win {
 class ASHE_API ProcessFinder {
    public:
-    ASHE_DISALLOW_COPY_MOVE(ProcessFinder);
+    ASHE_DISALLOW_COPY_AND_MOVE(ProcessFinder);
 
     // dwFlags can be one or more of the following values.
     // TH32CS_SNAPHEAPLIST

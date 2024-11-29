@@ -1,9 +1,9 @@
 #include "ashe/message_loop/message_pump_default.h"
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 
 namespace ashe {
 void MessagePumpDefault::run(Delegate* delegate) {
-    ASHE_CHECK_FAILURE(keepRunning_, "Quit must have been called outside of Run!");
+    DCHECK(keepRunning_) << "Quit must have been called outside of Run!";
 
     for (;;) {
         bool did_work = delegate->doWork();

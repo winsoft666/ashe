@@ -23,7 +23,7 @@
 
 #include "ashe/config.h"
 #include "ashe/compiler_specific.h"
-#include "ashe/message_loop/task_runner.h"
+#include "ashe/task_runner.h"
 #include "ashe/message_loop/message_loop.h"
 #include "ashe/message_loop/pending_task.h"
 #if ASHE_CPP_STANDARD_VER >= 201703L
@@ -62,7 +62,7 @@ class ASHE_API MessageLoopTaskRunner final : public TaskRunner {
 #endif
     std::thread::id threadId_;
 
-    ASHE_DISALLOW_COPY(MessageLoopTaskRunner);
+    ASHE_DISALLOW_COPY_AND_ASSIGN(MessageLoopTaskRunner);
 };
 
 }  // namespace ashe

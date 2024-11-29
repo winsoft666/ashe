@@ -31,7 +31,7 @@ class ASHE_API MessagePump {
     using TimePoint = std::chrono::time_point<Clock>;
     using Milliseconds = std::chrono::milliseconds;
 
-    class Delegate {
+    class ASHE_API Delegate {
        public:
         virtual ~Delegate() = default;
 

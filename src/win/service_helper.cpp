@@ -11,7 +11,7 @@
 #endif
 #include <stdio.h>
 #include <strsafe.h>
-#include "ashe/trace.h"
+#include "ashe/win/dbg_trace.h"
 
 namespace ashe {
 namespace win {

@@ -3,7 +3,6 @@
 #include <Softpub.h>
 #include <wincrypt.h>
 #include <wintrust.h>
-#include "ashe/check_failure.h"
 
 namespace ashe {
 namespace win {
@@ -85,7 +84,6 @@ Signature::SignVerifyResult Signature::verify() {
             break;
 
         default:
-            ASHE_CHECK_FAILURE_LSTATUS(lStatus, "WinVerifyTrust failed");
             break;
     }
 

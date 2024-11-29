@@ -23,7 +23,7 @@
 #include "ashe/arch.h"
 #include "ashe/config.h"
 #include "ashe/macros.h"
-#include "ashe/message_loop/task_runner.h"
+#include "ashe/task_runner.h"
 #include "ashe/message_loop/message_pump.h"
 #include "ashe/message_loop/message_pump_dispatcher.h"
 #include "ashe/message_loop/pending_task.h"
@@ -140,12 +140,12 @@ class ASHE_API MessageLoop final : public MessagePump::Delegate {
     // The next sequence number to use for delayed tasks.
     int next_sequence_num_ = 0;
 
-    std::shared_ptr<MessageLoopTaskRunner> proxy_;
+    std::shared_ptr<MessageLoopTaskRunner> taskRunnerProxy_;
 
    private:
     void quit();
 
-    ASHE_DISALLOW_COPY(MessageLoop);
+    ASHE_DISALLOW_COPY_AND_ASSIGN(MessageLoop);
 };
 }  // namespace ashe
 #endif  // ASHE_MESSAGE_LOOP_MESSAGE_LOOP_H_

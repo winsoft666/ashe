@@ -84,7 +84,7 @@ class ASHE_API MessagePumpForWin final : public MessagePump {
     // State for the current invocation of Run.
     RunState* state_ = nullptr;
 
-    ASHE_DISALLOW_COPY(MessagePumpForWin);
+    ASHE_DISALLOW_COPY_AND_ASSIGN(MessagePumpForWin);
 };
 }  // namespace ashe
 #endif  // ASHE_WIN

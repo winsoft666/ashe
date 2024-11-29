@@ -64,7 +64,7 @@ class ASHE_API AtExitManager {
     std::mutex m_;
     std::stack<AtExitCallbackType> stack_;
 
-    ASHE_DISALLOW_COPY_MOVE(AtExitManager);
+    ASHE_DISALLOW_COPY_AND_MOVE(AtExitManager);
 };
 
 }  // namespace ashe

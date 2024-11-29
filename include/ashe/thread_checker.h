@@ -21,10 +21,11 @@
 #define ASHE_THREAD_CHECKER_H_
 #pragma once
 
+#include "ashe/config.h"
 #include "ashe/macros.h"
 #include <thread>
 #include <mutex>
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 
 // ThreadChecker is a helper class used to help verify that some methods of a
 // class are called from the same thread (for thread-affinity).
@@ -67,7 +68,7 @@
 //   }
 
 namespace ashe {
-class ThreadChecker {
+class ASHE_API ThreadChecker {
    public:
     ThreadChecker();
     ~ThreadChecker() = default;
@@ -81,13 +82,13 @@ class ThreadChecker {
     std::thread::id thread_id_;
     mutable std::mutex thread_id_lock_;
 
-    ASHE_DISALLOW_COPY(ThreadChecker);
+    ASHE_DISALLOW_COPY_AND_ASSIGN(ThreadChecker);
 };
 }  // namespace ashe
 
 #ifndef NDEBUG
 #define THREAD_CHECKER(name) ::ashe::ThreadChecker name
-#define DCHECK_CALLED_ON_VALID_THREAD(name) ASHE_CHECK_FAILURE((name).calledOnValidThread(), "this call is running on invalid thread")
+#define DCHECK_CALLED_ON_VALID_THREAD(name) CHECK((name).calledOnValidThread()) << "this call is running on invalid thread"
 #define DETACH_FROM_THREAD(name) (name).detachFromThread()
 #else  // NDEBUG
 #define THREAD_CHECKER(name)

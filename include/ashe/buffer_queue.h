@@ -39,7 +39,6 @@ typedef struct QueueElem {
 
 class ASHE_API BufferQueue {
    public:
-    ASHE_DISALLOW_COPY_MOVE(BufferQueue);
     explicit BufferQueue(const std::string& name = "");
     ~BufferQueue();
 
@@ -110,6 +109,7 @@ class ASHE_API BufferQueue {
     size_t total_data_size_;
     std::string queue_name_;
     std::recursive_mutex queue_mutex_;
+    ASHE_DISALLOW_COPY_AND_MOVE(BufferQueue);
 };
 }  // namespace ashe
 

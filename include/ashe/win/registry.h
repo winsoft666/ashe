@@ -40,7 +40,7 @@ namespace ashe {
 namespace win {
 class ASHE_API Registry {
    public:
-    ASHE_DISALLOW_COPY_MOVE(Registry);
+    ASHE_DISALLOW_COPY_AND_MOVE(Registry);
 
     // hkeyRoot can be one of :
     // HKEY_CLASSES_ROOT

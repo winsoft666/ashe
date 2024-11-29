@@ -34,7 +34,7 @@ namespace win {
 class ASHE_API IconHelper {
    public:
     class IconInfo {
-        ASHE_DISALLOW_COPY(IconInfo);
+        ASHE_DISALLOW_COPY_AND_ASSIGN(IconInfo);
 
        public:
         IconInfo() = default;

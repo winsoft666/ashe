@@ -2,7 +2,7 @@
 #include "ashe/sha256.h"
 #include "ashe/arch.h"
 #include "ashe/file.h"
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 #include <cstring>
 
 namespace ashe {
@@ -35,7 +35,7 @@ typedef struct sha256_ctx {
 #define s0(x) (ROTR(7, (x)) ^ ROTR(18, (x)) ^ SHR(3, (x)))
 #define s1(x) (ROTR(17, (x)) ^ ROTR(19, (x)) ^ SHR(10, (x)))
 
-#define EXPAND(W, i) (W[(i) & 15] += (s1(W[((i)-2) & 15]) + W[((i)-7) & 15] + s0(W[((i)-15) & 15])))
+#define EXPAND(W, i) (W[(i) & 15] += (s1(W[((i) - 2) & 15]) + W[((i) - 7) & 15] + s0(W[((i) - 15) & 15])))
 
 #define ROUND(a, b, c, d, e, f, g, h, k, data)                \
     do {                                                      \
@@ -230,7 +230,7 @@ std::string GetFileSHA256(const std::wstring& filePath) {
         result = sha256.digest();
     } catch (std::exception& e) {
         result.clear();
-        ASHE_UNEXPECTED_EXCEPTION(e, "Get file sha256 failed");
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
     }
     return result;
 }
@@ -254,7 +254,7 @@ std::string GetDataSHA256(const unsigned char* data, size_t dataSize) {
 
         return sha256.digest();
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, "Get data sha256 failed");
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
         return "";
     }
 }

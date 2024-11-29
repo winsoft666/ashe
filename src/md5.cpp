@@ -2,8 +2,8 @@
 #include "ashe/md5.h"
 #include "ashe/arch.h"
 #include "ashe/byteorder.h"
-#include "ashe/check_failure.h"
 #include "ashe/string_encode.h"
+#include "ashe/logging.h"
 
 namespace ashe {
 
@@ -33,7 +33,7 @@ std::string GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
 
         return szMd5;
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, "Get data md5 failed");
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
         return "";
     }
 }
@@ -72,7 +72,7 @@ std::string GetFileMD5(const std::wstring& file_path) {
 
         return szMd5;
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, "Get file md5 failed");
+         DLOG(LS_FATAL) << "exception occurred: " << e.what();
         return "";
     }
 }

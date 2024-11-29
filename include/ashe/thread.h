@@ -34,7 +34,7 @@ class ASHE_API Thread {
     Thread() = default;
     ~Thread();
 
-    class Delegate {
+    class ASHE_API Delegate {
        public:
         virtual ~Delegate() = default;
 
@@ -108,7 +108,7 @@ class ASHE_API Thread {
 
     MessageLoop* messageLoop_ = nullptr;
 
-    ASHE_DISALLOW_COPY(Thread);
+    ASHE_DISALLOW_COPY_AND_ASSIGN(Thread);
 };
 }  // namespace ashe
 #endif  // ASHE_THREAD_H_

@@ -3,7 +3,7 @@
 #include "ashe/time_util.h"
 #include "ashe/uuid.h"
 #include "ashe/string_encode.h"
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 
 namespace ashe {
 namespace win {
@@ -24,7 +24,7 @@ bool GetPersistentUUID(std::wstring& result) {
         str = std::to_wstring(GetCurrentTimestampByMicroSec());
     }
 
-    ASHE_CHECK_FAILURE(!str.empty(), "create uuid failed");
+    DCHECK(!str.empty());
     if (str.empty()) {
         return false;
     }

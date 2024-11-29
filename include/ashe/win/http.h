@@ -34,7 +34,7 @@ namespace win {
 //
 class ASHE_API Http {
    public:
-    ASHE_DISALLOW_COPY_MOVE(Http);
+    ASHE_DISALLOW_COPY_AND_MOVE(Http);
 
     Http() = default;
 

@@ -1,6 +1,6 @@
 #include "ashe/win/message_window.h"
 #include <atomic>
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 
 namespace ashe {
 namespace win {
@@ -21,7 +21,7 @@ MessageWindow::~MessageWindow() {
 
 bool MessageWindow::create(MessageCallback message_callback) {
     DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
-    ASHE_CHECK_FAILURE(!hwnd_, nullptr);
+    DCHECK(!hwnd_);
 
     message_callback_ = std::move(message_callback);
 
@@ -31,12 +31,12 @@ bool MessageWindow::create(MessageCallback message_callback) {
                                 GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
                             reinterpret_cast<wchar_t*>(&windowProc),
                             &instance)) {
-        ASHE_CHECK_FAILURE(false, "GetModuleHandleExW failed");
+        NOTREACHED();
         return false;
     }
 
     if (!registerWindowClass(instance)) {
-        ASHE_CHECK_FAILURE(false, "Unable to create window class");
+        NOTREACHED();
 
         return false;
     }
@@ -49,7 +49,7 @@ bool MessageWindow::create(MessageCallback message_callback) {
                           instance,
                           this);
     if (!hwnd_) {
-        ASHE_CHECK_FAILURE(false, "CreateWindowW failed");
+        NOTREACHED();
         return false;
     }
 
@@ -79,7 +79,7 @@ LRESULT CALLBACK MessageWindow::windowProc(HWND window, UINT msg, WPARAM wParam,
             SetLastError(ERROR_SUCCESS);
             LONG_PTR result =
                 SetWindowLongPtrW(window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(self));
-            ASHE_CHECK_FAILURE((result != 0 || GetLastError() == ERROR_SUCCESS), nullptr);
+            DCHECK((result != 0 || GetLastError() == ERROR_SUCCESS));
         } break;
 
         // Clear the pointer to stop calling the self once WM_DESTROY is
@@ -87,7 +87,7 @@ LRESULT CALLBACK MessageWindow::windowProc(HWND window, UINT msg, WPARAM wParam,
         case WM_DESTROY: {
             SetLastError(ERROR_SUCCESS);
             LONG_PTR result = SetWindowLongPtrW(window, GWLP_USERDATA, 0);
-            ASHE_CHECK_FAILURE((result != 0 || GetLastError() == ERROR_SUCCESS), nullptr);
+            DCHECK((result != 0 || GetLastError() == ERROR_SUCCESS));
         } break;
 
         default:
@@ -119,7 +119,7 @@ bool MessageWindow::registerWindowClass(HINSTANCE instance) {
     window_class.lpfnWndProc = windowProc;
 
     if (!RegisterClassExW(&window_class)) {
-        ASHE_CHECK_FAILURE(false, "RegisterClassExW failed");
+        NOTREACHED();
         return false;
     }
 

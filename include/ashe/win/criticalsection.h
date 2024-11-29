@@ -41,7 +41,7 @@ class ASHE_API CriticalSection {
     class Private;
     Private* p_ = nullptr;
 
-    ASHE_DISALLOW_COPY_MOVE(CriticalSection);
+    ASHE_DISALLOW_COPY_AND_MOVE(CriticalSection);
 };
 
 class ASHE_API ScopedWinCriticalSection {
@@ -61,7 +61,7 @@ class ASHE_API ScopedWinCriticalSection {
 
    private:
     const CriticalSection* const crit_;
-    ASHE_DISALLOW_COPY_MOVE(ScopedWinCriticalSection);
+    ASHE_DISALLOW_COPY_AND_MOVE(ScopedWinCriticalSection);
 };
 }  // namespace win
 }  // namespace ashe

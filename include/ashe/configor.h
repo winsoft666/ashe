@@ -172,7 +172,7 @@ class ASHE_API Configor {
 
     std::string filePath_;
 
-    ASHE_DISALLOW_COPY_MOVE(Configor);
+    ASHE_DISALLOW_COPY_AND_MOVE(Configor);
 };
 }  // namespace ashe
 #endif  // !ASHE_CONFIGOR_HPP__

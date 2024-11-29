@@ -97,16 +97,26 @@
 #endif  // !ASHE_DISALLOW_MOVE
 
 #ifndef ASHE_DISALLOW_COPY
-#define ASHE_DISALLOW_COPY(TypeName)    \
-    TypeName(const TypeName&) = delete; \
-    TypeName& operator=(const TypeName&) = delete
+#define ASHE_DISALLOW_COPY(TypeName) \
+    TypeName(const TypeName&) = delete;
 #endif  // !ASHE_DISALLOW_COPY
 
-#ifndef ASHE_DISALLOW_COPY_MOVE
-#define ASHE_DISALLOW_COPY_MOVE(TypeName) \
+#ifndef ASHE_DISALLOW_ASSIGN
+#define ASHE_DISALLOW_ASSIGN(TypeName) \
+    TypeName& operator=(const TypeName&) = delete
+#endif  // !ASHE_DISALLOW_ASSIGN
+
+#ifndef ASHE_DISALLOW_COPY_AND_ASSIGN
+#define ASHE_DISALLOW_COPY_AND_ASSIGN(TypeName)  \
+    TypeName(const TypeName&) = delete; \
+    TypeName& operator=(const TypeName&) = delete
+#endif  // !ASHE_DISALLOW_COPY_AND_ASSIGN
+
+#ifndef ASHE_DISALLOW_COPY_AND_MOVE
+#define ASHE_DISALLOW_COPY_AND_MOVE(TypeName) \
     ASHE_DISALLOW_MOVE(TypeName);         \
     ASHE_DISALLOW_COPY(TypeName)
-#endif  // !ASHE_DISALLOW_COPY_MOVE
+#endif  // !ASHE_DISALLOW_COPY_AND_MOVE
 
 #ifndef IS_FLAG_SET
 #define IS_FLAG_SET(var, flag) (((var) & (flag)) == (flag))

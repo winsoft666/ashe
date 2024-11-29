@@ -56,15 +56,14 @@ ASHE_API bool RunAsAdmin(const std::wstring& path, const std::wstring& param, in
 
 ASHE_API bool Is32BitProcess(HANDLE process);
 
-// Require user call free(buf).
-ASHE_API bool GetCurrentExePath(wchar_t** buf);
-
-ASHE_API bool GetCurrentExePath(char** buf);
-
+ASHE_API bool GetCurrentExePath(std::wstring& path);
+ASHE_API bool GetCurrentExePath(std::string& path);
 ASHE_API std::wstring GetCurrentExePathW();
 ASHE_API std::string GetCurrentExePathA();
 
 // End with '\'
+ASHE_API bool GetCurrentExeDirectory(std::wstring& dir);
+ASHE_API bool GetCurrentExeDirectory(std::string& dir);
 ASHE_API std::wstring GetCurrentExeDirectoryW();
 ASHE_API std::string GetCurrentExeDirectoryA();
 

@@ -41,7 +41,7 @@
 namespace ashe {
 class ASHE_API AsyncWorker {
    public:
-    ASHE_DISALLOW_COPY_MOVE(AsyncWorker);
+    ASHE_DISALLOW_COPY_AND_MOVE(AsyncWorker);
 
     AsyncWorker();
     AsyncWorker(const std::string& name);

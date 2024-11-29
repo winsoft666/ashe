@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -17,35 +17,14 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_CONFIG_HPP__
-#define ASHE_CONFIG_HPP__
+#ifndef ASHE_WIN_DLL_MT_WARNING_H_
+#define ASHE_WIN_DLL_MT_WARNING_H_
 #pragma once
 
-#define ASHE_VERSION "@PROJECT_VERSION@"
-
-#ifdef ASHE_STATIC
-#define ASHE_API
-#else
-#if defined(ASHE_EXPORTS)
-#if defined(_MSC_VER)
-#define ASHE_API __declspec(dllexport)
-#else
-#define ASHE_API
-#endif
-#else
-#if defined(_MSC_VER)
-#define ASHE_API __declspec(dllimport)
-#pragma warning(disable: 4251)
-#else
-#define ASHE_API
-#endif
-#endif
-#endif
-
-
 #ifdef _MSC_VER
-#include "ashe/win/dll_mt_warning.h"
+#ifdef ASHE_USE_STATIC_CRT
+#pragma message("Warning: DLL compiled with MT(d) option will cause CRT heap release exception.")
+#endif
 #endif
 
-
-#endif //!ASHE_CONFIG_HPP__
+#endif // !ASHE_WIN_DLL_MT_WARNING_H_

@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #endif  // !ASHE_WIN
 #include "ashe/string_encode.h"
+#include "ashe/logging.h"
 
 namespace ashe {
 
@@ -109,7 +110,7 @@ bool File::flush() {
     return false;
 }
 
-bool File::exist() const {
+bool File::isExist() const {
     if (path_.empty())
         return false;
 #ifdef ASHE_WIN
@@ -249,82 +250,81 @@ size_t File::writeFrom(const void* buffer, size_t needWrite, int64_t from) {
     return written;
 }
 
-size_t File::readAll(void** buffer) {
+bool File::readAll(std::vector<uint8_t>& buffer) {
     std::lock_guard<std::recursive_mutex> lg(mutex_);
-    if (!f_ || !buffer)
-        return 0;
+    if (!f_)
+        return false;
 
 #ifdef ASHE_WIN
     const int64_t curPos = _ftelli64(f_);
     if (curPos == -1L)
-        return 0;
+        return false;
 
     if (_fseeki64(f_, 0L, SEEK_END) != 0)
-        return 0;
+        return false;
 
     const int64_t fileSize = _ftelli64(f_);
     if (_fseeki64(f_, 0, SEEK_SET) != 0)
-        return 0;
+        return false;
 
     size_t read = 0;
-    if (fileSize <= SIZE_MAX) {
-        *buffer = malloc((size_t)fileSize);
-        if (*buffer != nullptr) {
-            read = fread(*buffer, 1, (size_t)fileSize, f_);
-        }
+    try {
+        buffer.resize(fileSize);
+    } catch (std::exception& e) {
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
+        return false;
     }
+    read = fread(buffer.data(), 1, (size_t)fileSize, f_);
 
     _fseeki64(f_, curPos, SEEK_SET);
 
-    return read;
+    return read == fileSize;
 #else
     const int64_t curPos = ftello64(f_);
     if (curPos == -1L)
-        return 0;
+        return false;
 
     if (fseeko64(f_, 0L, SEEK_END) != 0)
-        return 0;
+        return false;
 
     const int64_t fileSize = ftello64(f_);
     if (fseeko64(f_, 0, SEEK_SET) != 0)
-        return 0;
+        return false;
 
     size_t read = 0;
-    if (fileSize <= SIZE_MAX) {
-        *buffer = malloc((size_t)fileSize);
-        if (*buffer != nullptr) {
-            read = fread(*buffer, 1, (size_t)fileSize, f_);
-        }
+    try {
+        buffer.resize(fileSize);
+    } catch (std::exception& e) {
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
+        return false;
     }
+    read = fread(buffer.data(), 1, (size_t)fileSize, f_);
 
     fseeko64(f_, curPos, SEEK_SET);
 
-    return read;
+    return read == fileSize;
 #endif
 }
 
 std::string File::readAll() {
-    std::string ret;
-    void* buffer = nullptr;
-    const size_t read = readAll(&buffer);
-
-    if (buffer) {
-        ret.assign((const char* const)buffer, read);
-        free(buffer);
+    std::vector<uint8_t> buffer;
+    if (!readAll(buffer)) {
+        return std::string();
     }
+
+    std::string ret;
+    ret.assign((const char* const)buffer.data(), buffer.size());
     return ret;
 }
 
 bool File::readAll(std::string& ret) {
-    void* buffer = nullptr;
-    const size_t read = readAll(&buffer);
-
-    if (buffer) {
-        ret.assign((const char* const)buffer, read);
-        free(buffer);
-        return true;
+    std::vector<uint8_t> buffer;
+    if (!readAll(buffer)) {
+        return false;
     }
 
-    return false;
+    ret.clear();
+    ret.assign((const char* const)buffer.data(), buffer.size());
+    return true;
 }
 }  // namespace ashe

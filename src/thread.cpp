@@ -1,6 +1,6 @@
 #include "ashe/thread.h"
 #include "ashe/scoped_object.h"
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 
 namespace ashe {
 Thread::~Thread() {
@@ -8,7 +8,7 @@ Thread::~Thread() {
 }
 
 void Thread::start(MessageLoop::Type messageLoopType, Delegate* delegate) {
-    ASHE_CHECK_FAILURE(!messageLoop_, nullptr);
+    DCHECK(!messageLoop_);
 
     delegate_ = delegate;
     state_ = State::STARTING;
@@ -21,7 +21,7 @@ void Thread::start(MessageLoop::Type messageLoopType, Delegate* delegate) {
 
     state_ = State::STARTED;
 
-    ASHE_CHECK_FAILURE(messageLoop_, nullptr);
+    DCHECK(messageLoop_);
 }
 
 void Thread::stopSoon() {
@@ -47,7 +47,7 @@ void Thread::stop() {
     join();
 
     // The thread should NULL message_loop_ on exit.
-    ASHE_CHECK_FAILURE(!messageLoop_, nullptr);
+    DCHECK(!messageLoop_);
 
     delegate_ = nullptr;
 }
@@ -115,7 +115,7 @@ void Thread::threadMain(MessageLoop::Type message_loop_type) {
 #if defined(ASHE_WIN)
 bool Thread::setPriority(Priority priority) {
     if (!SetThreadPriority(thread_.native_handle(), static_cast<int>(priority))) {
-        ASHE_CHECK_FAILURE(false, "Unable to set thread priority");
+        NOTREACHED();
         return false;
     }
 

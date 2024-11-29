@@ -1,4 +1,4 @@
-#include "ashe/message_loop/task_runner.h"
+#include "ashe/task_runner.h"
 #include "ashe/macros.h"
 
 namespace ashe {
@@ -28,7 +28,7 @@ class DeleteHelper {
     void (*deleter_)(const void*);
     const void* object_;
 
-    ASHE_DISALLOW_COPY(DeleteHelper);
+    ASHE_DISALLOW_COPY_AND_ASSIGN(DeleteHelper);
 };
 }  // namespace
 

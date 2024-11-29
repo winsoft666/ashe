@@ -193,7 +193,7 @@ class ASHE_API Process {
     void async_read() noexcept;
     void close_fds() noexcept;
 
-    ASHE_DISALLOW_COPY_MOVE(Process);
+    ASHE_DISALLOW_COPY_AND_MOVE(Process);
 };
 }  // namespace ashe
 #endif  // !ASHE_PROCESS_HPP__

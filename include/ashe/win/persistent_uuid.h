@@ -21,10 +21,11 @@
 #define ASHE_WIN_PERSISTENT_UUID_H_
 #pragma once
 #include <string>
+#include "ashe/config.h"
 
 namespace ashe {
 namespace win {
-bool GetPersistentUUID(std::wstring& uuid);
+ASHE_API bool GetPersistentUUID(std::wstring& uuid);
 }
 }  // namespace ashe
 

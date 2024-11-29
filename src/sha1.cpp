@@ -1,7 +1,7 @@
 #include "ashe/config.h"
 #include "ashe/sha1.h"
 #include "ashe/file.h"
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 #include <stdio.h>
 #include <cstring>
 
@@ -142,7 +142,7 @@ std::string GetFileSHA1(const std::wstring& filePath) {
         result = szSHA1;
     } catch (std::exception& e) {
         result.clear();
-        ASHE_UNEXPECTED_EXCEPTION(e, "Get file sha1 failed");
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
     }
     return result;
 }
@@ -169,7 +169,7 @@ std::string GetDataSHA1(const unsigned char* data, size_t dataSize) {
 
         return szSHA1;
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, "Get data sha1 failed");
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
         return "";
     }
 }

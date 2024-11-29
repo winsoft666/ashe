@@ -18,7 +18,7 @@
 #include "ashe/macros.h"
 #include "ashe/string_encode.h"
 #include "ashe/path_util.h"
-#include "ashe/check_failure.h"
+#include "ashe/logging.h"
 
 #pragma warning(disable : 4996)
 
@@ -176,40 +176,14 @@ bool Is32BitProcess(HANDLE process) {
     return !IsWin64();
 }
 
-std::wstring GetCurrentExePathW() {
-    wchar_t* buf = nullptr;
-    if (!GetCurrentExePath(&buf)) {
-        return L"";
-    }
-
-    std::wstring result = buf;
-    free(buf);
-
-    return result;
-}
-
-std::string GetCurrentExePathA() {
-    char* buf = nullptr;
-    if (!GetCurrentExePath(&buf)) {
-        return "";
-    }
-
-    std::string result = buf;
-    free(buf);
-
-    return result;
-}
-
-bool GetCurrentExePath(wchar_t** buf) {
-    if (!buf) {
-        return false;
-    }
-
+bool GetCurrentExePath(std::wstring& path) {
     bool result = false;
     wchar_t* pBuf = NULL;
     DWORD dwBufSize = MAX_PATH;
 
     try {
+        path.clear();
+
         do {
             pBuf = (wchar_t*)malloc((dwBufSize + 1) * sizeof(wchar_t));
             if (!pBuf)
@@ -233,76 +207,72 @@ bool GetCurrentExePath(wchar_t** buf) {
         } while (true);
 
         if (result) {
-            *buf = pBuf;
+            path = pBuf;
         }
-        else {
-            if (pBuf) {
-                free(pBuf);
-                pBuf = NULL;
-            }
+
+        if (pBuf) {
+            free(pBuf);
+            pBuf = NULL;
         }
-    }
-    catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, "GetCurrentExePath failed");
-        *buf = NULL;
+    } catch (std::exception& e) {
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
         return false;
     }
 
     return result;
 }
 
-bool GetCurrentExePath(char** buf) {
-    if (!buf) {
+bool GetCurrentExePath(std::string& path) {
+    std::wstring pathW;
+    if (!GetCurrentExePath(pathW)) {
+        NOTREACHED();
         return false;
     }
 
-    bool result = false;
-    char* pBuf = NULL;
-    DWORD dwBufSize = MAX_PATH;
+    path = w2a(pathW);
+    return true;
+}
 
-    do {
-        pBuf = (char*)malloc((dwBufSize + 1) * sizeof(char));
-        if (!pBuf)
-            break;
-        memset(pBuf, 0, (dwBufSize + 1) * sizeof(char));
-
-        DWORD dwGot = GetModuleFileNameA(NULL, pBuf, dwBufSize);
-        if (dwGot == 0) {
-            break;
-        }
-
-        if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-            free(pBuf);
-            dwBufSize *= 2;
-        }
-        else {
-            result = true;
-            break;
-        }
-    } while (true);
-
-    if (result) {
-        *buf = pBuf;
+std::wstring GetCurrentExePathW() {
+    std::wstring path;
+    if (!GetCurrentExePath(path)) {
+        NOTREACHED();
+        return std::wstring();
     }
-    else {
-        if (pBuf) {
-            free(pBuf);
-        }
+    return path;
+}
+
+std::string GetCurrentExePathA() {
+    return w2a(GetCurrentExePathW());
+}
+
+bool GetCurrentExeDirectory(std::wstring& dir) {
+    std::wstring path;
+    if (!GetCurrentExePath(path))
+        return false;
+
+    dir = PathGetDirectory(path, 1);
+    return true;
+}
+
+bool GetCurrentExeDirectory(std::string& dir) {
+    std::wstring dirW;
+    if (!GetCurrentExeDirectory(dirW)) {
+        NOTREACHED();
+        return false;
     }
 
-    return result;
+    dir = w2a(dirW);
+    return true;
 }
 
 std::wstring GetCurrentExeDirectoryW() {
-    wchar_t* buf = nullptr;
-    if (ASHE_CHECK_FAILURE(GetCurrentExePath(&buf), "GetCurrentExePath failed")) {
-        return L"";
+    std::wstring dir;
+    if (!GetCurrentExeDirectory(dir)) {
+        NOTREACHED();
+        return std::wstring();
     }
-
-    std::wstring result = buf;
-    free(buf);
-
-    return PathGetDirectory(result, 1);
+    return dir;
 }
 
 std::string GetCurrentExeDirectoryA() {
@@ -314,15 +284,21 @@ bool IsWow64Process(HANDLE process) {
 
     typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
     HMODULE hDll = GetModuleHandle(TEXT("kernel32"));
-    if (ASHE_CHECK_FAILURE(hDll != NULL, "get kernel32 handle failed"))
+    if (hDll == NULL) {
+        NOTREACHED();
         return false;
+    }
 
     LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(hDll, "IsWow64Process");
-    if (ASHE_CHECK_FAILURE(fnIsWow64Process != NULL, "get IsWow64Process address failed"))
+    if (fnIsWow64Process == NULL) {
+        NOTREACHED();
         return false;
+    }
 
-    if (ASHE_CHECK_FAILURE(!!fnIsWow64Process(process, &bIsWow64), "IsWow64Process failed"))
+    if (!fnIsWow64Process(process, &bIsWow64)) {
+        NOTREACHED();
         return false;
+    }
 
     return !!bIsWow64;
 }
@@ -343,7 +319,8 @@ bool IsX64Process(unsigned long pid) {
 
 bool IsPeX64(LPCWSTR pszModulePath) {
     HMODULE h = GetModuleHandleW(pszModulePath);
-    if (ASHE_CHECK_FAILURE(h, "the module must have been loaded by the calling process."))
+    DCHECK(h) << "the module must have been loaded by the calling process.";
+    if (!h)
         return false;
     return PE_OPT_HEADER((CHAR*)h)->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC;
 }
@@ -628,7 +605,7 @@ std::string GetProcessPathA(pid_t id) {
                 cmdLine = cmdLine.substr(0, pos);
         }
     } catch (std::exception& e) {
-        ASHE_UNEXPECTED_EXCEPTION(e, "GetProcessPathA");
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
     }
     return cmdLine;
 }
