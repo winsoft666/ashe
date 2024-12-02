@@ -96,12 +96,12 @@ enum LoggingDestination {
 // On Windows, use a file next to the exe.
 #if defined(NDEBUG)
     LOG_DEFAULT = LOG_TO_FILE
-#else
+#else   // defined(NDEBUG)
     LOG_DEFAULT = LOG_TO_ALL
-#endif
+#endif  // defined(NDEBUG)
 #elif defined(ASHE_POSIX)
     LOG_DEFAULT = LOG_TO_STDOUT
-#endif
+#endif  // defined(ASHE_WIN)
 };
 
 enum LoggingSeverity {

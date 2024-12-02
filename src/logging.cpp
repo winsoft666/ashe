@@ -31,17 +31,17 @@ const LoggingSeverity kDefaultLogLevel = LOG_LS_FATAL;
 const size_t kDefaultMaxLogFileSize = 2 * 1024 * 1024;  // 2 Mb.
 const size_t kDefaultMaxLogFileAge = 14;                // 14 days.
 
-LoggingSeverity g_min_log_level = LOG_LS_ERROR;
-LoggingDestination g_logging_destination = LOG_DEFAULT;
+LoggingSeverity gMinLogLevel = LOG_LS_ERROR;
+LoggingDestination gLoggingDestination = LOG_DEFAULT;
 
-size_t g_max_log_file_size = kDefaultMaxLogFileSize;
-size_t g_max_log_file_age = kDefaultMaxLogFileAge;
-int g_log_file_number = -1;
+size_t gMaxLogFileSize = kDefaultMaxLogFileSize;
+size_t gMaxLogFileAge = kDefaultMaxLogFileAge;
+int gLogFileNumber = -1;
 
-filesystem::path g_log_dir_path;
-filesystem::path g_log_file_path;
-std::ofstream g_log_file;
-std::mutex g_log_file_lock;
+filesystem::path gLogDirPath;
+filesystem::path gLogFilePath;
+std::ofstream gLogFile;
+std::mutex gLogFileLock;
 
 const char* severityName(LoggingSeverity severity) {
     static const char* const kLogSeverityNames[] = {"I", "E", "F"};
@@ -77,15 +77,15 @@ filesystem::path defaultLogFileDir(const std::string& prefix) {
 }
 
 bool initLoggingUnlocked(const std::string& prefix) {
-    g_log_file.close();
+    gLogFile.close();
 
-    if (!(g_logging_destination & LOG_TO_FILE))
+    if (!(gLoggingDestination & LOG_TO_FILE))
         return true;
 
     // The next log file must have a number higher than the current one.
-    ++g_log_file_number;
+    ++gLogFileNumber;
 
-    filesystem::path file_dir = g_log_dir_path;
+    filesystem::path file_dir = gLogDirPath;
     if (file_dir.empty())
         file_dir = defaultLogFileDir(prefix);
 
@@ -116,24 +116,24 @@ bool initLoggingUnlocked(const std::string& prefix) {
         << '.'
         << std::setw(3) << time.milliseconds
         << '.'
-        << g_log_file_number
+        << gLogFileNumber
         << ".log";
 
     filesystem::path file_path(file_dir);
     file_path.append(file_name_stream.str());
 
-    g_log_file.open(file_path);
-    if (!g_log_file.is_open())
+    gLogFile.open(file_path);
+    if (!gLogFile.is_open())
         return false;
 
-    if (g_max_log_file_age != 0) {
+    if (gMaxLogFileAge != 0) {
         filesystem::file_time_type file_time =
             filesystem::last_write_time(file_path, error_code);
         if (!error_code)
-            removeOldFiles(file_dir, file_time, g_max_log_file_age);
+            removeOldFiles(file_dir, file_time, gMaxLogFileAge);
     }
 
-    g_log_file_path = std::move(file_path);
+    gLogFilePath = std::move(file_path);
     return true;
 }
 
@@ -199,24 +199,24 @@ std::string logFilePrefix() {
 
 bool initLogging(const LoggingSettings& settings) {
     {
-        std::lock_guard<std::mutex> lock(g_log_file_lock);
+        std::lock_guard<std::mutex> lock(gLogFileLock);
 
-        g_logging_destination = settings.destination;
-        g_min_log_level = settings.minLogLevel;
-        g_log_dir_path = settings.logDir;
-        g_max_log_file_size = settings.maxLogFileSize;
-        g_max_log_file_age = settings.maxLogFileAge;
+        gLoggingDestination = settings.destination;
+        gMinLogLevel = settings.minLogLevel;
+        gLogDirPath = settings.logDir;
+        gMaxLogFileSize = settings.maxLogFileSize;
+        gMaxLogFileAge = settings.maxLogFileAge;
 
         if (!initLoggingUnlocked(logFilePrefix()))
             return false;
     }
 
     LOG(LS_INFO) << "Executable file: " << execFilePath();
-    if (g_logging_destination & LOG_TO_FILE) {
+    if (gLoggingDestination & LOG_TO_FILE) {
         // If log output is enabled, then we output information about the file.
-        LOG(LS_INFO) << "Logging file: " << g_log_file_path;
+        LOG(LS_INFO) << "Logging file: " << gLogFilePath;
     }
-    LOG(LS_INFO) << "Logging level: " << g_min_log_level;
+    LOG(LS_INFO) << "Logging level: " << gMinLogLevel;
 #ifdef ASHE_WIN
     LOG(LS_INFO) << "Debugger present: " << (isDebuggerPresent() ? "Yes" : "No");
 #endif
@@ -235,18 +235,18 @@ bool initLogging(const LoggingSettings& settings) {
 void shutdownLogging() {
     LOG(LS_INFO) << "Logging finished";
 
-    std::lock_guard<std::mutex> lock(g_log_file_lock);
-    g_log_file.close();
+    std::lock_guard<std::mutex> lock(gLogFileLock);
+    gLogFile.close();
 }
 
 bool shouldCreateLogMessage(LoggingSeverity severity) {
-    if (severity < g_min_log_level)
+    if (severity < gMinLogLevel)
         return false;
 
     // Return true here unless we know ~LogMessage won't do anything. Note that
     // ~LogMessage writes to stderr if severity_ >= kAlwaysPrintErrorLevel, even
     // when g_logging_destination is LOG_NONE.
-    return g_logging_destination != LOG_NONE || severity >= LOG_LS_ERROR;
+    return gLoggingDestination != LOG_NONE || severity >= LOG_LS_ERROR;
 }
 
 LogMessage::LogMessage(const std::string& file,
@@ -271,7 +271,7 @@ LogMessage::~LogMessage() {
 
     std::string message(stream_.str());
 
-    if ((g_logging_destination & LOG_TO_STDOUT) != 0) {
+    if ((gLoggingDestination & LOG_TO_STDOUT) != 0) {
 #ifdef ASHE_WIN
         win::TraceA(message.data());
 #endif
@@ -287,17 +287,17 @@ LogMessage::~LogMessage() {
     }
 
     // Write to log file.
-    if ((g_logging_destination & LOG_TO_FILE) != 0) {
-        std::lock_guard<std::mutex> lock(g_log_file_lock);
+    if ((gLoggingDestination & LOG_TO_FILE) != 0) {
+        std::lock_guard<std::mutex> lock(gLogFileLock);
 
-        if (static_cast<size_t>(g_log_file.tellp()) >= g_max_log_file_size) {
+        if (static_cast<size_t>(gLogFile.tellp()) >= gMaxLogFileSize) {
             // The maximum size of the log file has been exceeded. Close the current log file and
             // create a new one.
             initLoggingUnlocked(logFilePrefix());
         }
 
-        g_log_file.write(message.c_str(), message.size());
-        g_log_file.flush();
+        gLogFile.write(message.c_str(), message.size());
+        gLogFile.flush();
     }
 
     if (severity_ == LOG_LS_FATAL) {
