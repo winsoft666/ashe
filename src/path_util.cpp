@@ -8,13 +8,11 @@
 #include <shlobj_core.h>
 #include <shellapi.h>
 #include <Shlwapi.h>
-
-#pragma comment(lib, "Shlwapi.lib")
 #else
 #include <unistd.h>
 #endif
 #include "ashe/os_version.h"
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 #include "ashe/string_encode.h"
 #include "ashe/logging.h"
 
@@ -145,28 +143,8 @@ std::wstring GetLocalAppDataFolder() {
     return tempPath;
 }
 
-bool OpenWinExplorerAndLocate(const std::wstring& path) {
-    bool result = false;
-    PIDLIST_ABSOLUTE pidl = ILCreateFromPathW(path.c_str());
-    if (pidl) {
-        result = (S_OK == SHOpenFolderAndSelectItems(pidl, 0, NULL, 0));
-        ILFree(pidl);
-    }
-    return result;
-}
-
-std::wstring GetWinExplorerDisplayName(const std::wstring& path) {
-    SHFILEINFOW sfi;
-    ZeroMemory(&sfi, sizeof(SHFILEINFOW));
-    DWORD_PTR dwRet = ::SHGetFileInfoW(path.c_str(), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFOW), SHGFI_DISPLAYNAME);
-    if (dwRet != 0) {
-        return std::wstring(sfi.szDisplayName);
-    }
-    return std::wstring();
-}
-
 std::string ReplaceKnownEnvToWow6432(const std::string& src) {
-    if (!IsContains(src, "%"))
+    if (!StrIsContains(src, "%"))
         return src;
 
     BOOL isWow64 = FALSE;
@@ -186,7 +164,7 @@ std::string ReplaceKnownEnvToWow6432(const std::string& src) {
 }
 
 std::wstring ReplaceKnownEnvToWow6432(const std::wstring& src) {
-    if (!IsContains(src, L"%"))
+    if (!StrIsContains(src, L"%"))
         return src;
 
     BOOL isWow64 = FALSE;

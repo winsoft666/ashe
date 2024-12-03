@@ -1,7 +1,7 @@
 #include "ashe/config.h"
 #include "ashe/cmd_line_parser.h"
 #include "ashe/arch.h"
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 #include "ashe/string_encode.h"
 
 namespace ashe {
@@ -10,41 +10,40 @@ const wchar_t delims[] = L"-/";
 const wchar_t quotes[] = L"\"";
 const wchar_t value_sep[] = L" :=";  // don't forget space!!
 }  // namespace
-}  // namespace ashe
 
-ashe::CmdLineParser::CmdLineParser(const std::wstring& cmdline) {
+CmdLineParser::CmdLineParser(const std::wstring& cmdline) {
     if (cmdline.length() > 0) {
         cmdline_ = cmdline;
         parse();
     }
 }
 
-ashe::CmdLineParser::CmdLineParser(std::wstring&& cmdline) {
+CmdLineParser::CmdLineParser(std::wstring&& cmdline) {
     if (cmdline.length() > 0) {
         cmdline_ = std::move(cmdline);
         parse();
     }
 }
 
-ashe::CmdLineParser::CmdLineParser(const CmdLineParser& that) {
+CmdLineParser::CmdLineParser(const CmdLineParser& that) {
     cmdline_ = that.cmdline_;
     value_map_ = that.value_map_;
 }
 
-ashe::CmdLineParser::CmdLineParser(CmdLineParser&& that) noexcept {
+CmdLineParser::CmdLineParser(CmdLineParser&& that) noexcept {
     cmdline_ = std::move(that.cmdline_);
     value_map_ = std::move(that.value_map_);
 }
 
-ashe::CmdLineParser::ITERPOS ashe::CmdLineParser::begin() const {
+CmdLineParser::ITERPOS CmdLineParser::begin() const {
     return value_map_.begin();
 }
 
-ashe::CmdLineParser::ITERPOS ashe::CmdLineParser::end() const {
+CmdLineParser::ITERPOS CmdLineParser::end() const {
     return value_map_.end();
 }
 
-bool ashe::CmdLineParser::hasKey(const std::wstring& key) const {
+bool CmdLineParser::hasKey(const std::wstring& key) const {
     ITERPOS it = findKey(key);
 
     if (it == value_map_.end())
@@ -53,7 +52,7 @@ bool ashe::CmdLineParser::hasKey(const std::wstring& key) const {
     return true;
 }
 
-bool ashe::CmdLineParser::hasVal(const std::wstring& key) const {
+bool CmdLineParser::hasVal(const std::wstring& key) const {
     ITERPOS it = findKey(key);
 
     if (it == value_map_.end())
@@ -65,7 +64,7 @@ bool ashe::CmdLineParser::hasVal(const std::wstring& key) const {
     return true;
 }
 
-std::wstring ashe::CmdLineParser::getVal(const std::wstring& key) const {
+std::wstring CmdLineParser::getVal(const std::wstring& key) const {
     ITERPOS it = findKey(key);
 
     if (it == value_map_.end())
@@ -74,11 +73,11 @@ std::wstring ashe::CmdLineParser::getVal(const std::wstring& key) const {
     return it->second;
 }
 
-size_t ashe::CmdLineParser::getKeyCount() const {
+size_t CmdLineParser::getKeyCount() const {
     return value_map_.size();
 }
 
-void ashe::CmdLineParser::parse() {
+void CmdLineParser::parse() {
     value_map_.clear();
 
     std::wstring strW = cmdline_;
@@ -102,7 +101,7 @@ void ashe::CmdLineParser::parse() {
 
         if (sVal == NULL) {
             std::wstring Key(sArg);
-            Key = ToLower(Key);
+            Key = StrToLower(Key);
             value_map_.insert(CmdLineParser::ValsMap::value_type(Key, L""));
             break;
         }
@@ -111,7 +110,7 @@ void ashe::CmdLineParser::parse() {
             std::wstring Key(sArg, (int)(sVal - sArg));
 
             if (Key.length() > 0) {
-                Key = ToLower(Key);
+                Key = StrToLower(Key);
                 value_map_.insert(CmdLineParser::ValsMap::value_type(Key, L""));
             }
 
@@ -121,7 +120,7 @@ void ashe::CmdLineParser::parse() {
         else {
             // key has value
             std::wstring Key(sArg, (int)(sVal - sArg));
-            Key = ToLower(Key);
+            Key = StrToLower(Key);
 
             sVal++;
 
@@ -162,7 +161,8 @@ void ashe::CmdLineParser::parse() {
     }
 }
 
-ashe::CmdLineParser::ITERPOS ashe::CmdLineParser::findKey(const std::wstring& key) const {
-    const std::wstring keyLower = ToLower(key);
+CmdLineParser::ITERPOS CmdLineParser::findKey(const std::wstring& key) const {
+    const std::wstring keyLower = StrToLower(key);
     return value_map_.find(keyLower);
 }
+}  // namespace ashe

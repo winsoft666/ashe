@@ -31,35 +31,35 @@ class ASHE_API Ini {
    public:
     Ini() = default;
 
-    Ini(const std::wstring& file_path);
+    Ini(const std::wstring& filePath);
 
-    Ini(std::wstring&& file_path);
+    Ini(std::wstring&& filePath);
 
     ~Ini() = default;
 
-    void setIniFilePath(const std::wstring& file_path) noexcept;
+    void setIniFilePath(const std::wstring& filePath);
 
-    std::wstring iniFilePath() const noexcept;
+    std::wstring iniFilePath() const;
 
-    bool readInt(const std::wstring& item, const std::wstring& sub_item, unsigned int& result) noexcept;
+    bool readInt(const std::wstring& item, const std::wstring& subItem, unsigned int& result);
 
     unsigned int readIntWithDefault(const std::wstring& item,
                                     const std::wstring& subItem,
-                                    unsigned int defaultValue) noexcept;
+                                    unsigned int defaultValue);
 
     std::wstring readStringWithDefault(const std::wstring& item,
                                        const std::wstring& subItem,
-                                       const std::wstring& defaultValue) noexcept;
+                                       const std::wstring& defaultValue);
 
     bool readString(const std::wstring& item,
                     const std::wstring& subItem,
-                    std::wstring& result) noexcept;
+                    std::wstring& result);
 
-    bool writeInt(const std::wstring& item, const std::wstring& subItem, unsigned int value) noexcept;
+    bool writeInt(const std::wstring& item, const std::wstring& subItem, unsigned int value);
 
     bool writeString(const std::wstring& item,
                      const std::wstring& subItem,
-                     const std::wstring& value) noexcept;
+                     const std::wstring& value);
 
    protected:
     std::wstring iniFilePath_;

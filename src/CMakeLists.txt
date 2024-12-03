@@ -38,16 +38,40 @@ endif()
 
 if(ASHE_BUILD_SHARED_LIBS)
 	if(WIN32)
-		add_library(ashe SHARED ${HEADERS} ${WIN_HEADERS} ${SOURCES} ${WIN_SOURCES} ${MESSAGE_LOOP_HEADERS} ${MESSAGE_LOOP_SOURCES})
+		add_library(ashe SHARED 
+			${HEADERS} 
+			${WIN_HEADERS} 
+			${SOURCES} 
+			${WIN_SOURCES} 
+			${MESSAGE_LOOP_HEADERS} 
+			${MESSAGE_LOOP_SOURCES}
+		)
 	else()
-		add_library(ashe SHARED ${HEADERS} ${SOURCES} ${MESSAGE_LOOP_HEADERS} ${MESSAGE_LOOP_SOURCES})
+		add_library(ashe SHARED 
+			${HEADERS} 
+			${SOURCES} 
+			${MESSAGE_LOOP_HEADERS} 
+			${MESSAGE_LOOP_SOURCES}
+		)
 	endif()
 	target_compile_definitions(ashe PRIVATE ASHE_EXPORTS)
 else()
 	if(WIN32)
-		add_library(ashe STATIC ${HEADERS} ${WIN_HEADERS} ${SOURCES} ${WIN_SOURCES} ${MESSAGE_LOOP_HEADERS} ${MESSAGE_LOOP_SOURCES})
+		add_library(ashe STATIC 
+			${HEADERS} 
+			${WIN_HEADERS} 
+			${SOURCES} 
+			${WIN_SOURCES} 
+			${MESSAGE_LOOP_HEADERS} 
+			${MESSAGE_LOOP_SOURCES}
+		)
 	else()
-		add_library(ashe STATIC ${HEADERS} ${SOURCES} ${MESSAGE_LOOP_HEADERS} ${MESSAGE_LOOP_SOURCES})
+		add_library(ashe STATIC 
+			${HEADERS} 
+			${SOURCES} 
+			${MESSAGE_LOOP_HEADERS} 
+			${MESSAGE_LOOP_SOURCES}
+		)
 	endif()
 
 	target_compile_definitions(ashe PUBLIC ASHE_STATIC)
@@ -78,12 +102,16 @@ if(WIN32)
 	set_target_properties(ashe PROPERTIES COMPILE_FLAGS "/wd4251")
 	target_compile_options(ashe PUBLIC "/Zc:__cplusplus")
 
+	set(WIN_LIBS Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib 
+		Psapi.lib Shlwapi.lib Version.lib taskschd.lib 
+		Shell32.lib wintrust.lib crypt32.lib ole32.lib oleaut32.lib
+		winhttp.lib
+	)
+
 	if(ASHE_BUILD_SHARED_LIBS)
-		target_link_libraries(ashe PRIVATE 
-			Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
+		target_link_libraries(ashe PRIVATE ${WIN_LIBS})
 	else()
-		target_link_libraries(ashe PUBLIC 
-			Ws2_32.lib Iphlpapi.lib Userenv.lib Dbghelp.lib Psapi.lib Shlwapi.lib)
+		target_link_libraries(ashe PUBLIC ${WIN_LIBS})
 	endif()
 endif()
 

@@ -2,10 +2,6 @@
 #include "ashe/ipaddress.h"
 #include "ashe/byteorder.h"
 
-#ifdef ASHE_WIN
-#pragma comment(lib, "ws2_32.lib")
-#endif
-
 ashe::IPAddress::IPAddress() :
     family_(AF_UNSPEC) {
     memset(&u_, 0, sizeof(u_));

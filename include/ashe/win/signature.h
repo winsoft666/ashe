@@ -25,9 +25,6 @@
 #include "ashe/arch.h"
 #include <string>
 
-#pragma comment(lib, "wintrust.lib")
-#pragma comment(lib, "crypt32.lib")
-
 namespace ashe {
 namespace win {
 class ASHE_API Signature {

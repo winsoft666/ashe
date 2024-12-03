@@ -1,5 +1,5 @@
 #include "ashe/config.h"
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 #include "ashe/macros.h"
 #include "ashe/path_util.h"
 #include <algorithm>
@@ -42,7 +42,7 @@ struct EqualA {
 
     bool operator()(char ch1, char ch2) {
         if (caseInsensitive_)
-            return ToUpper(ch1) == ToUpper(ch2);
+            return StrToUpper(ch1) == StrToUpper(ch2);
         return ch1 == ch2;
     }
 
@@ -57,7 +57,7 @@ struct EqualW {
 
     bool operator()(wchar_t ch1, wchar_t ch2) {
         if (caseInsensitive_)
-            return ToUpper(ch1) == ToUpper(ch2);
+            return StrToUpper(ch1) == StrToUpper(ch2);
         return ch1 == ch2;
     }
 
@@ -65,84 +65,84 @@ struct EqualW {
     bool caseInsensitive_ = false;
 };
 }  // namespace stringhelper_detail
-char ToLower(const char& in) {
+char StrToLower(const char& in) {
     if (in <= 'Z' && in >= 'A')
         return in - ('Z' - 'z');
     return in;
 }
 
-char ToUpper(const char& in) {
+char StrToUpper(const char& in) {
     if (in <= 'z' && in >= 'a')
         return in + ('Z' - 'z');
     return in;
 }
 
-wchar_t ToLower(const wchar_t& in) {
+wchar_t StrToLower(const wchar_t& in) {
     if (in <= 'Z' && in >= 'A')
         return in - (L'Z' - L'z');
     return in;
 }
 
-wchar_t ToUpper(const wchar_t& in) {
+wchar_t StrToUpper(const wchar_t& in) {
     if (in <= L'z' && in >= L'a')
         return in + (L'Z' - L'z');
     return in;
 }
 
-std::string ToLower(const std::string& s) {
+std::string StrToLower(const std::string& s) {
     std::string d = s;
-    char (*pf)(const char&) = ToLower;
+    char (*pf)(const char&) = StrToLower;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-std::wstring ToLower(const std::wstring& s) {
+std::wstring StrToLower(const std::wstring& s) {
     std::wstring d = s;
-    wchar_t (*pf)(const wchar_t&) = ToLower;
+    wchar_t (*pf)(const wchar_t&) = StrToLower;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-std::string ToUpper(const std::string& s) {
+std::string StrToUpper(const std::string& s) {
     std::string d = s;
-    char (*pf)(const char&) = ToUpper;
+    char (*pf)(const char&) = StrToUpper;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-std::wstring ToUpper(const std::wstring& s) {
+std::wstring StrToUpper(const std::wstring& s) {
     std::wstring d = s;
-    wchar_t (*pf)(const wchar_t&) = ToUpper;
+    wchar_t (*pf)(const wchar_t&) = StrToUpper;
     std::transform(d.begin(), d.end(), d.begin(), pf);
     return d;
 }
 
-bool IsDigit(const std::string& s) {
+bool StrIsDigit(const std::string& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
 
-bool IsDigit(const std::wstring& s) {
+bool StrIsDigit(const std::wstring& s) {
     return !s.empty() &&
            std::find_if(s.begin(), s.end(), [](wchar_t c) { return !std::iswdigit(c); }) == s.end();
 }
 
-bool IsLetterOrDigit(const char& c) {
+bool StrIsLetterOrDigit(const char& c) {
     return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-bool IsLetterOrDigit(const wchar_t& c) {
+bool StrIsLetterOrDigit(const wchar_t& c) {
     return (c >= L'0' && c <= L'9') || (c >= L'a' && c <= L'z') || (c >= L'A' && c <= L'Z');
 }
 
-bool IsLetterOrDigit(const std::string& s) {
+bool StrIsLetterOrDigit(const std::string& s) {
     return !s.empty() &&
-           std::find_if(s.begin(), s.end(), [](char c) { return !IsLetterOrDigit(c); }) == s.end();
+           std::find_if(s.begin(), s.end(), [](char c) { return !StrIsLetterOrDigit(c); }) == s.end();
 }
 
-bool IsLetterOrDigit(const std::wstring& s) {
+bool StrIsLetterOrDigit(const std::wstring& s) {
     return !s.empty() &&
-           std::find_if(s.begin(), s.end(), [](wchar_t c) { return !IsLetterOrDigit(c); }) == s.end();
+           std::find_if(s.begin(), s.end(), [](wchar_t c) { return !StrIsLetterOrDigit(c); }) == s.end();
 }
 
 std::string StrTrim(const std::string& s, const std::string& whitespaces) {
@@ -201,33 +201,33 @@ std::wstring StrTrimRight(const std::wstring& s, const std::wstring& whitespaces
     return s.substr(0, pos + 1);
 }
 
-bool IsStartsWith(const std::string& s, const std::string& prefix) {
+bool StrIsStartsWith(const std::string& s, const std::string& prefix) {
     return s.compare(0, prefix.length(), prefix) == 0;
 }
 
-bool IsStartsWith(const std::wstring& s, const std::wstring& prefix) {
+bool StrIsStartsWith(const std::wstring& s, const std::wstring& prefix) {
     return s.compare(0, prefix.length(), prefix) == 0;
 }
 
-bool IsEndsWith(const std::string& s, const std::string& suffix) {
+bool StrIsEndsWith(const std::string& s, const std::string& suffix) {
     if (suffix.length() <= s.length()) {
         return s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0;
     }
     return false;
 }
 
-bool IsEndsWith(const std::wstring& s, const std::wstring& suffix) {
+bool StrIsEndsWith(const std::wstring& s, const std::wstring& suffix) {
     if (suffix.length() <= s.length()) {
         return s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0;
     }
     return false;
 }
 
-bool IsContains(const std::string& str, const std::string& substring) {
+bool StrIsContains(const std::string& str, const std::string& substring) {
     return (str.find(substring) != std::string::npos);
 }
 
-bool IsContains(const std::wstring& str, const std::wstring& substring) {
+bool StrIsContains(const std::wstring& str, const std::wstring& substring) {
     return (str.find(substring) != std::wstring::npos);
 }
 
@@ -463,14 +463,14 @@ std::wstring StrJoin(const std::vector<std::wstring>& src, const std::wstring& d
     return ss.str();
 }
 
-bool IsEqual(const std::string& s1, const std::string& s2, bool ignoreCase) {
+bool StrIsEqual(const std::string& s1, const std::string& s2, bool ignoreCase) {
     const std::string::size_type s1_len = s1.length();
     if (s1_len != s2.length())
         return false;
 
     for (std::string::size_type i = 0; i < s1_len; i++) {
         if (ignoreCase) {
-            if (ToLower(s1[i]) != ToLower(s2[i]))
+            if (StrToLower(s1[i]) != StrToLower(s2[i]))
                 return false;
         }
         else {
@@ -482,14 +482,14 @@ bool IsEqual(const std::string& s1, const std::string& s2, bool ignoreCase) {
     return true;
 }
 
-bool IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase) {
+bool StrIsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase) {
     const std::wstring::size_type s1_len = s1.length();
     if (s1_len != s2.length())
         return false;
 
     for (std::wstring::size_type i = 0; i < s1_len; i++) {
         if (ignoreCase) {
-            if (ToLower(s1[i]) != ToLower(s2[i]))
+            if (StrToLower(s1[i]) != StrToLower(s2[i]))
                 return false;
         }
         else {
@@ -719,9 +719,9 @@ std::wstring StrFormat(const wchar_t* format, va_list argList) noexcept {
 }
 
 #ifdef ASHE_WIN
-bool IsResourceString(const std::wstring& s) {
+bool StrIsResourceString(const std::wstring& s) {
     std::wstring s2 = StrTrim(s, L" \"");
-    return IsStartsWith(s2, L"@");
+    return StrIsStartsWith(s2, L"@");
 }
 
 bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
@@ -753,7 +753,7 @@ bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
         return false;
     }
 
-    if (IsStartsWith(v[1], L"-"))
+    if (StrIsStartsWith(v[1], L"-"))
         v[1] = v[1].substr(1);
 
     UINT id = _wtoi(v[1].c_str());
@@ -771,7 +771,7 @@ bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result) {
     return true;
 }
 
-std::wstring Win32ErrCodeToStr(unsigned long err) {
+std::wstring StrFromWin32ErrCode(unsigned long err) {
     std::wstring result;
     LPWSTR buffer = NULL;
     DWORD dwRet = FormatMessageW(

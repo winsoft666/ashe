@@ -11,7 +11,7 @@
 #include <Windows.h>
 #endif
 #include <strsafe.h>
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 
 namespace ashe {
 namespace win {

@@ -2,7 +2,7 @@
 #include "ashe/win/shellink_parser.h"
 #include "ashe/scoped_object.h"
 #include "ashe/string_encode.h"
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 #include "ashe/path_util.h"
 #include "ashe/macros.h"
 #include "ashe/byteorder.h"

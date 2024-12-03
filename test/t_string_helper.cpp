@@ -1,31 +1,31 @@
 #include "catch.hpp"
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 
 using namespace ashe;
 
 // Test: string operate.
 //
 TEST_CASE("StringHelperTest1") {
-    REQUIRE(ToLower('c') == 'c');
-    REQUIRE(ToLower('C') == 'c');
-    REQUIRE(ToUpper('A') == 'A');
-    REQUIRE(ToUpper('a') == 'A');
-    REQUIRE(ToLower(L'c') == L'c');
-    REQUIRE(ToLower(L'C') == L'c');
-    REQUIRE(ToUpper(L'A') == L'A');
-    REQUIRE(ToUpper(L'a') == L'A');
-    REQUIRE(ToLower("1234567890abcdefABCDEF#@!%%") == "1234567890abcdefabcdef#@!%%");
-    REQUIRE(ToLower(L"1234567890abcdefABCDEF#@!%%") == L"1234567890abcdefabcdef#@!%%");
-    REQUIRE(ToUpper("1234567890abcdefABCDEF#@!%%") == "1234567890ABCDEFABCDEF#@!%%");
-    REQUIRE(ToUpper(L"1234567890abcdefABCDEF#@!%%") == L"1234567890ABCDEFABCDEF#@!%%");
+    REQUIRE(StrToLower('c') == 'c');
+    REQUIRE(StrToLower('C') == 'c');
+    REQUIRE(StrToUpper('A') == 'A');
+    REQUIRE(StrToUpper('a') == 'A');
+    REQUIRE(StrToLower(L'c') == L'c');
+    REQUIRE(StrToLower(L'C') == L'c');
+    REQUIRE(StrToUpper(L'A') == L'A');
+    REQUIRE(StrToUpper(L'a') == L'A');
+    REQUIRE(StrToLower("1234567890abcdefABCDEF#@!%%") == "1234567890abcdefabcdef#@!%%");
+    REQUIRE(StrToLower(L"1234567890abcdefABCDEF#@!%%") == L"1234567890abcdefabcdef#@!%%");
+    REQUIRE(StrToUpper("1234567890abcdefABCDEF#@!%%") == "1234567890ABCDEFABCDEF#@!%%");
+    REQUIRE(StrToUpper(L"1234567890abcdefABCDEF#@!%%") == L"1234567890ABCDEFABCDEF#@!%%");
 
-    REQUIRE(IsDigit("3.14") == false);
-    REQUIRE(IsDigit("3a12") == false);
-    REQUIRE(IsDigit("134") == true);
+    REQUIRE(StrIsDigit("3.14") == false);
+    REQUIRE(StrIsDigit("3a12") == false);
+    REQUIRE(StrIsDigit("134") == true);
 
-    REQUIRE(IsDigit(L"3.14") == false);
-    REQUIRE(IsDigit(L"3a12") == false);
-    REQUIRE(IsDigit(L"134") == true);
+    REQUIRE(StrIsDigit(L"3.14") == false);
+    REQUIRE(StrIsDigit(L"3a12") == false);
+    REQUIRE(StrIsDigit(L"134") == true);
 
     REQUIRE(StrTrim("\r\f erase\n\t white-spaces   \n") == "erase\n\t white-spaces");
     REQUIRE(StrTrim(L"\r\f erase\n\t white-spaces   \n") == L"erase\n\t white-spaces");
@@ -37,18 +37,18 @@ TEST_CASE("StringHelperTest1") {
     REQUIRE(StrTrim("\r\f erase\n\t white-spaces   \n", "") == "\r\f erase\n\t white-spaces   \n");
     REQUIRE(StrTrim("\r\f erase\n\t white-spaces   \n", "\r\f") == " erase\n\t white-spaces   \n");
 
-    REQUIRE(IsEqual("abcdefgxyz123#~/", "abcdefgxyz123#~/", false));
-    REQUIRE(!IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", false));
-    REQUIRE(IsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", true));
+    REQUIRE(StrIsEqual("abcdefgxyz123#~/", "abcdefgxyz123#~/", false));
+    REQUIRE(!StrIsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", false));
+    REQUIRE(StrIsEqual("abcdefgxyz123#~/", "abcdefgxyZ123#~/", true));
 
-    REQUIRE(IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyz123#~/", false));
-    REQUIRE(!IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", false));
-    REQUIRE(IsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", true));
+    REQUIRE(StrIsEqual(L"abcdefgxyz123#~/", L"abcdefgxyz123#~/", false));
+    REQUIRE(!StrIsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", false));
+    REQUIRE(StrIsEqual(L"abcdefgxyz123#~/", L"abcdefgxyZ123#~/", true));
 
-    REQUIRE(IsStartsWith("1234567890abcdef#@!%%", "1234567890"));
-    REQUIRE(IsStartsWith(L"1234567890abcdef#@!%%", L"1234567890"));
-    REQUIRE(!IsStartsWith("1234567890abcdef#@!%%", "abcdefg"));
-    REQUIRE(!IsStartsWith(L"1234567890abcdef#@!%%", L"abcdefg"));
+    REQUIRE(StrIsStartsWith("1234567890abcdef#@!%%", "1234567890"));
+    REQUIRE(StrIsStartsWith(L"1234567890abcdef#@!%%", L"1234567890"));
+    REQUIRE(!StrIsStartsWith("1234567890abcdef#@!%%", "abcdefg"));
+    REQUIRE(!StrIsStartsWith(L"1234567890abcdef#@!%%", L"abcdefg"));
 
     REQUIRE(StrContainTimes("123456712", "12") == 2);
     REQUIRE(StrContainTimes(L"123456712", L"12") == 2);

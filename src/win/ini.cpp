@@ -16,29 +16,28 @@
 
 namespace ashe {
 namespace win {
-Ini::Ini(const std::wstring& file_path) :
-    iniFilePath_(file_path) {
+Ini::Ini(const std::wstring& filePath) :
+    iniFilePath_(filePath) {
 }
 
-Ini::Ini(std::wstring&& file_path) :
-    iniFilePath_(std::move(file_path)) {
+Ini::Ini(std::wstring&& filePath) :
+    iniFilePath_(std::move(filePath)) {
 }
 
-void Ini::setIniFilePath(const std::wstring& file_path) noexcept {
-    iniFilePath_ = file_path;
+void Ini::setIniFilePath(const std::wstring& filePath) {
+    iniFilePath_ = filePath;
 }
 
-std::wstring Ini::iniFilePath() const noexcept {
+std::wstring Ini::iniFilePath() const {
     return iniFilePath_;
 }
 
-bool Ini::readInt(const std::wstring& item, const std::wstring& sub_item, unsigned int& result) noexcept {
+bool Ini::readInt(const std::wstring& item, const std::wstring& subItem, unsigned int& result) {
     if (iniFilePath_.length() == 0)
         return false;
     INT iDefault = 0;
     SetLastError(0);
-    UINT ret =
-        GetPrivateProfileIntW(item.c_str(), sub_item.c_str(), iDefault, iniFilePath_.c_str());
+    UINT ret = GetPrivateProfileIntW(item.c_str(), subItem.c_str(), iDefault, iniFilePath_.c_str());
     DWORD dwGLE = GetLastError();
     if (dwGLE == 0) {
         result = ret;
@@ -48,8 +47,8 @@ bool Ini::readInt(const std::wstring& item, const std::wstring& sub_item, unsign
 }
 
 unsigned int Ini::readIntWithDefault(const std::wstring& item,
-                                        const std::wstring& subItem,
-                                        unsigned int defaultValue) noexcept {
+                                     const std::wstring& subItem,
+                                     unsigned int defaultValue) {
     if (iniFilePath_.length() == 0)
         return defaultValue;
 
@@ -59,8 +58,8 @@ unsigned int Ini::readIntWithDefault(const std::wstring& item,
 }
 
 std::wstring Ini::readStringWithDefault(const std::wstring& item,
-                                           const std::wstring& subItem,
-                                           const std::wstring& defaultValue) noexcept {
+                                        const std::wstring& subItem,
+                                        const std::wstring& defaultValue) {
     std::wstring result;
     if (!readString(item, subItem, result)) {
         result = defaultValue;
@@ -70,8 +69,8 @@ std::wstring Ini::readStringWithDefault(const std::wstring& item,
 }
 
 bool Ini::readString(const std::wstring& item,
-                        const std::wstring& subItem,
-                        std::wstring& result) noexcept {
+                     const std::wstring& subItem,
+                     std::wstring& result) {
     if (iniFilePath_.length() == 0)
         return false;
 
@@ -111,7 +110,7 @@ bool Ini::readString(const std::wstring& item,
     return ret;
 }
 
-bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsigned int value) noexcept {
+bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsigned int value) {
     if (iniFilePath_.length() == 0)
         return false;
 
@@ -121,8 +120,8 @@ bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsig
 }
 
 bool Ini::writeString(const std::wstring& item,
-                         const std::wstring& sub_item,
-                         const std::wstring& value) noexcept {
+                      const std::wstring& sub_item,
+                      const std::wstring& value) {
     if (iniFilePath_.length() == 0)
         return false;
 

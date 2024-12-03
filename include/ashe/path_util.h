@@ -45,10 +45,6 @@ ASHE_API std::wstring GetProgramFilesFolder();
 
 ASHE_API std::wstring GetLocalAppDataFolder();
 
-ASHE_API bool OpenWinExplorerAndLocate(const std::wstring& path);
-
-ASHE_API std::wstring GetWinExplorerDisplayName(const std::wstring& path);
-
 ASHE_API std::string ReplaceKnownEnvToWow6432(const std::string& src);
 ASHE_API std::wstring ReplaceKnownEnvToWow6432(const std::wstring& src);
 

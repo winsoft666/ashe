@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <ctime>
 #endif
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 
 namespace ashe {
 #ifndef ASHE_WIN

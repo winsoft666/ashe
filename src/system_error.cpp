@@ -1,5 +1,5 @@
 #include "ashe/system_error.h"
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 
 #ifdef ASHE_WIN
 #include "ashe/win/windows_lite.h"

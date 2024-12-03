@@ -27,7 +27,7 @@
 
 namespace ashe {
 namespace win {
-class ASHE_API ServiceHelper {
+class ASHE_API ServiceUtil {
    public:
     //
     //   FUNCTION: InstallService

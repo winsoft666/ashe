@@ -17,8 +17,8 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_WIN_HWND_HPP_
-#define ASHE_WIN_HWND_HPP_
+#ifndef ASHE_WIN_HWND_UTIL_HPP_
+#define ASHE_WIN_HWND_UTIL_HPP_
 #pragma once
 
 #include "ashe/config.h"
@@ -26,9 +26,8 @@
 #include "ashe/win/windows_lite.h"
 
 namespace ashe {
-class ASHE_API HwndHelper {
-   public:
-    static bool BelongToSameProcess(HWND hwndA, HWND hwndB);
-};
+namespace win {
+ASHE_API bool HwndBelongToSameProcess(HWND hwndA, HWND hwndB);
+}
 }  // namespace ashe
-#endif  // !ASHE_WIN_HWND_HPP_
+#endif  // !ASHE_WIN_HWND_UTIL_HPP_

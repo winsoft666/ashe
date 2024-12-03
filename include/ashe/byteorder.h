@@ -35,10 +35,6 @@
 #include <libkern/OSByteOrder.h>
 #endif
 
-#ifdef ASHE_WIN
-#pragma comment(lib, "ws2_32.lib")
-#endif
-
 namespace ashe {
 #ifdef ASHE_WIN
 #define htobe16(v) htons(v)

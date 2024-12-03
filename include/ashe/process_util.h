@@ -34,9 +34,6 @@
 #endif  // !_WINSOCKAPI_
 #include <Windows.h>
 #endif  // !_INC_WINDOWS
-
-#pragma comment(lib, "Shlwapi.lib")
-#pragma comment(lib, "Psapi.lib")
 #endif
 
 namespace ashe {

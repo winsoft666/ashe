@@ -12,7 +12,7 @@ Version::Version(const std::string& s) {
                        std::find_if(v.begin(),
                                     v.end(),
                                     [](const std::string& c) {
-                                        return !IsDigit(c);
+                                        return !StrIsDigit(c);
                                     }) == v.end();
     if (valid) {
         for (const auto& c : v) {
@@ -28,7 +28,7 @@ Version::Version(const std::wstring& s) {
                        std::find_if(v.begin(),
                                     v.end(),
                                     [](const std::wstring& c) {
-                                        return !IsDigit(c);
+                                        return !StrIsDigit(c);
                                     }) == v.end();
     if (valid) {
         for (const auto& c : v) {

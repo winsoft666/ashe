@@ -32,14 +32,12 @@
 #include <string>
 #include "ashe/time_util.h"
 
-#pragma comment(lib, "Version.lib")
-
 namespace ashe {
 namespace win {
 class ASHE_API FileProperty {
    public:
     FileProperty();
-    ~FileProperty();
+    ~FileProperty() = default;
 
     bool open(HMODULE hModule = NULL);
     bool open(const std::wstring& strFileName);

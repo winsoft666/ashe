@@ -10,7 +10,7 @@ static const UINT kMsgHaveWork = WM_USER + 1;
 
 //--------------------------------------------------------------------------------------------------
 MessagePumpForWin::MessagePumpForWin() {
-    bool succeeded = message_window_.create(
+    bool succeeded = messageWindow_.create(
         std::bind(&MessagePumpForWin::onMessage,
                   this,
                   std::placeholders::_1, std::placeholders::_2,
@@ -30,11 +30,11 @@ void MessagePumpForWin::quit() {
 }
 
 void MessagePumpForWin::scheduleWork() {
-    if (InterlockedExchange(&work_state_, HAVE_WORK) != READY)
+    if (InterlockedExchange(&workState_, HAVE_WORK) != READY)
         return;  // Someone else continued the pumping.
 
     // Make sure the MessagePump does some work for us.
-    BOOL ret = PostMessageW(message_window_.hwnd(), kMsgHaveWork, 0, 0);
+    BOOL ret = PostMessageW(messageWindow_.hwnd(), kMsgHaveWork, 0, 0);
     if (ret)
         return;  // There was room in the Window Message queue.
 
@@ -46,7 +46,7 @@ void MessagePumpForWin::scheduleWork() {
     // full, of about 2000 messages), so we'll do a near-graceful recovery.  Nested loops are
     // pretty transient (we think), so this will probably be recoverable.
     // Clarify that we didn't really insert.
-    InterlockedExchange(&work_state_, READY);
+    InterlockedExchange(&workState_, READY);
 }
 
 void MessagePumpForWin::scheduleDelayedWork(const TimePoint& delayed_work_time) {
@@ -64,7 +64,7 @@ void MessagePumpForWin::scheduleDelayedWork(const TimePoint& delayed_work_time) 
     // We use a single SetTimer corresponding to the timer that will expire soonest. As new timers
     // are created and destroyed, we update SetTimer. Getting a spurrious SetTimer event firing is
     // benign, as we'll just be processing an empty timer queue.
-    delayed_work_time_ = delayed_work_time;
+    delayedWorkTime_ = delayed_work_time;
 
     int delay_msec = currentDelay();
     DCHECK(delay_msec > 0);
@@ -73,7 +73,7 @@ void MessagePumpForWin::scheduleDelayedWork(const TimePoint& delayed_work_time) 
 
     // Create a WM_TIMER event that will wake us up to check for any pending timers (in case we are
     // running within a nested, external sub-pump).
-    SetTimer(message_window_.hwnd(),
+    SetTimer(messageWindow_.hwnd(),
              reinterpret_cast<UINT_PTR>(this),
              static_cast<UINT>(delay_msec),
              nullptr);
@@ -145,14 +145,14 @@ void MessagePumpForWin::doRunLoop() {
         if (state_->should_quit)
             break;
 
-        more_work_is_plausible |= state_->delegate->doDelayedWork(&delayed_work_time_);
+        more_work_is_plausible |= state_->delegate->doDelayedWork(&delayedWorkTime_);
 
         // If we did not process any delayed work, then we can assume that our existing WM_TIMER if
         // any will fire when delayed work should run. We don't want to disturb that timer if it is
         // already in flight. However, if we did do all remaining delayed work, then lets kill the
         // WM_TIMER.
-        if (more_work_is_plausible && delayed_work_time_ == TimePoint()) {
-            KillTimer(message_window_.hwnd(), reinterpret_cast<UINT_PTR>(this));
+        if (more_work_is_plausible && delayedWorkTime_ == TimePoint()) {
+            KillTimer(messageWindow_.hwnd(), reinterpret_cast<UINT_PTR>(this));
         }
 
         if (state_->should_quit)
@@ -213,7 +213,7 @@ void MessagePumpForWin::handleWorkMessage() {
     // could correspond to a MessageBox call or something of that sort.
     if (!state_) {
         // Since we handled a kMsgHaveWork message, we must still update this flag.
-        InterlockedExchange(&work_state_, READY);
+        InterlockedExchange(&workState_, READY);
         return;
     }
 
@@ -229,17 +229,17 @@ void MessagePumpForWin::handleWorkMessage() {
 }
 
 void MessagePumpForWin::handleTimerMessage() {
-    KillTimer(message_window_.hwnd(), reinterpret_cast<UINT_PTR>(this));
+    KillTimer(messageWindow_.hwnd(), reinterpret_cast<UINT_PTR>(this));
 
     // If we are being called outside of the context of Run, then don't do anything. This could
     // correspond to a MessageBox call or something of that sort.
     if (!state_)
         return;
 
-    state_->delegate->doDelayedWork(&delayed_work_time_);
-    if (delayed_work_time_ != TimePoint()) {
+    state_->delegate->doDelayedWork(&delayedWorkTime_);
+    if (delayedWorkTime_ != TimePoint()) {
         // A bit gratuitous to set delayed_work_time_ again, but oh well.
-        scheduleDelayedWork(delayed_work_time_);
+        scheduleDelayedWork(delayedWorkTime_);
     }
 }
 
@@ -272,7 +272,7 @@ bool MessagePumpForWin::processMessageHelper(const MSG& msg) {
     }
 
     // While running our main message pump, we discard kMsgHaveWork messages.
-    if (msg.message == kMsgHaveWork && msg.hwnd == message_window_.hwnd())
+    if (msg.message == kMsgHaveWork && msg.hwnd == messageWindow_.hwnd())
         return processPumpReplacementMessage();
 
     if (state_->dispatcher) {
@@ -301,10 +301,10 @@ bool MessagePumpForWin::processPumpReplacementMessage() {
     const bool have_message = (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE) != FALSE);
 
     // Expect no message or a message different than kMsgHaveWork.
-    DCHECK((!have_message || kMsgHaveWork != msg.message || msg.hwnd != message_window_.hwnd()));
+    DCHECK((!have_message || kMsgHaveWork != msg.message || msg.hwnd != messageWindow_.hwnd()));
 
     // Since we discarded a kMsgHaveWork message, we must update the flag.
-    int old_have_work = InterlockedExchange(&work_state_, READY);
+    int old_have_work = InterlockedExchange(&workState_, READY);
     DCHECK(old_have_work);
 
     // We don't need a special time slice if we didn't have_message to process.
@@ -321,14 +321,14 @@ bool MessagePumpForWin::processPumpReplacementMessage() {
 }
 
 int MessagePumpForWin::currentDelay() const {
-    if (delayed_work_time_ == TimePoint())
+    if (delayedWorkTime_ == TimePoint())
         return -1;
 
     // Be careful here. TimeDelta has a precision of microseconds, but we want
     // a value in milliseconds. If there are 5.5ms left, should the delay be 5
     // or 6?  It should be 6 to avoid executing delayed work too early.
     int64_t timeout = std::chrono::duration_cast<Milliseconds>(
-                          delayed_work_time_ - Clock::now())
+                          delayedWorkTime_ - Clock::now())
                           .count();
 
     // If this value is negative, then we need to run delayed work soon.

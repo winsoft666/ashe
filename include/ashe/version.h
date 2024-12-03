@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 
 namespace ashe {
 class ASHE_API Version {

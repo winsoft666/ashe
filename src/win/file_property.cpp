@@ -9,13 +9,11 @@ FileProperty::FileProperty() {
     reset();
 }
 
-FileProperty::~FileProperty() {}
-
 bool FileProperty::getTranslationId(LPVOID lpData,
-                                       UINT unBlockSize,
-                                       WORD wLangId,
-                                       DWORD& dwId,
-                                       BOOL bPrimaryEnough /*= FALSE*/) {
+                                    UINT unBlockSize,
+                                    WORD wLangId,
+                                    DWORD& dwId,
+                                    BOOL bPrimaryEnough /*= FALSE*/) {
     LPWORD lpwData;
 
     for (lpwData = (LPWORD)lpData; (LPBYTE)lpwData < ((LPBYTE)lpData) + unBlockSize; lpwData += 2) {

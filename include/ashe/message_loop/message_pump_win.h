@@ -27,6 +27,7 @@
 #include "ashe/message_loop/message_pump.h"
 #include "ashe/message_loop/message_pump_dispatcher.h"
 #include "ashe/win/message_window.h"
+#include "message_loop.h"
 
 namespace ashe {
 class ASHE_API MessagePumpForWin final : public MessagePump {
@@ -71,15 +72,15 @@ class ASHE_API MessagePumpForWin final : public MessagePump {
     bool processPumpReplacementMessage();
     int currentDelay() const;
 
-    win::MessageWindow message_window_;
+    win::MessageWindow messageWindow_;
 
     // The time at which delayed work should run.
-    TimePoint delayed_work_time_;
+    TimePoint delayedWorkTime_;
 
     // A value used to indicate if there is a kMsgDoWork message pending in the Windows Message
     // queue. There is at most one such message, and it can drive execution of tasks when a native
     // message pump is running.
-    LONG work_state_ = READY;
+    LONG workState_ = READY;
 
     // State for the current invocation of Run.
     RunState* state_ = nullptr;

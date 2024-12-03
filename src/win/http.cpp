@@ -11,8 +11,7 @@
 #endif  // !_INC_WINDOWS
 #include <winhttp.h>
 #include <Intsafe.h>
-#pragma comment(lib, "winhttp")
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 #include "ashe/file.h"
 
 namespace ashe {

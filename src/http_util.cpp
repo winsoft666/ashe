@@ -1,7 +1,7 @@
 #include "ashe/config.h"
 #include "ashe/http_util.h"
 #include <string.h>
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 
 namespace ashe {
 HttpReqDatagram::METHOD HttpReqDatagram::method() const {
@@ -107,7 +107,7 @@ std::string HttpRspDatagram::saveFilePath() const {
 }
 
 bool HttpUtil::IsHttps(const std::string& url) {
-    if (ashe::ToLower(url.substr(0, 6)) == "https:")
+    if (ashe::StrToLower(url.substr(0, 6)) == "https:")
         return true;
     return false;
 }

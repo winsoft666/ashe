@@ -17,34 +17,36 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef ASHE_STRING_HELPER_HPP__
-#define ASHE_STRING_HELPER_HPP__
+#ifndef ASHE_STRING_UTIL_HPP__
+#define ASHE_STRING_UTIL_HPP__
+#pragma once
+
 #include "ashe/config.h"
 #include "ashe/arch.h"
 #include <string>
 #include <vector>
 
 namespace ashe {
-ASHE_API char ToLower(const char& in);
-ASHE_API char ToUpper(const char& in);
+ASHE_API char StrToLower(const char& in);
+ASHE_API char StrToUpper(const char& in);
 
-ASHE_API wchar_t ToLower(const wchar_t& in);
-ASHE_API wchar_t ToUpper(const wchar_t& in);
+ASHE_API wchar_t StrToLower(const wchar_t& in);
+ASHE_API wchar_t StrToUpper(const wchar_t& in);
 
-ASHE_API std::string ToLower(const std::string& s);
-ASHE_API std::wstring ToLower(const std::wstring& s);
+ASHE_API std::string StrToLower(const std::string& s);
+ASHE_API std::wstring StrToLower(const std::wstring& s);
 
-ASHE_API std::string ToUpper(const std::string& s);
-ASHE_API std::wstring ToUpper(const std::wstring& s);
+ASHE_API std::string StrToUpper(const std::string& s);
+ASHE_API std::wstring StrToUpper(const std::wstring& s);
 
-ASHE_API bool IsDigit(const std::string& s);
-ASHE_API bool IsDigit(const std::wstring& s);
+ASHE_API bool StrIsDigit(const std::string& s);
+ASHE_API bool StrIsDigit(const std::wstring& s);
 
-ASHE_API bool IsLetterOrDigit(const char& c);
-ASHE_API bool IsLetterOrDigit(const wchar_t& c);
+ASHE_API bool StrIsLetterOrDigit(const char& c);
+ASHE_API bool StrIsLetterOrDigit(const wchar_t& c);
 
-ASHE_API bool IsLetterOrDigit(const std::string& s);
-ASHE_API bool IsLetterOrDigit(const std::wstring& s);
+ASHE_API bool StrIsLetterOrDigit(const std::string& s);
+ASHE_API bool StrIsLetterOrDigit(const std::wstring& s);
 
 ASHE_API std::string StrTrim(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r");
 ASHE_API std::wstring StrTrim(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r");
@@ -55,14 +57,14 @@ ASHE_API std::wstring StrTrimLeft(const std::wstring& s, const std::wstring& whi
 ASHE_API std::string StrTrimRight(const std::string& s, const std::string& whitespaces = " \t\f\v\n\r");
 ASHE_API std::wstring StrTrimRight(const std::wstring& s, const std::wstring& whitespaces = L" \t\f\v\n\r");
 
-ASHE_API bool IsStartsWith(const std::string& s, const std::string& prefix);
-ASHE_API bool IsStartsWith(const std::wstring& s, const std::wstring& prefix);
+ASHE_API bool StrIsStartsWith(const std::string& s, const std::string& prefix);
+ASHE_API bool StrIsStartsWith(const std::wstring& s, const std::wstring& prefix);
 
-ASHE_API bool IsEndsWith(const std::string& s, const std::string& suffix);
-ASHE_API bool IsEndsWith(const std::wstring& s, const std::wstring& suffix);
+ASHE_API bool StrIsEndsWith(const std::string& s, const std::string& suffix);
+ASHE_API bool StrIsEndsWith(const std::wstring& s, const std::wstring& suffix);
 
-ASHE_API bool IsContains(const std::string& str, const std::string& substring);
-ASHE_API bool IsContains(const std::wstring& str, const std::wstring& substring);
+ASHE_API bool StrIsContains(const std::string& str, const std::string& substring);
+ASHE_API bool StrIsContains(const std::wstring& str, const std::wstring& substring);
 
 ASHE_API size_t StrContainTimes(const std::string& str, const std::string& substring);
 ASHE_API size_t StrContainTimes(const std::wstring& str, const std::wstring& substring);
@@ -85,8 +87,8 @@ ASHE_API std::vector<std::wstring> StrSplit(const std::wstring& src, const std::
 ASHE_API std::string StrJoin(const std::vector<std::string>& src, const std::string& delimiter, bool includeEmptyStr = true);
 ASHE_API std::wstring StrJoin(const std::vector<std::wstring>& src, const std::wstring& delimiter, bool includeEmptyStr = true);
 
-ASHE_API bool IsEqual(const std::string& s1, const std::string& s2, bool ignoreCase = false);
-ASHE_API bool IsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase = false);
+ASHE_API bool StrIsEqual(const std::string& s1, const std::string& s2, bool ignoreCase = false);
+ASHE_API bool StrIsEqual(const std::wstring& s1, const std::wstring& s2, bool ignoreCase = false);
 
 // format a string
 ASHE_API bool StrFormat(const char* format, va_list argList, std::string& output) noexcept;
@@ -100,13 +102,13 @@ ASHE_API std::wstring StrFormat(const wchar_t* format, va_list argList) noexcept
 
 #ifdef ASHE_WIN
 // such as @%SystemRoot%\\system32\\%SystemRoot%.dll,-10113
-ASHE_API bool IsResourceString(const std::wstring& s);
+ASHE_API bool StrIsResourceString(const std::wstring& s);
 
 // Notice: 32bit program can not load 64bit dll
 ASHE_API bool LoadStringFromRes(const std::wstring& resStr, std::wstring& result);
 
 // Get HRESULT/LSTATUS description message.
-ASHE_API std::wstring Win32ErrCodeToStr(unsigned long err);
+ASHE_API std::wstring StrFromWin32ErrCode(unsigned long err);
 #endif
 }  // namespace ashe
-#endif  // !ASHE_STRING_HELPER_HPP__
+#endif  // !ASHE_STRING_UTIL_HPP__

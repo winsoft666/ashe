@@ -1,8 +1,9 @@
 #include "ashe/config.h"
-#include "ashe/win/hwnd_helper.h"
+#include "ashe/win/hwnd_util.h"
 
 namespace ashe {
-bool HwndHelper::BelongToSameProcess(HWND hwndA, HWND hwndB) {
+namespace win {
+bool HwndBelongToSameProcess(HWND hwndA, HWND hwndB) {
     DWORD procAId = 0, procBId = 0;
 
     GetWindowThreadProcessId(hwndA, &procAId);
@@ -10,4 +11,5 @@ bool HwndHelper::BelongToSameProcess(HWND hwndA, HWND hwndB) {
 
     return (procAId == procBId);
 }
+}  // namespace win
 }  // namespace ashe

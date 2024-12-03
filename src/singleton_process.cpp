@@ -19,7 +19,7 @@
 #include <unistd.h>
 #endif
 #include <assert.h>
-#include "ashe/string_helper.h"
+#include "ashe/string_util.h"
 
 namespace ashe {
 void SingletonProcess::markAndCheckStartup(const std::string& uniqueName) {

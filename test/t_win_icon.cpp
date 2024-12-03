@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "ashe/arch.h"
 #ifdef ASHE_WIN
-#include "ashe/win/icon_helper.h"
+#include "ashe/win/icon_util.h"
 
 using namespace ashe::win;
 

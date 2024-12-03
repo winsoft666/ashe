@@ -26,8 +26,6 @@
 #include "ashe/macros.h"
 #include <string>
 
-#pragma comment(lib, "taskschd.lib")
-
 namespace ashe {
 namespace win {
 class ASHE_API ScheduleTask {

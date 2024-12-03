@@ -3,9 +3,6 @@
 #include <objbase.h>
 #include <oleauto.h>
 
-#pragma comment(lib, "ole32.lib")
-#pragma comment(lib, "oleaut32.lib")
-
 namespace ashe {
 namespace win {
 HRESULT Firewall::initialize() {
