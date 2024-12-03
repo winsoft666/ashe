@@ -365,7 +365,7 @@ void KillProcessTree(unsigned long pid) {
         return;
 
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (snapshot) {
+    if (snapshot != INVALID_HANDLE_VALUE) {
         PROCESSENTRY32 process;
         ZeroMemory(&process, sizeof(process));
         process.dwSize = sizeof(process);
@@ -405,7 +405,7 @@ bool KillProcess(const std::wstring& exeName) {
     bool ret = false;
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
-    if (snapshot) {
+    if (snapshot != INVALID_HANDLE_VALUE) {
         PROCESSENTRY32 process;
         ZeroMemory(&process, sizeof(process));
         process.dwSize = sizeof(process);

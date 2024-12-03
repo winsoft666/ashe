@@ -371,7 +371,7 @@ void Process::killProcessTree(bool /*force*/) noexcept {
     std::lock_guard<std::mutex> lock(close_mutex_);
     if (data_.id > 0 && !closed_) {
         HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-        if (snapshot) {
+        if (snapshot != INVALID_HANDLE_VALUE) {
             PROCESSENTRY32 process;
             ZeroMemory(&process, sizeof(process));
             process.dwSize = sizeof(process);
@@ -391,10 +391,6 @@ void Process::killProcessTree(bool /*force*/) noexcept {
         TerminateProcess(data_.handle, 2);
     }
 }
-
-
-
-
 #else // ASHE_WIN
 Process::Data::Data() noexcept :
     id(-1) {}
