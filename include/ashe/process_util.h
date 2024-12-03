@@ -88,10 +88,6 @@ ASHE_API std::wstring GetProcessPathW(unsigned long pid);
 // Return false when have one or more process kill failed.
 ASHE_API bool KillProcess(const std::wstring& exeName);
 ASHE_API bool KillProcess(const std::string& exeName);
-
-// Kill all process that EXE file in "dirPath" directory.
-ASHE_API void RecursiveKillProcess(const std::wstring& dirPath, bool excludeSelf);
-ASHE_API void RecursiveKillProcess(const std::string& dirPath, bool excludeSelf);
 #else  // !ASHE_WIN
 ASHE_API void KillProcessTree(pid_t id, bool force = false);
 ASHE_API bool KillProcess(pid_t id, bool force = false);
