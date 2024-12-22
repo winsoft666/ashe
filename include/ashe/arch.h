@@ -32,11 +32,12 @@
 #elif defined(__linux__) || defined(linux) || defined(__linux)
 #define ASHE_LINUX 1
 #else
-#error "Unknown compiler"
+#error Unknown OS
 #endif
 
-#if ASHE_MACOS || ASHE_LINUX
+#if defined(ASHE_MACOS) || defined(ASHE_LINUX)
 #define ASHE_POSIX 1
+#define ASHE_UNIX 1
 #endif
 
 // Processor architecture detection.
