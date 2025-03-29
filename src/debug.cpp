@@ -4,13 +4,7 @@
 #endif
 
 namespace ashe {
-#ifdef ASHE_WIN
-bool isDebuggerPresent() {
-    return !!IsDebuggerPresent();
-}
-#endif
-
-void debugBreak() {
+void DebugBreak() {
 #if defined(_MSC_VER)
     __debugbreak();
 #else

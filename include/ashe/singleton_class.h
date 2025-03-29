@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
-*    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
+*    Copyright (C) 2020~2025 winsoft666 <winsoft666@outlook.com>.
 *
 *    This program is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,15 @@
 
 #include "ashe/at_exit.h"
 
+// Singleton class implement based on the Lazy Loading Mode.
+//
 namespace ashe {
-#define SINGLETON_DEFINE(TypeName)      \
-    static TypeName* GetInstance() {    \
-        static TypeName type_instance;  \
-        return &type_instance;          \
-    }                                   \
-                                        \
-    TypeName(const TypeName&) = delete; \
-    TypeName& operator=(const TypeName&) = delete
-
 template <class T, bool releaseAtExitManager = false>
 class SingletonClass {
    public:
     static T* Instance() {
         static T* instance = nullptr;
-        static std::once_flag oc;
+        static std::once_flag oc;  // C++ 11
         std::call_once(oc, [&] {
             instance = new T();
             if (releaseAtExitManager) {

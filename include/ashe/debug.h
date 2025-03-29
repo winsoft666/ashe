@@ -25,9 +25,6 @@
 #include "ashe/arch.h"
 
 namespace ashe {
-#ifdef ASHE_WIN
-ASHE_API bool isDebuggerPresent();
-#endif
-ASHE_API void debugBreak();
+ASHE_API void DebugBreak();
 }  // namespace ashe
 #endif  //!ASHE_DEBUG_H_

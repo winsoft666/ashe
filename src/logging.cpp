@@ -218,7 +218,7 @@ bool initLogging(const LoggingSettings& settings) {
     }
     LOG(LS_INFO) << "Logging level: " << gMinLogLevel;
 #ifdef ASHE_WIN
-    LOG(LS_INFO) << "Debugger present: " << (isDebuggerPresent() ? "Yes" : "No");
+    LOG(LS_INFO) << "Debugger present: " << (::IsDebuggerPresent() ? "Yes" : "No");
 #endif
 
 #if defined(NDEBUG)
@@ -302,7 +302,7 @@ LogMessage::~LogMessage() {
 
     if (severity_ == LOG_LS_FATAL) {
         // Crash the process.
-        debugBreak();
+        DebugBreak();
     }
 }
 
