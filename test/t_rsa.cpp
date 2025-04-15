@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "ashe/rsa.h"
+#include <string.h>
 
 using namespace ashe;
 
@@ -14,7 +15,7 @@ TEST_CASE("RSATest") {
 
     std::vector<uint8_t> vIn;
     vIn.resize(in.length());
-    memcpy(vIn.data(), in.c_str(), in.length());
+    memcpy((void*)vIn.data(), in.c_str(), in.length());
 
     std::string cipher;
     REQUIRE(RSAEncrypt(vIn, pub, cipher));
