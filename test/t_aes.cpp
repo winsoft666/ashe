@@ -19,11 +19,11 @@ TEST_CASE("AESTest-NoPadding") {
                                 0x3f, 0xf1, 0xca, 0xa1, 0x68, 0x1f, 0xac, 0x09, 0x12, 0x0e, 0xca, 0x30, 0x75, 0x86, 0xe1, 0xa7};
 
     std::vector<uint8_t> cipher;
-    REQUIRE(AES128EncryptWithCBC(key, iv, AESPaddingMode::None, in, cipher));
+    REQUIRE(AES128CBCEncrypt(key, iv, AESPaddingMode::None, in, cipher));
     REQUIRE(cipher == out);
 
     std::vector<uint8_t> plain;
-    REQUIRE(AES128DecryptWithCBC(key, iv, AESPaddingMode::None, cipher, plain));
+    REQUIRE(AES128CBCDecrypt(key, iv, AESPaddingMode::None, cipher, plain));
     REQUIRE(plain == in);
 }
 
@@ -36,11 +36,11 @@ TEST_CASE("AESTest-PKCS7") {
     std::string outWithBase64 = "3LF4CXlSGyQfK2C0cq8QMQ==";
 
     std::string cipher;
-    REQUIRE(AES128EncryptWithCBC(key, iv, AESPaddingMode::PKCS7, in, cipher));
+    REQUIRE(AES128CBCEncrypt(key, iv, AESPaddingMode::PKCS7, in, cipher));
     std::string cipher64 = Base64::Encode(cipher);
     REQUIRE(cipher64 == outWithBase64);
 
     std::string plain;
-    REQUIRE(AES128DecryptWithCBC(key, iv, AESPaddingMode::PKCS7, cipher, plain));
+    REQUIRE(AES128CBCDecrypt(key, iv, AESPaddingMode::PKCS7, cipher, plain));
     REQUIRE(plain == in);
 }

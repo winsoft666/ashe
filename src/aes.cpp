@@ -1,11 +1,9 @@
 #include "ashe/config.h"
 #include "ashe/aes.h"
-#include <stdint.h>
+#include <cstring>
 
 namespace ashe {
 namespace tiny_aes_impl {
-
-#include <stdint.h>
 
 // #define the macros below to 1/0 to enable/disable the mode of operation.
 //
@@ -629,11 +627,11 @@ size_t pkcs7_padding_data_length(uint8_t* buffer, size_t buffer_size, uint8_t mo
 }
 }  // namespace pkcs7_padding
 
-bool AES128EncryptWithCBC(const std::vector<uint8_t>& key,
-                          const std::vector<uint8_t>& iv,
-                          AESPaddingMode paddingMode,
-                          const std::vector<uint8_t>& plain,
-                          std::vector<uint8_t>& cipher) {
+bool AES128CBCEncrypt(const std::vector<uint8_t>& key,
+                      const std::vector<uint8_t>& iv,
+                      AESPaddingMode paddingMode,
+                      const std::vector<uint8_t>& plain,
+                      std::vector<uint8_t>& cipher) {
     using namespace tiny_aes_impl;
     if (key.size() != AES_KEYLEN || iv.size() != AES_KEYLEN || plain.empty())
         return false;
@@ -683,11 +681,11 @@ bool AES128EncryptWithCBC(const std::vector<uint8_t>& key,
     return ret;
 }
 
-bool AES128DecryptWithCBC(const std::vector<uint8_t>& key,
-                          const std::vector<uint8_t>& iv,
-                          AESPaddingMode paddingMode,
-                          const std::vector<uint8_t>& cipher,
-                          std::vector<uint8_t>& plain) {
+bool AES128CBCDecrypt(const std::vector<uint8_t>& key,
+                      const std::vector<uint8_t>& iv,
+                      AESPaddingMode paddingMode,
+                      const std::vector<uint8_t>& cipher,
+                      std::vector<uint8_t>& plain) {
     using namespace tiny_aes_impl;
     if (key.size() != AES_KEYLEN || iv.size() != AES_KEYLEN || cipher.empty())
         return false;
@@ -740,11 +738,11 @@ bool AES128DecryptWithCBC(const std::vector<uint8_t>& key,
     return ret;
 }
 
-bool AES128EncryptWithCBC(const std::string& key,
-                          const std::string& iv,
-                          AESPaddingMode paddingMode,
-                          const std::string& plain,
-                          std::string& cipher) {
+bool AES128CBCEncrypt(const std::string& key,
+                      const std::string& iv,
+                      AESPaddingMode paddingMode,
+                      const std::string& plain,
+                      std::string& cipher) {
     std::vector<uint8_t> vCipher;
     std::vector<uint8_t> vPlain;
     std::vector<uint8_t> vKey;
@@ -759,7 +757,7 @@ bool AES128EncryptWithCBC(const std::string& key,
     vPlain.resize(plain.size());
     memcpy(vPlain.data(), plain.c_str(), plain.size());
 
-    if (!AES128EncryptWithCBC(vKey, vIV, paddingMode, vPlain, vCipher))
+    if (!AES128CBCEncrypt(vKey, vIV, paddingMode, vPlain, vCipher))
         return false;
 
     cipher.assign((const char*)vCipher.data(), vCipher.size());
@@ -767,11 +765,11 @@ bool AES128EncryptWithCBC(const std::string& key,
     return true;
 }
 
-bool AES128DecryptWithCBC(const std::string& key,
-                          const std::string& iv,
-                          AESPaddingMode paddingMode,
-                          const std::string& cipher,
-                          std::string& plain) {
+bool AES128CBCDecrypt(const std::string& key,
+                      const std::string& iv,
+                      AESPaddingMode paddingMode,
+                      const std::string& cipher,
+                      std::string& plain) {
     std::vector<uint8_t> vCipher;
     std::vector<uint8_t> vPlain;
     std::vector<uint8_t> vKey;
@@ -786,7 +784,7 @@ bool AES128DecryptWithCBC(const std::string& key,
     vCipher.resize(cipher.size());
     memcpy(vCipher.data(), cipher.c_str(), cipher.size());
 
-    if (!AES128DecryptWithCBC(vKey, vIV, paddingMode, vCipher, vPlain))
+    if (!AES128CBCDecrypt(vKey, vIV, paddingMode, vCipher, vPlain))
         return false;
 
     plain.assign((const char*)vPlain.data(), vPlain.size());

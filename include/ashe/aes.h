@@ -24,37 +24,38 @@
 #include "ashe/config.h"
 #include <vector>
 #include <string>
+#include <stdint.h>
 
 namespace ashe {
 enum class AESPaddingMode {
     PKCS7 = 0,
-    None = 1,
+    None = 1,  // If the padding mode is None, the length of the plaintext will be automatically expanded to an integer multiple of 16, and it will be padded with 0.
 };
 
-// AES 128bit CBC Mode
+// AES 128bit CBC Mode.
 // The length of key, iv is 16.
-bool ASHE_API AES128EncryptWithCBC(const std::vector<uint8_t>& key,
-                                   const std::vector<uint8_t>& iv,
-                                   AESPaddingMode paddingMode,
-                                   const std::vector<uint8_t>& plain,
-                                   std::vector<uint8_t>& cipher);
+bool ASHE_API AES128CBCEncrypt(const std::vector<uint8_t>& key,
+                               const std::vector<uint8_t>& iv,
+                               AESPaddingMode paddingMode,
+                               const std::vector<uint8_t>& plain,
+                               std::vector<uint8_t>& cipher);
 
-bool ASHE_API AES128DecryptWithCBC(const std::vector<uint8_t>& key,
-                                   const std::vector<uint8_t>& iv,
-                                   AESPaddingMode paddingMode,
-                                   const std::vector<uint8_t>& cipher,
-                                   std::vector<uint8_t>& plain);
+bool ASHE_API AES128CBCDecrypt(const std::vector<uint8_t>& key,
+                               const std::vector<uint8_t>& iv,
+                               AESPaddingMode paddingMode,
+                               const std::vector<uint8_t>& cipher,
+                               std::vector<uint8_t>& plain);
 
-bool ASHE_API AES128EncryptWithCBC(const std::string& key,
-                                   const std::string& iv,
-                                   AESPaddingMode paddingMode,
-                                   const std::string& plain,
-                                   std::string& cipher);
+bool ASHE_API AES128CBCEncrypt(const std::string& key,
+                               const std::string& iv,
+                               AESPaddingMode paddingMode,
+                               const std::string& plain,
+                               std::string& cipher);
 
-bool ASHE_API AES128DecryptWithCBC(const std::string& key,
-                                   const std::string& iv,
-                                   AESPaddingMode paddingMode,
-                                   const std::string& cipher,
-                                   std::string& plain);
+bool ASHE_API AES128CBCDecrypt(const std::string& key,
+                               const std::string& iv,
+                               AESPaddingMode paddingMode,
+                               const std::string& cipher,
+                               std::string& plain);
 }  // namespace ashe
 #endif  // !ASHE_AES_H__
