@@ -66,15 +66,21 @@ bool Event::isSet() const {
 
 bool Event::wait(int64_t millseconds) {
     std::unique_lock<std::mutex> ul(set_lock_);
-    int64_t m = (millseconds >= 0 ? millseconds : std::chrono::duration_values<int64_t>::max());
-    setted_event_.wait_for(ul, std::chrono::milliseconds(m), [this] { return is_set_; });
+    if (millseconds >= 0) {
+        setted_event_.wait_for(ul, std::chrono::milliseconds(millseconds), [this] { return is_set_; });
+    } else {
+        setted_event_.wait(ul, [this] { return is_set_; });
+    }
     return is_set_;
 }
 
 bool Event::wait(int64_t& d, int64_t millseconds /*= -1*/) {
     std::unique_lock<std::mutex> ul(set_lock_);
-    int64_t m = (millseconds >= 0 ? millseconds : std::chrono::duration_values<int64_t>::max());
-    setted_event_.wait_for(ul, std::chrono::milliseconds(m), [this] { return is_set_; });
+    if (millseconds >= 0) {
+        setted_event_.wait_for(ul, std::chrono::milliseconds(millseconds), [this] { return is_set_; });
+    } else {
+        setted_event_.wait(ul, [this] { return is_set_; });
+    }
     d = data_;
     return is_set_;
 }
