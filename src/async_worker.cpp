@@ -45,7 +45,8 @@ bool AsyncWorker::start() {
 void AsyncWorker::stop() {
     {
         std::lock_guard<std::mutex> lg(mutex_);
-        work_queue_.swap(std::queue<std::function<void()>>());
+        std::queue<std::function<void()>> empty_queue;
+        work_queue_.swap(empty_queue);
         exit_ = true;
         exit_cond_var_.notify_one();
     }
