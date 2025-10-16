@@ -1,24 +1,22 @@
-#include "catch.hpp"
+﻿#include "catch.hpp"
 #include "ashe/arch.h"
 #ifdef ASHE_WIN
-#include "ashe/win/persistent_uuid.h"
+#include "ashe/win/machine_uuid.h"
 
 using namespace ashe;
 using namespace ashe::win;
 
 TEST_CASE("PersisitentUUIDTest", "") {
     std::wstring uuid;
-    bool b = GetPersistentUUID(uuid);
+    uuid = MachineUUID::GetMachineGUID();
 
-    REQUIRE(b);
     REQUIRE(!uuid.empty());
 
+    std::wstring softUUID = MachineUUID::GetSoftwareUUID(L"UUIDTest");
+    REQUIRE(!softUUID.empty());
     for (int i = 0; i < 1000; i++) {
-        std::wstring str;
-        b = GetPersistentUUID(str);
-
-        REQUIRE(b);
-        REQUIRE(str == uuid);
+        std::wstring str = MachineUUID::GetSoftwareUUID(L"UUIDTest");
+        REQUIRE(softUUID == str);
     }
 }
 #endif

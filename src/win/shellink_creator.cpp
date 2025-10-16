@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/win/shellink_creator.h"
 #include "ashe/win/windows_lite.h"
 #include <shellapi.h>
@@ -58,7 +58,7 @@ HRESULT InitializeShortcutInterfaces(const wchar_t* shortcut,
 bool ShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
                                          const ShellLinkProperties& properties,
                                          OperationOption operation) {
-    ashe::ScopedComInitialize comInit;
+    ScopedComInitialize comInit;
 
     // A target is required unless |operation| is SHORTCUT_UPDATE_EXISTING.
     if (operation != OperationOption::SHORTCUT_UPDATE_EXISTING &&
@@ -171,7 +171,7 @@ bool ShellinkCreator::CreateShellLink(const std::wstring& shellLinkPath,
 }
 
 bool ShellinkCreator::ResolveShellLink(const std::wstring& shellLinkPath, ShellLinkProperties& properties) {
-    ashe::ScopedComInitialize comInit;
+    ScopedComInitialize comInit;
 
     HRESULT result;
     IShellLink* iShellLink = NULL;

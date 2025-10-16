@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -27,19 +27,30 @@
 
 namespace ashe {
 namespace win {
+// 创建Windows快捷方式.lnk文件
+//
 class ASHE_API ShellinkCreator {
    public:
     enum OperationOption {
-        // Create a new shortcut (overwriting if necessary).
+        // 始终创建一个新的快捷方式，覆盖同名的已有快捷方式（如果存在的话）
+        //
         SHORTCUT_CREATE_ALWAYS = 0,
-        // Overwrite an existing shortcut (fails if the shortcut doesn't exist).
-        // If the arguments are not specified on the new shortcut, keep the old shortcut's arguments.
+
+        // 覆盖一个已有的快捷方式，如果不存在则失败
+        // 如果新快捷方式没有指定参数（setArguments），则使用旧快捷方式的参数
+        //
         SHORTCUT_REPLACE_EXISTING = 1,
-        // Update specified properties only on an existing shortcut.
+
+        // 更新一个已有的快捷方式，如果不存在则失败
+        //
         SHORTCUT_UPDATE_EXISTING = 2,
     };
 
+    // 存储快捷方式的属性
+    //
     struct ShellLinkProperties {
+        // 不要直接使用这些枚举值，应该使用下面的setXXX()方法
+        //
         enum IndividualProperties {
             PROPERTIES_TARGET = 1 << 0,
             PROPERTIES_WORKING_DIR = 1 << 1,
@@ -52,50 +63,45 @@ class ASHE_API ShellinkCreator {
             icon_index(-1), options(0U) {
         }
 
+        // 快捷方式的目标
         void setTarget(const std::wstring& target_in) {
             target = target_in;
             options |= PROPERTIES_TARGET;
         }
 
+        // 快捷方式的工作目录
         void setWorkingDir(const std::wstring& working_dir_in) {
             working_dir = working_dir_in;
             options |= PROPERTIES_WORKING_DIR;
         }
 
+        // 快捷方式的参数
         void setArguments(const std::wstring& arguments_in) {
             // Size restriction as per MSDN at http://goo.gl/TJ7q5.
             arguments = arguments_in;
             options |= PROPERTIES_ARGUMENTS;
         }
 
+        // 快捷方式的描述
         void setDescription(const std::wstring& description_in) {
             // Size restriction as per MSDN at http://goo.gl/OdNQq.
             description = description_in;
             options |= PROPERTIES_DESCRIPTION;
         }
 
+        // 快捷方式的图标
         void setIcon(const std::wstring& icon_in, int icon_index_in) {
             icon = icon_in;
             icon_index = icon_index_in;
             options |= PROPERTIES_ICON;
         }
 
-        // The target to launch from this shortcut. This is mandatory when creating a shortcut.
         std::wstring target;
-        // The name of the working directory when launching the shortcut.
         std::wstring working_dir;
-        // The arguments to be applied to |target| when launching from this shortcut.
-        // The length of this string must be less than MAX_PATH.
         std::wstring arguments;
-        // The localized description of the shortcut.
-        // The length of this string must be less than MAX_PATH.
         std::wstring description;
-        // The path to the icon (can be a dll or exe, in which case |icon_index| is the resource id).
         std::wstring icon;
         int icon_index;
-
-        // Bitfield made of IndividualProperties. Properties set in |options| will be
-        // set on the shortcut, others will be ignored.
         uint32_t options;
     };
 

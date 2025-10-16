@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/uuid.h"
 
 #ifdef ASHE_WIN
@@ -16,6 +16,7 @@
 
 namespace ashe {
 #ifndef ASHE_WIN
+namespace {
 uint32_t UUID::Rand32() {
     return ((rand() & 0x3) << 30) | ((rand() & 0x7fff) << 15) |
            (rand() & 0x7fff);
@@ -34,16 +35,17 @@ std::string UUID::GenUuid4() {
         Rand32() & 0xffff,
         Rand32());
 }
+}  // namespace
 #endif
 
-std::string UUID::Create() {
+std::string CreateUuid() {
 #ifdef ASHE_WIN
     GUID guid;
     if (S_OK != CoCreateGuid(&guid))
         return std::string();
 
     return StrFormat(
-        "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+        "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
         guid.Data1,
         guid.Data2,
         guid.Data3,
@@ -59,4 +61,5 @@ std::string UUID::Create() {
     return GenUuid4();
 #endif
 }
+
 }  // namespace ashe

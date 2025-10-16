@@ -1,34 +1,20 @@
-# ashe
-ashe is a C++ common library.
+# ashe - C++ Common Library
+ashe 是一个开源的 C++ 通用基础代码库，支持 Windows、Linux、macOS 等平台。
 
-# How to use
-Clone repository and submodules:
+ashe 虽然没有 Boost、Abseil、Folly 这些库大而全，但胜在小而美。
 
+# 编译
+编译 ashe 不需要额外编译其他任何第三方库。
+
+## vcpkg
 ```bash
-git clone https://github.com/winsoft666/ashe.git
-cd ashe
-git submodule update --init --recursive
+vcpkg install ashe
 ```
 
-and include `ashe/include` directory to your project, then `#include` any ashe header file or `ashe.hpp`:
-
-```c++
-#include "ashe/file.hpp"
-// or include all header files at once
-#include "ashe.hpp"
-```
-
-# Build Test
-
+## CMake
 ```bash
-git clone https://github.com/winsoft666/ashe.git
-cd ashe
-git submodule update --init --recursive
-
-cd test
 mkdir build
 cd build
 cmake ..
-make
-./test
+cmake --build . --config Release
 ```

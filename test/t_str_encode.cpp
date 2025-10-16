@@ -28,4 +28,12 @@ TEST_CASE("Base64Test") {
 #else
     REQUIRE(ashe::Base64::Encode("hello world!") == "aGVsbG8gd29ybGQh");
 #endif
+    std::string s = ashe::Base64::Encode("hello world+/=");
+    std::string s2 = ashe::Base64::Encode("hello world+/=", true);
+    std::string s3 = ashe::Base64::EncodeWithPEM("hello world hello world hello world hello world hello world hello world hello world hello world hello world !!!");
+
+    std::string s4 = ashe::Base64::EncodeWithMIME("hello world hello world hello world hello world hello world hello world hello world hello world hello world !!!");
+
+    auto s5 = ashe::Base64::Decode(s4, true);
+    std::string s6(s5.begin(), s5.end());
 }

@@ -63,35 +63,48 @@ class ASHE_API Time {
     int nanoseconds;
 };
 
+// 时间单位换算常量，每秒的毫秒数
 #define kNumMillisecsPerSec INT64_C(1000)
+
+// 时间单位换算常量，每秒的微秒数
 #define kNumMicrosecsPerSec INT64_C(1000000);
+
+// 时间单位换算常量，每秒的纳秒数
 #define kNumNanosecsPerSec INT64_C(1000000000);
 
-#define kNumMicrosecsPerMillisec (kNumMicrosecsPerSec / kNumMillisecsPerSec)
-#define kNumNanosecsPerMillisec (kNumNanosecsPerSec / kNumMillisecsPerSec)
-#define kNumNanosecsPerMicrosec (kNumNanosecsPerSec / kNumMicrosecsPerSec)
-
-// The microseconds that since 1970-01-01 00:00:00(UTC)
+// 时间戳，从 1970-01-01 00:00:00(UTC)开始到现在的微秒数
+//
 ASHE_API int64_t GetCurrentTimestampByMicroSec();
 
-// The milliseconds that since 1970-01-01 00:00:00(UTC)
+// 时间戳，从 1970-01-01 00:00:00(UTC)开始到现在的毫秒数
+//
 ASHE_API int64_t GetCurrentTimestampByMilliSec();
 
-// The seconds that since 1970-01-01 00:00:00(UTC)
+// 时间戳，从 1970-01-01 00:00:00(UTC)开始到现在的秒数
+//
 ASHE_API int64_t GetCurrentTimestampBySec();
 
-// Windows: precision is milliseconds
+// 获取当前本地时间
+// 在Windows平台，精度为毫秒，其他平台进度为秒
+//
 ASHE_API Time GetLocalTime();
 
-// Windows: precision is milliseconds
+// 获取当前UTC时间
+// 在Windows平台，精度为毫秒，其他平台进度为秒
+//
 ASHE_API Time GetUTCTime();
 
 #ifdef ASHE_WIN
-Time FILETIMEToUTC(unsigned int dwLowDateTime,
-                   unsigned int dwHighDateTime);
+// 将Windows文件时间转换为UTC时间
+Time FILETIMEToUTC(unsigned int dwLowDateTime, unsigned int dwHighDateTime);
 #endif
+
+// 将UTC时间转换为从 1970-01-01 00:00:00(UTC)开始的时间戳，单位为微秒
+//
 int64_t UTCToTimeStamp(Time t);
 
+// 时间测量类，精度为微秒
+//
 class ASHE_API TimeMeter {
    public:
     inline TimeMeter() {

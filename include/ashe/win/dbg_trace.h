@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -25,6 +25,8 @@
 
 namespace ashe {
 namespace win {
+// 打印日志到 DbgView 或 Visual Studio 的输出窗口
+//
 ASHE_API void TraceW(const wchar_t* lpFormat, ...);
 ASHE_API void TraceA(const char* lpFormat, ...);
 }  // namespace win

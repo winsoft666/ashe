@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -31,24 +31,19 @@
 
 namespace ashe {
 namespace win {
+// 存储图标信息
+//
 class ASHE_API IconInfo {
    public:
     IconInfo() = default;
 
-    inline IconInfo(IconInfo&& that) {
-        *this = std::move(that);
+    inline IconInfo(IconInfo&& that) noexcept {
+        swap(*this, that);
     }
 
-    inline IconInfo& operator=(IconInfo&& that) {
+    inline IconInfo& operator=(IconInfo&& that) noexcept {
         if (this != &that) {
-            this->hIcon = that.hIcon;
-            that.hIcon = nullptr;
-
-            this->cx = that.cx;
-            that.cx = 0;
-
-            this->cy = that.cy;
-            that.cy = 0;
+            swap(*this, that);
         }
         return *this;
     }
@@ -65,6 +60,12 @@ class ASHE_API IconInfo {
     int cy = 0;
 
    private:
+    friend void swap(IconInfo& first, IconInfo& second) noexcept {
+        using std::swap;
+        swap(first.hIcon, second.hIcon);
+        swap(first.cx, second.cx);
+        swap(first.cy, second.cy);
+    }
     ASHE_DISALLOW_COPY_AND_ASSIGN(IconInfo);
 };
 

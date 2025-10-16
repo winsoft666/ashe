@@ -36,6 +36,9 @@
 
 namespace ashe {
 namespace win {
+// 基于Windows Timer Queue 实现的毫秒级定时器
+// 通常不直接使用该类，而是使用TTimer或Timer
+//
 class ASHE_API WinTimerBase {
    public:
     WinTimerBase();
@@ -61,6 +64,8 @@ class ASHE_API WinTimerBase {
     Private* p_ = nullptr;
 };
 
+// 模板方式
+//
 template <class T>
 class TTimer : public WinTimerBase {
    public:
@@ -88,6 +93,8 @@ class TTimer : public WinTimerBase {
     POnTimer m_pfnOnTimer;
 };
 
+// 使用std::function方式，支持Lambda表达式
+//
 class ASHE_API Timer : public WinTimerBase {
    public:
     typedef std::function<void()> FN_CB;

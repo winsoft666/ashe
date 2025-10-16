@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -31,7 +31,8 @@
 namespace ashe {
 using HttpHeaders = std::multimap<std::string, std::string>;
 
-// HTTP Request Datagram
+// HTTP请求报文类
+//
 class ASHE_API HttpReqDatagram {
    public:
     enum class METHOD {
@@ -80,7 +81,8 @@ class ASHE_API HttpReqDatagram {
     std::string saveFilePath_;
 };
 
-// HTTP Response Datagram
+// HTTP响应报文类
+//
 class ASHE_API HttpRspDatagram {
    public:
     HttpRspDatagram() = default;
@@ -110,9 +112,6 @@ class ASHE_API HttpRspDatagram {
     std::string saveFilePath_;
 };
 
-class ASHE_API HttpUtil {
-   public:
-    static bool IsHttps(const std::string& url);
-};
+ASHE_API bool IsHttpsUrl(const std::string& url);
 }  // namespace ashe
 #endif  // !HTTP_UTIL_HPP_

@@ -23,23 +23,21 @@
 #include <climits>
 #include <cstddef>
 #include <mutex>
-/*
- MemoryPool is mostly compliant with the C++ Standard Library allocators.
- This means you can use it with `allocator_traits`
- ([see here] (http://www.cplusplus.com/reference/memory/allocator_traits/))
- or just like you would use the `std::allocator`
- ([see here] (http://www.cplusplus.com/reference/memory/allocator/)).
 
- There are some differences though:
-
- * MemorPool **cannot** allocate multiple objects with a single call to `allocate`
- and will simply ignore the count value you pass to the allocate/deallocate function.
- Fixing this is not too hard, but it would deteriorate performance and create memory fragmentation.
- * This is **NOT** thread safe. You should create a different instance for each thread (suggested)
- or find some way of scheduling queries to the allocator.
-
- Also see: https://blog.csdn.net/china_jeffery/article/details/80750042
- */
+// C++内存池分配器（线程安全）
+//     T: 内存片中存储的对象类型
+//     BlockSize: 内存池中内存片的大小，单位字节，默认4096字节
+//     ZeroOnDeallocate: 在内存片被归还之后，是否清除其中的内容，默认true
+// 
+// 功能特性：
+// - 内存池的总大小自动增长；
+// - 内存池中内存片的大小固定；
+// - 在内存片被归还之后，可以清除其中的内容；
+// - 线程安全；
+// - 兼容 std::allocator；
+//
+// https://jiangxueqiao.com/post/581068365.html
+//
 
 namespace ashe {
 template <typename T, size_t BlockSize = 4096, bool ZeroOnDeallocate = true>

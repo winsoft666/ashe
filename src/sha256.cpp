@@ -1,9 +1,12 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/sha256.h"
 #include "ashe/arch.h"
 #include "ashe/file.h"
 #include "ashe/logging.h"
 #include <cstring>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 namespace ashe {
 
@@ -60,6 +63,40 @@ typedef struct sha256_ctx {
 #define STRING2INT(s)                                                                          \
     ((((((EXTRACT_UCHAR(s) << 8) | EXTRACT_UCHAR(s + 1)) << 8) | EXTRACT_UCHAR(s + 2)) << 8) | \
      EXTRACT_UCHAR(s + 3))
+
+namespace internal {
+class SHA256 {
+   public:
+    SHA256();
+    ~SHA256();
+
+    /* Initialize the SHA values */
+    void init();
+
+    void update(const unsigned char* buffer, uint32_t length);
+
+    /* Final wrapup - pad to SHA1_DATA_SIZE-byte boundary with the bit pattern
+      1 0* (64-bit count of bits processed, MSB-first) */
+    void final();
+
+    void digest(unsigned char* s);
+
+    std::string digest();
+
+   private:
+    void sha256_block(const unsigned char* block);
+
+    /* Perform the SHA transformation.  Note that this code, like MD5, seems to
+      break some optimizing compilers due to the complexity of the expressions
+      and the size of the basic block.  It may be necessary to split it into
+      sections, e.g. based on the four subrounds
+
+      Note that this function destroys the data area */
+    void sha256_transform(uint32_t* state, uint32_t* data);
+
+    class Private;
+    Private* p_ = nullptr;
+};
 
 class SHA256::Private {
    public:
@@ -203,60 +240,6 @@ std::string SHA256::digest() {
         strSHA256.append(std::string(buf));
     }
     return strSHA256;
-}
-
-std::string GetFileSHA256(const std::wstring& filePath) {
-    std::string result;
-
-    try {
-        ashe::File file(filePath);
-        if (!file.open(L"rb")) {
-            return result;
-        }
-
-        SHA256 sha256;
-        sha256.init();
-
-        size_t readBytes = 0;
-        unsigned char szData[1024] = {0};
-
-        while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
-            sha256.update(szData, (uint32_t)readBytes);
-        }
-        file.close();
-
-        sha256.final();
-
-        result = sha256.digest();
-    } catch (std::exception& e) {
-        result.clear();
-        DLOG(LS_FATAL) << "exception occurred: " << e.what();
-    }
-    return result;
-}
-
-std::string GetDataSHA256(const unsigned char* data, size_t dataSize) {
-    try {
-        SHA256 sha256;
-        sha256.init();
-
-        size_t offset = 0;
-        while (offset < dataSize) {
-            size_t needRead = 10240;
-            if (offset + needRead > dataSize)
-                needRead = dataSize - offset;
-
-            sha256.update(data + offset, (uint32_t)needRead);
-            offset += needRead;
-        }
-
-        sha256.final();
-
-        return sha256.digest();
-    } catch (std::exception& e) {
-        DLOG(LS_FATAL) << "exception occurred: " << e.what();
-        return "";
-    }
 }
 
 void SHA256::sha256_block(const unsigned char* block) {
@@ -405,5 +388,61 @@ void SHA256::sha256_transform(uint32_t* state, uint32_t* data) {
     state[5] += F;
     state[6] += G;
     state[7] += H;
+}
+
+}  // namespace internal
+
+std::string GetFileSHA256(const Path& filePath) {
+    std::string result;
+
+    try {
+        ashe::File file(filePath);
+        if (!file.open(L"rb")) {
+            return result;
+        }
+
+        internal::SHA256 sha256;
+        sha256.init();
+
+        size_t readBytes = 0;
+        unsigned char szData[1024] = {0};
+
+        while ((readBytes = file.readFrom(szData, 1024, -1)) > 0) {
+            sha256.update(szData, (uint32_t)readBytes);
+        }
+        file.close();
+
+        sha256.final();
+
+        result = sha256.digest();
+    } catch (std::exception& e) {
+        result.clear();
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
+    }
+    return result;
+}
+
+std::string GetDataSHA256(const unsigned char* data, size_t dataSize) {
+    try {
+        internal::SHA256 sha256;
+        sha256.init();
+
+        size_t offset = 0;
+        while (offset < dataSize) {
+            size_t needRead = 10240;
+            if (offset + needRead > dataSize)
+                needRead = dataSize - offset;
+
+            sha256.update(data + offset, (uint32_t)needRead);
+            offset += needRead;
+        }
+
+        sha256.final();
+
+        return sha256.digest();
+    } catch (std::exception& e) {
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
+        return "";
+    }
 }
 }  // namespace ashe

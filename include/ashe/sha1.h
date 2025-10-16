@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -25,7 +25,7 @@
 #include <string.h>
 #include <string>
 #include "ashe/arch.h"
-#include "ashe/file.h"
+#include "ashe/path.h"
 
 namespace ashe {
 class ASHE_API SHA1 {
@@ -60,7 +60,7 @@ class ASHE_API SHA1 {
     unsigned char m_digest[20];
 };
 
-ASHE_API std::string GetFileSHA1(const std::wstring& filePath);
+ASHE_API std::string GetFileSHA1(const Path& filePath);
 
 ASHE_API std::string GetDataSHA1(const unsigned char* data, size_t dataSize);
 

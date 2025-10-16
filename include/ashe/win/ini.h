@@ -29,13 +29,7 @@ namespace ashe {
 namespace win {
 class ASHE_API Ini {
    public:
-    Ini() = default;
-
     Ini(const std::wstring& filePath);
-
-    Ini(std::wstring&& filePath);
-
-    ~Ini() = default;
 
     void setIniFilePath(const std::wstring& filePath);
 

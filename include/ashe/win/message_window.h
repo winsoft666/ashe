@@ -1,4 +1,4 @@
-#ifndef ASHE_WIN_MESSAGE_WINDOW_H_
+﻿#ifndef ASHE_WIN_MESSAGE_WINDOW_H_
 #define ASHE_WIN_MESSAGE_WINDOW_H_
 
 #include "ashe/macros.h"
@@ -8,6 +8,8 @@
 
 namespace ashe {
 namespace win {
+// 创建一个隐藏的消息窗口
+//
 class MessageWindow {
    public:
     MessageWindow() = default;

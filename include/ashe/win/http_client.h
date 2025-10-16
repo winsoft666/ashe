@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -31,12 +31,12 @@
 
 namespace ashe {
 namespace win {
-// Http Client base on windows winhttp api.
+// 基于 WinHttp 接口实现的 HTTP 客户端，包含请求、响应、文件下载等
 //
 class ASHE_API HttpClient {
    public:
     using RequestResult =
-        std::function<void(long,                   // =0 is success, >0 is lasterror
+        std::function<void(long,                   // 0 is success, > 0 is lasterror
                            unsigned long,          // microseconds
                            const HttpRspDatagram&  // HTTP response datagram
                            )>;
@@ -44,38 +44,35 @@ class ASHE_API HttpClient {
     enum : int {
         PARAM_ERROR = -1,
         UNKNOWN_ERROR = -2,
-        USER_ABORT = 12017 /*ERROR_WINHTTP_OPERATION_CANCELLED*/
+        USER_ABORT = 12017 // ERROR_WINHTTP_OPERATION_CANCELLED
     };
 
     HttpClient();
-    HttpClient(const HttpClient&) = delete;
-    HttpClient& operator=(const HttpClient&) = delete;
     virtual ~HttpClient();
 
    public:
-    // Issue an asynchronous HTTP request.
-    // Return value:
-    //   The return value does not indicate that the request is finished.
-    //   Return false only when has another request is doing, other case will return true.
-    //
+    // 发起HTTP异步请求
+    // 函数返回不代表请求完成，仅在当前HttpClient实例已有其他请求正在进行时才返回false，其他情况均返回true
+    // 响应结果及内容通过 RequestResult 回调函数返回
+    // 
     bool request(std::shared_ptr<HttpReqDatagram> reqDatagram,
                  RequestResult ret,
                  bool allowRedirect = true,
                  int timeout = 5000  // ms
     );
 
-    // Abort the current HTTP request.
+    // 取消/中止当前HTTP请求
     //
     void abort();
 
-    // Wait for the current HTTP request to be finished.
-    // Return value:
-    //   true  - request has finished or request finished with the special time(ms).
-    //   false - timeout, the request did not finished with the special time(ms).
-    //
+    // 等待当前的 HTTP 请求完成
+    // 返回值：
+    //   true  - 请求已完成或在指定时间（毫秒）内完成
+    //   false - 超时，请求未在指定时间（毫秒）内完成
+
     bool wait(int ms);
 
-    // Set HTTP proxy
+    // 设置HTTP代理
     void setProxy(const std::string& proxy);
     std::string proxy() const;
 
@@ -94,6 +91,8 @@ class ASHE_API HttpClient {
     std::atomic_bool abort_;
     std::string proxy_;
     std::shared_ptr<Http> winHttp_;
+
+    ASHE_DISALLOW_COPY_AND_MOVE(HttpClient);
 };
 }  // namespace win
 }  // namespace ashe

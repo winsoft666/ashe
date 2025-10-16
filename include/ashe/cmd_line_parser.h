@@ -26,16 +26,19 @@
 #include <string>
 
 namespace ashe {
+// 命令行参数解析器
+// 
+// 支持的参数格式有：
+// C:\Path\to\app.exe /Key:Value /Key:"Value" -Key:Value -Key:"Value" -Key=Value -Key="Value" /FlagKey
+// 
+// Key不区分大小写
+//
 class ASHE_API CmdLineParser {
    public:
     typedef std::unordered_map<std::wstring, std::wstring> ValsMap;
     typedef ValsMap::const_iterator ITERPOS;
 
     explicit CmdLineParser(const std::wstring& cmdline);
-    explicit CmdLineParser(std::wstring&& cmdline);
-    CmdLineParser(const CmdLineParser& that);
-    CmdLineParser(CmdLineParser&& that) noexcept;
-    ~CmdLineParser() = default;
 
     ITERPOS begin() const;
     ITERPOS end() const;

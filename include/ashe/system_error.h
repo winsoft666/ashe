@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -25,6 +25,10 @@
 #include <string>
 
 namespace ashe {
+// 封装系统错误代码和描述
+// 在 Windows 系统上，错误代码通过 GetLastError 获取和设置
+// 在 POSIX 系统上，错误代码通过 errno 获取
+//
 class ASHE_API SystemError {
    public:
 #if defined(ASHE_WIN)
@@ -41,16 +45,20 @@ class ASHE_API SystemError {
     SystemError(const SystemError& other) = default;
     SystemError& operator=(const SystemError& other) = default;
 
-    // Alias for GetLastError() on Windows and errno on POSIX. Avoids having to pull in Windows.h
-    // just for GetLastError() and DWORD.
+    // 用于 Windows 系统的 GetLastError() 函数和 POSIX 系统的 errno 函数的别名
+    // 避免了仅为了使用 GetLastError() 和 DWORD 而引入 Windows.h 头文件的情况
+    //
     static SystemError last();
 
-    // Returns an error code.
     Code code() const;
 
-    // Returns a string description of the error in UTF-8 encoding.
+    // 返回错误代码对应的描述字符串（UTF8编码）
+    //
     std::string toString();
 
+    // 返回错误代码对应的描述字符串（UTF8编码）
+    // 静态方法
+    //
     static std::string toString(Code code);
 
    private:

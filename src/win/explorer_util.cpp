@@ -1,18 +1,21 @@
-#include "ashe/win/explorer_util.h"
+﻿#include "ashe/win/explorer_util.h"
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_
 #endif  // !_WINSOCKAPI_
 #include <shlobj_core.h>
 #include <shellapi.h>
 #include <Shlwapi.h>
+#include "ashe/scoped_object.h"
 
 namespace ashe {
 namespace win {
 bool OpenWinExplorerAndLocate(const std::wstring& path) {
     bool result = false;
+    ScopedComInitialize com;
     PIDLIST_ABSOLUTE pidl = ILCreateFromPathW(path.c_str());
     if (pidl) {
-        result = (S_OK == SHOpenFolderAndSelectItems(pidl, 0, NULL, 0));
+        HRESULT hr = SHOpenFolderAndSelectItems(pidl, 0, NULL, 0);
+        result = (S_OK == hr);
         ILFree(pidl);
     }
     return result;

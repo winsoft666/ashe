@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/sha512.h"
 #include "ashe/file.h"
 #include "ashe/logging.h"
@@ -6,6 +6,33 @@
 #include <cstring>
 
 namespace ashe {
+namespace internal {
+class SHA512 {
+   public:
+    void init();
+
+    void update(const unsigned char* message, unsigned int len);
+
+    void final(unsigned char* digest);
+
+    void transform(const unsigned char* message, unsigned int block_nb);
+
+    static const unsigned int SHA384_512_BLOCK_SIZE = (1024 / 8);
+    static const unsigned int DIGEST_SIZE = (512 / 8);
+
+   private:
+    typedef unsigned char uint8;
+    typedef unsigned long uint32;
+    typedef unsigned long long uint64;
+
+    static uint64 getSha512K(int i);
+
+    unsigned int m_tot_len;
+    unsigned int m_len;
+    unsigned char m_block[2 * SHA384_512_BLOCK_SIZE];
+    uint64 m_h[8];
+};
+
 SHA512::uint64 SHA512::getSha512K(int i) {
     static const SHA512::uint64 sha512K[80] =
         {0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL,
@@ -170,17 +197,18 @@ void SHA512::transform(const unsigned char* message, unsigned int block_nb) {
         }
     }
 }
+}  // namespace internal
 
-std::string GetFileSHA512(const std::wstring& filePath) {
+std::string GetFileSHA512(const Path& filePath) {
     try {
         File file(filePath);
         if (!file.open("rb")) {
             return "";
         }
 
-        unsigned char digest[SHA512::DIGEST_SIZE];
-        memset(digest, 0, SHA512::DIGEST_SIZE);
-        SHA512 ctx;
+        unsigned char digest[internal::SHA512::DIGEST_SIZE];
+        memset(digest, 0, internal::SHA512::DIGEST_SIZE);
+        internal::SHA512 ctx;
         ctx.init();
 
         size_t readBytes = 0;
@@ -193,9 +221,9 @@ std::string GetFileSHA512(const std::wstring& filePath) {
 
         ctx.final(digest);
 
-        char buf[2 * SHA512::DIGEST_SIZE + 1];
-        buf[2 * SHA512::DIGEST_SIZE] = 0;
-        for (int i = 0; i < SHA512::DIGEST_SIZE; i++) {
+        char buf[2 * internal::SHA512::DIGEST_SIZE + 1];
+        buf[2 * internal::SHA512::DIGEST_SIZE] = 0;
+        for (int i = 0; i < internal::SHA512::DIGEST_SIZE; i++) {
 #ifdef ASHE_WIN
             sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
 #else
@@ -212,14 +240,14 @@ std::string GetFileSHA512(const std::wstring& filePath) {
 
 std::string GetDataSHA512(const unsigned char* data, size_t dataSize) {
     try {
-        unsigned char digest[SHA512::DIGEST_SIZE] = {0};
-        SHA512 ctx;
+        unsigned char digest[internal::SHA512::DIGEST_SIZE] = {0};
+        internal::SHA512 ctx;
         ctx.init();
         ctx.update((const unsigned char*)data, (unsigned int)dataSize);
         ctx.final(digest);
 
-        char buf[2 * SHA512::DIGEST_SIZE + 1] = {0};
-        for (unsigned int i = 0; i < SHA512::DIGEST_SIZE; i++) {
+        char buf[2 * internal::SHA512::DIGEST_SIZE + 1] = {0};
+        for (unsigned int i = 0; i < internal::SHA512::DIGEST_SIZE; i++) {
 #ifdef ASHE_WIN
             sprintf_s(buf + i * 2, 3, "%02x", (int)(digest[i]));
 #else

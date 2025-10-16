@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -24,26 +24,10 @@
 #include "ashe/config.h"
 #include <stdint.h>
 #include <string>
-#ifndef _WINSOCKAPI_
-#define _WINSOCKAPI_
-#endif  // !_WINSOCKAPI_
+#include "ashe/path.h"
 
 namespace ashe {
-class ASHE_API CRC32 {
-   public:
-    void init();
-
-    void update(const unsigned char* pData, uint32_t uSize);
-
-    void finish();
-
-    std::string digest();
-
-   private:
-    uint32_t ulCRC32_ = 0;
-};
-
-ASHE_API std::string GetFileCRC32(const std::wstring& filePath);
+ASHE_API std::string GetFileCRC32(const Path& filePath);
 ASHE_API std::string GetDataCRC32(const unsigned char* data, size_t dataSize);
 }  // namespace ashe
 #endif  // !ASHE_CRC32_HPP__

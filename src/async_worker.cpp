@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/async_worker.h"
 #if defined ASHE_WIN || defined ASHE_LINUX
 #ifdef ASHE_WIN
@@ -20,55 +20,32 @@
 
 namespace ashe {
 AsyncWorker::AsyncWorker() :
-    thread_id_(0), exit_(false) {
-    running_.store(false);
-}
-
-AsyncWorker::AsyncWorker(const std::string& name) :
-    thread_id_(0), exit_(false), thread_name_(name) {
+    exit_(false) {
     running_.store(false);
 }
 
 AsyncWorker::~AsyncWorker() {
-    stop(false);
-}
-
-void AsyncWorker::setName(const std::string& name) {
-    thread_name_ = name;
-}
-
-std::string AsyncWorker::name() const {
-    return thread_name_;
-}
-
-long AsyncWorker::id() {
-    return thread_id_;
+    stop();
 }
 
 bool AsyncWorker::start() {
-    if (thread_.valid()) {
-        if (thread_.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready) {
-            return false;
+    try {
+        if (thread_.valid()) {
+            if (thread_.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout) {
+                return true;
+            }
         }
+        thread_ = std::async(std::launch::async, &AsyncWorker::run, this);
+        return true;
+    } catch (...) {
+        return false;
     }
-    thread_ = std::async(std::launch::async, &AsyncWorker::run, this);
-    return true;
 }
 
-void AsyncWorker::stop(bool waitUntilAllTasksFinish) {
-    if (waitUntilAllTasksFinish) {
-        do {
-            {
-                std::unique_lock<std::mutex> lg(mutex_);
-                if (work_queue_.empty())
-                    break;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(60));
-        } while (true);
-    }
-
+void AsyncWorker::stop() {
     {
         std::lock_guard<std::mutex> lg(mutex_);
+        work_queue_.swap(std::queue<std::function<void()>>());
         exit_ = true;
         exit_cond_var_.notify_one();
     }
@@ -83,9 +60,6 @@ bool AsyncWorker::isRunning() const {
 
 void AsyncWorker::run() {
     running_.store(true);
-
-    SetCurrentThreadName(thread_name_.c_str());
-    thread_id_ = AsyncWorker::GetCurThreadId();
     while (true) {
         std::function<void()> task;
         {
@@ -99,35 +73,20 @@ void AsyncWorker::run() {
             work_queue_.pop();
         }
 
-        task();
+        if (task) {
+            task();
+        }
     }
 }
 
-void AsyncWorker::SetCurrentThreadName(const char* name) {
-#ifdef ASHE_WIN
-    struct {
-        DWORD dwType;
-        LPCSTR szName;
-        DWORD dwThreadID;
-        DWORD dwFlags;
-    } threadname_info = {0x1000, name, static_cast<DWORD>(-1), 0};
-
-    __try {
-        ::RaiseException(0x406D1388, 0, sizeof(threadname_info) / sizeof(DWORD),
-                         reinterpret_cast<ULONG_PTR*>(&threadname_info));
-    } __except (EXCEPTION_EXECUTE_HANDLER) {  // NOLINT
-    }
-#elif defined ASHE_LINUX
-    prctl(PR_SET_NAME, reinterpret_cast<unsigned long>(name));  // NOLINT
-#endif
+void AsyncWorker::clearTasks() {
+    std::unique_lock<std::mutex> lg(mutex_);
+    work_queue_.swap(std::queue<std::function<void()>>());
 }
 
-long AsyncWorker::GetCurThreadId() {
-#ifdef ASHE_WIN
-    return GetCurrentThreadId();
-#elif defined ASHE_LINUX
-    return static_cast<long>(syscall(__NR_gettid));
-#endif
+size_t AsyncWorker::tasksCount() const {
+    std::unique_lock<std::mutex> lg(mutex_);
+    return work_queue_.size();
 }
 }  // namespace ashe
 #endif

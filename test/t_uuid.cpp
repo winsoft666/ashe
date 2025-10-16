@@ -1,4 +1,4 @@
-#include "catch.hpp"
+﻿#include "catch.hpp"
 #include "ashe/uuid.h"
 #include <map>
 
@@ -9,7 +9,7 @@ TEST_CASE("UUIDTest") {
     const int totalNum = 100000;
 
     for (int i = 0; i < totalNum; i++) {
-        values[ashe::UUID::Create()] = i;
+        values[ashe::CreateUuid()] = i;
     }
 
     REQUIRE(values.size() == totalNum);

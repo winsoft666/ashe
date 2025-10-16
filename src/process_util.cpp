@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/process_util.h"
 
 #ifdef ASHE_WIN
@@ -43,7 +43,7 @@ bool EnablePrivilege(LPCTSTR szPrivilege, bool fEnable) {
     return fOk;
 }
 
-bool IsRunAsAdminPrivilege(HANDLE hProcess) {
+bool IsRunningAsElevation(HANDLE hProcess) {
     BOOL fRet = FALSE;
     HANDLE hToken = NULL;
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
@@ -61,11 +61,11 @@ bool IsRunAsAdminPrivilege(HANDLE hProcess) {
     return !!fRet;
 }
 
-bool IsRunAsAdminPrivilege(DWORD dwPid) {
+bool IsRunningAsElevation(DWORD dwPid) {
     HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwPid);
     if (!hProcess)
         return false;
-    const bool ret = IsRunAsAdminPrivilege(hProcess);
+    const bool ret = IsRunningAsElevation(hProcess);
     CloseHandle(hProcess);
     return ret;
 }
@@ -174,6 +174,17 @@ bool Is32BitProcess(HANDLE process) {
         return true;
 
     return !IsWin64();
+}
+
+bool Is32BitProcess(unsigned long pid) {
+    bool result = false;
+    HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+    DCHECK(process) << "Unable to open process with PROCESS_QUERY_INFORMATION, pid:" << pid;
+    if (process) {
+        result = Is32BitProcess(process);
+        CloseHandle(process);
+    }
+    return result;
 }
 
 bool GetCurrentExePath(std::wstring& path) {
@@ -306,6 +317,7 @@ bool IsWow64Process(HANDLE process) {
 bool IsWow64Process(unsigned long pid) {
     bool result = false;
     HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+    DCHECK(process) << "Unable to open process with PROCESS_QUERY_INFORMATION, pid:" << pid;
     if (process) {
         result = IsWow64Process(process);
         CloseHandle(process);
@@ -313,8 +325,12 @@ bool IsWow64Process(unsigned long pid) {
     return result;
 }
 
-bool IsX64Process(unsigned long pid) {
+bool Is64BitProcess(unsigned long pid) {
     return IsWin64() && !IsWow64Process(pid);
+}
+
+bool Is64BitProcess(HANDLE process) {
+    return IsWin64() && !IsWow64Process(process);
 }
 
 bool IsPeX64(LPCWSTR pszModulePath) {
@@ -360,74 +376,94 @@ bool GetExeOrDllManifest(const std::wstring& path, std::list<std::string>& manif
 }
 
 // Based on http://stackoverflow.com/a/1173396
-void KillProcessTree(unsigned long pid) {
+bool KillProcessTree(unsigned long pid, unsigned int exitCode) {
     if (pid == 0)
-        return;
+        return false;
 
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (snapshot != INVALID_HANDLE_VALUE) {
-        PROCESSENTRY32 process;
-        ZeroMemory(&process, sizeof(process));
-        process.dwSize = sizeof(process);
-        if (Process32First(snapshot, &process)) {
-            do {
-                if (process.th32ParentProcessID == pid) {
-                    const HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
-                    if (process_handle) {
-                        TerminateProcess(process_handle, 2);
-                        CloseHandle(process_handle);
-                    }
+    if (snapshot == INVALID_HANDLE_VALUE)
+        return false;
+
+    bool allSuccess = true;
+    PROCESSENTRY32 process;
+    ZeroMemory(&process, sizeof(process));
+    process.dwSize = sizeof(process);
+    if (Process32First(snapshot, &process)) {
+        do {
+            if (process.th32ParentProcessID == pid) {
+                const HANDLE h = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
+                if (h) {
+                    if (!TerminateProcess(h, exitCode))
+                        allSuccess = false;
+                    CloseHandle(h);
                 }
-            } while (Process32Next(snapshot, &process));
-        }
-        CloseHandle(snapshot);
+                else {
+                    allSuccess = false;
+                }
+            }
+        } while (Process32Next(snapshot, &process));
+    }
+    CloseHandle(snapshot);
+
+    const HANDLE h = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    if (h) {
+        if (!TerminateProcess(h, exitCode))
+            allSuccess = false;
+        CloseHandle(h);
+    }
+    else {
+        allSuccess = false;
     }
 
-    const HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
-    if (process_handle)
-        TerminateProcess(process_handle, 2);
+    return allSuccess;
 }
 
-bool KillProcess(unsigned long pid) {
+bool KillProcess(unsigned long pid, unsigned int exitCode) {
     if (pid == 0)
         return false;
 
-    const HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
-    if (!process_handle)
+    const HANDLE h = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    if (!h)
         return false;
-    return !!TerminateProcess(process_handle, 2);
+    return !!TerminateProcess(h, exitCode);
 }
 
-bool KillProcess(const std::wstring& exeName) {
+bool KillProcess(const std::wstring& exeName, unsigned int exitCode) {
     if (exeName.empty())
         return false;
 
-    bool ret = false;
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE)
+        return false;
 
-    if (snapshot != INVALID_HANDLE_VALUE) {
-        PROCESSENTRY32 process;
-        ZeroMemory(&process, sizeof(process));
-        process.dwSize = sizeof(process);
-        if (Process32First(snapshot, &process)) {
-            do {
-                if (lstrcmpi(process.szExeFile, exeName.c_str()) == 0) {
-                    HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
-                    if (process_handle) {
-                        if (::TerminateProcess(process_handle, 2))
-                            ret = true;
-                        CloseHandle(process_handle);
+    bool allSuccess = true;
+    PROCESSENTRY32 process;
+    ZeroMemory(&process, sizeof(process));
+    process.dwSize = sizeof(process);
+    if (Process32First(snapshot, &process)) {
+        do {
+            if (lstrcmpi(process.szExeFile, exeName.c_str()) == 0) {
+                HANDLE h = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
+                if (h) {
+                    if (!::TerminateProcess(h, exitCode)) {
+                        allSuccess = false;
                     }
+
+                    CloseHandle(h);
                 }
-            } while (Process32Next(snapshot, &process));
-        }
-        CloseHandle(snapshot);
+                else {
+                    allSuccess = false;
+                }
+            }
+        } while (Process32Next(snapshot, &process));
     }
-    return ret;
+    CloseHandle(snapshot);
+
+    return allSuccess;
 }
 
-bool KillProcess(const std::string& exeName) {
-    return KillProcess(a2w(exeName));
+bool KillProcess(const std::string& exeName, unsigned int exitCode) {
+    return KillProcess(a2w(exeName), exitCode);
 }
 
 std::wstring GetProcessPathW(unsigned long id) {

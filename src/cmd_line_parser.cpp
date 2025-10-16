@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/cmd_line_parser.h"
 #include "ashe/arch.h"
 #include "ashe/string_util.h"
@@ -8,31 +8,14 @@ namespace ashe {
 namespace {
 const wchar_t delims[] = L"-/";
 const wchar_t quotes[] = L"\"";
-const wchar_t value_sep[] = L" :=";  // don't forget space!!
+const wchar_t value_sep[] = L" :=";  // Don't forget space
 }  // namespace
 
 CmdLineParser::CmdLineParser(const std::wstring& cmdline) {
-    if (cmdline.length() > 0) {
+    if (!cmdline.empty()) {
         cmdline_ = cmdline;
         parse();
     }
-}
-
-CmdLineParser::CmdLineParser(std::wstring&& cmdline) {
-    if (cmdline.length() > 0) {
-        cmdline_ = std::move(cmdline);
-        parse();
-    }
-}
-
-CmdLineParser::CmdLineParser(const CmdLineParser& that) {
-    cmdline_ = that.cmdline_;
-    value_map_ = that.value_map_;
-}
-
-CmdLineParser::CmdLineParser(CmdLineParser&& that) noexcept {
-    cmdline_ = std::move(that.cmdline_);
-    value_map_ = std::move(that.value_map_);
 }
 
 CmdLineParser::ITERPOS CmdLineParser::begin() const {

@@ -1,17 +1,17 @@
-#include "catch.hpp"
-#include "ashe/timer.h"
+﻿#include "catch.hpp"
+#include "ashe/timer_manager.h"
 #include <thread>
 
-TEST_CASE("TimerTest1", "Test start and stop") {
+TEST_CASE("TimerManagerTest1", "Test start and stop") {
     {
-        ashe::Timer t;
+        ashe::TimerManager t;
         t.init();
         t.destory();
     }
 }
 
-TEST_CASE("TimerTest2", "Tests with two argument add") {
-    ashe::Timer t;
+TEST_CASE("TimerManagerTest2", "Tests with two argument add") {
+    ashe::TimerManager t;
     t.init();
 
     SECTION("Test uint64_t timeout argument") {
@@ -38,8 +38,8 @@ TEST_CASE("TimerTest2", "Tests with two argument add") {
     t.destory();
 }
 
-TEST_CASE("TimerTest3", "Tests with three argument add") {
-    ashe::Timer t;
+TEST_CASE("TimerManagerTest3", "Tests with three argument add") {
+    ashe::TimerManager t;
     t.init();
 
     SECTION("Test uint64_t timeout argument") {
@@ -59,8 +59,8 @@ TEST_CASE("TimerTest3", "Tests with three argument add") {
     t.destory();
 }
 
-TEST_CASE("TimerTest4", "Test delete timer in callback") {
-    ashe::Timer t;
+TEST_CASE("TimerManagerTest4", "Test delete timer in callback") {
+    ashe::TimerManager t;
 
     t.init();
 
@@ -103,10 +103,10 @@ TEST_CASE("TimerTest4", "Test delete timer in callback") {
     t.destory();
 }
 
-TEST_CASE("TimerTest5", "Test two identical timeouts") {
+TEST_CASE("TimerManagerTest5", "Test two identical timeouts") {
     int i = 0;
     int j = 0;
-    ashe::Timer t;
+    ashe::TimerManager t;
     t.init();
 
     std::chrono::time_point<std::chrono::steady_clock> ts = std::chrono::steady_clock::now() + std::chrono::milliseconds(40);
@@ -119,8 +119,8 @@ TEST_CASE("TimerTest5", "Test two identical timeouts") {
     t.destory();
 }
 
-TEST_CASE("TimerTest6", "Test timeouts from the past.") {
-    ashe::Timer t;
+TEST_CASE("TimerManagerTest6", "Test timeouts from the past.") {
+    ashe::TimerManager t;
     t.init();
 
     SECTION("Test negative timeouts") {
@@ -148,9 +148,9 @@ TEST_CASE("TimerTest6", "Test timeouts from the past.") {
     t.destory();
 }
 
-TEST_CASE("TimerTest7", "Test order of multiple timeouts") {
+TEST_CASE("TimerManagerTest7", "Test order of multiple timeouts") {
     int i = 0;
-    ashe::Timer t;
+    ashe::TimerManager t;
     t.init();
     t.add(10000, [&](std::size_t) { i = 42; });
     t.add(20000, [&](std::size_t) { i = 43; });
@@ -161,12 +161,12 @@ TEST_CASE("TimerTest7", "Test order of multiple timeouts") {
     t.destory();
 }
 
-TEST_CASE("TimerTest8", "Test with multiple timers") {
+TEST_CASE("TimerManagerTest8", "Test with multiple timers") {
     int i = 0;
-    ashe::Timer t1;
+    ashe::TimerManager t1;
     t1.init();
 
-    ashe::Timer t2;
+    ashe::TimerManager t2;
     t2.init();
 
     SECTION("Update the same value at different times with different timers") {
@@ -191,8 +191,8 @@ TEST_CASE("TimerTest8", "Test with multiple timers") {
     t2.destory();
 }
 
-TEST_CASE("TimerTest9", "Test remove timer id") {
-    ashe::Timer t;
+TEST_CASE("TimerManagerTest9", "Test remove timer id") {
+    ashe::TimerManager t;
     t.init();
 
     SECTION("Remove out of range timer_id") {

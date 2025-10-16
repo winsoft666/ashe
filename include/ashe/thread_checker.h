@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -27,51 +27,35 @@
 #include <mutex>
 #include "ashe/logging.h"
 
-// ThreadChecker is a helper class used to help verify that some methods of a
-// class are called from the same thread (for thread-affinity).
-//
-// Use the macros below instead of the ThreadChecker directly so that the unused
-// member doesn't result in an extra byte (four when padded) per instance in
-// production.
-//
-// Usage:
+namespace ashe {
+// 检查函数是否运行在合适的线程
+// 
+// 推荐使用 THREAD_CHECKER、DCHECK_CALLED_ON_VALID_THREAD、DETACH_FROM_THREAD 宏，仅在Debug环境下检查
+// 
+// 使用方法如下:
 //   class MyClass
 //   {
 //   public:
-//       MyClass()
-//       {
-//           // It's sometimes useful to detach on construction for objects that are
-//           // constructed in one place and forever after used from another
-//           // thread.
-//           DETACH_FROM_THREAD(my_thread_checker_);
+//       MyClass() {
 //       }
 //
-//       ~MyClass()
-//       {
-//           // ThreadChecker doesn't automatically check it's destroyed on origin
-//           // thread for the same reason it's sometimes detached in the
-//           // constructor. It's okay to destroy off thread if the owner otherwise
-//           // knows usage on the associated thread is done. If you're not
-//           // detaching in the constructor, you probably want to explicitly check
-//           // in the destructor.
+//       ~MyClass() {
+//           // 检查析构函数是否与构造函数在同一个线程中被调用
 //           DCHECK_CALLED_ON_VALID_THREAD(my_thread_checker_);
 //       }
 //
-//       void MyMethod()
-//       {
+//       void MyMethod() {
+//           // 检查MyMethod函数是否与MyClass构造函数在同一个线程中被调用
 //           DCHECK_CALLED_ON_VALID_THREAD(my_thread_checker_);
-//           ... (do stuff) ...
 //       }
 //
 //    private:
 //       THREAD_CHECKER(my_thread_checker_);
 //   }
-
-namespace ashe {
+//
 class ASHE_API ThreadChecker {
    public:
     ThreadChecker();
-    ~ThreadChecker() = default;
 
     bool calledOnValidThread() const;
     void detachFromThread();

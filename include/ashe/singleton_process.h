@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -20,28 +20,47 @@
 #define ASHE_SINGLETON_PROCESS_HPP__
 #include "ashe/config.h"
 #include "ashe/arch.h"
+#include "ashe/macros.h"
 #include <string>
 #include <future>
 #include "ashe/event.h"
 
 namespace ashe {
+// 进程单实例类，用于确保某个程序在系统中只能运行一个实例
+// 
+// 使用方法：
+// SingletonProcess sp;
+// sp.markAndCheckStartup("unique_name_for_your_program");
+// if(!sp.isPrimary()) {
+// }
+//
 class ASHE_API SingletonProcess {
    public:
     SingletonProcess();
     ~SingletonProcess();
 
-    // when secondary process startup, SecondaryCallback will be call with the command line of secondary process.
-    // The command line string is encoded in utf8.
-    // SecondaryCallback is implemented only on windows platform.
     using SecondaryCallback = std::function<void(std::string secondaryCml)>;
 
+    // 在进程启动时调用此函数以标记程序启动，并检查唯一实例
+    // 程序应该在启动后尽快调用此函数
+    // 
+    // uniqueName参数用于标识唯一实例的名称，不能和其他程序重复
+    //
     void markAndCheckStartup(const std::string& uniqueName);
 
+    // 当第2个进程启动时，将调用 SecondaryCallback 并传入第2个进程的命令行参数
+    // 命令行字符串采用 UTF-8 编码
+    // 
+    // SecondaryCallback 仅在 Windows 平台上实现
+    //
     inline void registerSecondaryCallback(SecondaryCallback cb) { cb_ = cb; }
 
     const std::string& uniqueName() const;
 
+    // 检查当前进程是否为第一个实例
+    //
     bool isPrimary() const;
+
 #ifdef ASHE_WIN
     void* mutex() const;
 #else
@@ -62,7 +81,9 @@ class ASHE_API SingletonProcess {
     int pidFile_ = -1;
 #endif
     SecondaryCallback cb_;
-    ashe::Event exit_;
+    Event exit_;
+
+    ASHE_DISALLOW_COPY_AND_MOVE(SingletonProcess);
 };
 }  // namespace ashe
 #endif  // !ASHE_SINGLETON_PROCESS_HPP__

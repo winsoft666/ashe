@@ -38,15 +38,22 @@
 namespace ashe {
 class ASHE_API Base64 {
    public:
+    // 参数url决定编码后的字符串是否可用于URL：
+    // 如果url设置为true，则编码后的字符串将包含-、_和+，而不包含+、/和=
     static std::string Encode(std::string const& s, bool url = false);
 
+    // PEM = Privacy-Enhanced Mail
+    // EncodeWithPEM会在每第64个编码字符后插入一个换行符
     static std::string EncodeWithPEM(std::string const& s);
 
+    // MIME = Multipurpose Internet Mail Extensions
+    // EncodeWithMIME会在每第76个编码字符后插入一个换行符
     static std::string EncodeWithMIME(std::string const& s);
 
-    static std::vector<uint8_t> Decode(std::string const& s, bool remove_linebreaks = false);
+    // 如果编码字符串s中包含换行符（例如使用EncodeWithPEM或EncodeWithMIME生成的Base64编码），则需要将removeLinebreaks设置为true
+    static std::vector<uint8_t> Decode(std::string const& s, bool removeLinebreaks = false);
 
-    static std::string Encode(unsigned char const* bytes_to_encode, size_t in_len, bool url = false);
+    static std::string Encode(unsigned char const* bytesToEncode, size_t inLen, bool url = false);
 
 #if ASHE_CPP_STANDARD_VER >= 201703L
     static std::string Encode(std::string_view s, bool url = false);

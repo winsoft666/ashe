@@ -1,4 +1,4 @@
-#include "ashe/win/signature.h"
+﻿#include "ashe/win/signature.h"
 #include "ashe/win/windows_lite.h"
 #include <Softpub.h>
 #include <wincrypt.h>
@@ -13,7 +13,6 @@ Signature::Signature(const wchar_t* pFilePath) :
 Signature::SignVerifyResult Signature::verify() {
     SignVerifyResult result = SignVerifyResult::UnknownError;
     LONG lStatus;
-    DWORD dwLastError;
 
     if (filePath_.empty())
         return result;
@@ -36,6 +35,7 @@ Signature::SignVerifyResult Signature::verify() {
 
     // WinVerifyTrust verifies signatures as specified by the GUID and Wintrust_Data.
     lStatus = WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
+    DWORD dwLastError = GetLastError();
 
     switch (lStatus) {
         case ERROR_SUCCESS:
@@ -58,9 +58,11 @@ Signature::SignVerifyResult Signature::verify() {
         case TRUST_E_NOSIGNATURE:
             // The file was not signed or had a signature that was not valid.
             // Get the reason for no signature.
-            dwLastError = GetLastError();
             if (TRUST_E_NOSIGNATURE == dwLastError || TRUST_E_SUBJECT_FORM_UNKNOWN == dwLastError || TRUST_E_PROVIDER_UNKNOWN == dwLastError) {
                 result = SignVerifyResult::NotSigned;
+            }
+            else if (dwLastError == CERT_E_EXPIRED) {
+                result = SignVerifyResult::Expired;
             }
             else {
                 // The signature was not valid or there was an error opening the file.
@@ -82,8 +84,10 @@ Signature::SignVerifyResult Signature::verify() {
         case CRYPT_E_SECURITY_SETTINGS:
             result = SignVerifyResult::VerifyFailedDueToSecurityOption;
             break;
-
         default:
+            if (dwLastError == CERT_E_EXPIRED) {
+                result = SignVerifyResult::Expired;
+            }
             break;
     }
 

@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/win/ini.h"
 #include <tchar.h>
 #ifndef _INC_WINDOWS
@@ -13,15 +13,12 @@
 #include <strsafe.h>
 #include <assert.h>
 #include <vector>
+#include "ashe/scoped_clear_last_error.h"
 
 namespace ashe {
 namespace win {
 Ini::Ini(const std::wstring& filePath) :
     iniFilePath_(filePath) {
-}
-
-Ini::Ini(std::wstring&& filePath) :
-    iniFilePath_(std::move(filePath)) {
 }
 
 void Ini::setIniFilePath(const std::wstring& filePath) {
@@ -33,10 +30,11 @@ std::wstring Ini::iniFilePath() const {
 }
 
 bool Ini::readInt(const std::wstring& item, const std::wstring& subItem, unsigned int& result) {
-    if (iniFilePath_.length() == 0)
+    if (iniFilePath_.empty())
         return false;
+
+    ScopedClearLastError scle;
     INT iDefault = 0;
-    SetLastError(0);
     UINT ret = GetPrivateProfileIntW(item.c_str(), subItem.c_str(), iDefault, iniFilePath_.c_str());
     DWORD dwGLE = GetLastError();
     if (dwGLE == 0) {
@@ -49,10 +47,10 @@ bool Ini::readInt(const std::wstring& item, const std::wstring& subItem, unsigne
 unsigned int Ini::readIntWithDefault(const std::wstring& item,
                                      const std::wstring& subItem,
                                      unsigned int defaultValue) {
-    if (iniFilePath_.length() == 0)
+    if (iniFilePath_.empty())
         return defaultValue;
 
-    SetLastError(0);
+    ScopedClearLastError scle;
     return GetPrivateProfileIntW(item.c_str(), subItem.c_str(), defaultValue,
                                  iniFilePath_.c_str());
 }
@@ -71,9 +69,10 @@ std::wstring Ini::readStringWithDefault(const std::wstring& item,
 bool Ini::readString(const std::wstring& item,
                      const std::wstring& subItem,
                      std::wstring& result) {
-    if (iniFilePath_.length() == 0)
+    if (iniFilePath_.empty())
         return false;
 
+    ScopedClearLastError scle;
     bool ret = false;
     int iBufSize = 255;
     WCHAR* pBuf = NULL;
@@ -83,9 +82,7 @@ bool Ini::readString(const std::wstring& item,
             break;
         }
         memset(pBuf, 0, iBufSize * sizeof(WCHAR));
-        SetLastError(0);
-        DWORD dwRet = GetPrivateProfileStringW(item.c_str(), subItem.c_str(), L"", pBuf, iBufSize,
-                                               iniFilePath_.c_str());
+        DWORD dwRet = GetPrivateProfileStringW(item.c_str(), subItem.c_str(), L"", pBuf, iBufSize, iniFilePath_.c_str());
         DWORD dwGLE = GetLastError();
         if (dwRet == 0) {
             ret = (dwGLE == 0);
@@ -111,7 +108,7 @@ bool Ini::readString(const std::wstring& item,
 }
 
 bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsigned int value) {
-    if (iniFilePath_.length() == 0)
+    if (iniFilePath_.empty())
         return false;
 
     WCHAR szValue[50];
@@ -122,7 +119,7 @@ bool Ini::writeInt(const std::wstring& item, const std::wstring& sub_item, unsig
 bool Ini::writeString(const std::wstring& item,
                       const std::wstring& sub_item,
                       const std::wstring& value) {
-    if (iniFilePath_.length() == 0)
+    if (iniFilePath_.empty())
         return false;
 
     return !!WritePrivateProfileStringW(item.c_str(), sub_item.c_str(), value.c_str(),

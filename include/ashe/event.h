@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -27,31 +27,37 @@
 #include "ashe/macros.h"
 
 namespace ashe {
+// 事件(Event)类
+// 事件可以被置为有信号(set)或无信号(unset)，线程可以通过wait方法等待事件被设置为有信号
+//
 class ASHE_API Event {
    public:
     Event(bool isSet = false) noexcept;
 
     ~Event() = default;
 
+    // 将事件设置为有信号
+    //
     void set();
-    void set(int64_t d);
 
+    // 将事件设置为无信号
+    //
     void unset();
-    void unset(int64_t d);
 
-    // equal unset()
-    void reset();
-    void reset(int64_t d);
-
+    // 检查事件是否被设置为有信号
+    //
     bool isSet() const;
 
-    // infinite when millseconds < 0.
+    // 等待事件被设置为有信号
+    // millseconds参数指定等待的最长时间（毫秒），默认值-1表示无限等待
+    // 
+    // 如果事件在指定时间内被设置为有信号，则返回true，否则返回false
+    //
     bool wait(int64_t millseconds = -1);
-    bool wait(int64_t& d, int64_t millseconds = -1);
+
    protected:
     bool is_set_ = false;
-    int64_t data_ = 0;
-    std::mutex set_lock_;
+    mutable std::mutex set_lock_;
     std::condition_variable setted_event_;
 
     ASHE_DISALLOW_COPY_AND_MOVE(Event);

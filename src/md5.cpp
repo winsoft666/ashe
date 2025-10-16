@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/md5.h"
 #include "ashe/arch.h"
 #include "ashe/byteorder.h"
@@ -6,76 +6,54 @@
 #include "ashe/logging.h"
 
 namespace ashe {
+namespace internal {
+class MD5 {
+   public:
+    struct MD5Context {
+        unsigned int buf[4];
+        unsigned int bytes[2];
+        unsigned int in[16];
+    };
 
-// Support large memory.
-//
-std::string GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
-    try {
-        unsigned char md5Sig[16] = {0};
-        char szMd5[33] = {0};
+   public:
+    /*
+       * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
+       * initialization constants.
+    */
+    void MD5Init(struct MD5Context* ctx);
 
-        MD5 md5;
-        MD5::MD5Context md5Context;
-        md5.MD5Init(&md5Context);
+    /*
+       * Update context to reflect the concatenation of another buffer full
+       * of bytes.
+    */
+    void MD5Update(struct MD5Context* ctx, unsigned char const* buf, unsigned len);
 
-        size_t offset = 0;
-        while (offset < buffer_size) {
-            size_t needRead = 10240;
-            if (offset + needRead > buffer_size)
-                needRead = buffer_size - offset;
+    /*
+       * Final wrapup - pad to 64-byte boundary with the bit pattern
+       * 1 0* (64-bit count of bits processed, MSB-first)
+    */
+    void MD5Final(unsigned char digest[16], struct MD5Context* ctx);
 
-            md5.MD5Update(&md5Context, buffer + offset, (unsigned int)needRead);
-            offset += needRead;
-        }
+    void MD5Buffer(const unsigned char* buf, unsigned int len, unsigned char sig[16]);
 
-        md5.MD5Final(md5Sig, &md5Context);
-        md5.MD5SigToString(md5Sig, szMd5, 33);
+    void MD5SigToString(unsigned char signature[16], char* str, int len);
 
-        return szMd5;
-    } catch (std::exception& e) {
-        DLOG(LS_FATAL) << "exception occurred: " << e.what();
-        return "";
-    }
-}
+   private:
+#ifndef ASM_MD5
+    /*
+     * The core of the MD5 algorithm, this alters an existing MD5 hash to
+     * reflect the addition of 16 longwords of new data.  MD5Update blocks
+     * the data and converts bytes into longwords for this routine.
+     */
+    static void MD5Transform(unsigned int buf[4], unsigned int const in[16]);
 
-std::string GetFileMD5(const std::wstring& file_path) {
-    try {
-#ifdef ASHE_WIN
-        FILE* f = nullptr;
-        _wfopen_s(&f, file_path.c_str(), L"rb");
-#else
-        std::string pathu8 = UnicodeToUtf8(file_path);
-        FILE* f = fopen(pathu8.c_str(), "rb");
 #endif
 
-        if (!f)
-            return "";
+    void byteSwap(unsigned int* buf, unsigned words);
 
-        MD5 md5;
-
-        unsigned char szMd5Sig[16] = {0};
-        char szMd5[33] = {0};
-        MD5::MD5Context md5Context;
-        md5.MD5Init(&md5Context);
-
-        size_t readBytes = 0;
-        unsigned char szData[1024] = {0};
-
-        while ((readBytes = fread(szData, 1, 1024, f)) > 0) {
-            md5.MD5Update(&md5Context, szData, (unsigned int)readBytes);
-        }
-
-        fclose(f);
-
-        md5.MD5Final(szMd5Sig, &md5Context);
-        md5.MD5SigToString(szMd5Sig, szMd5, 33);
-
-        return szMd5;
-    } catch (std::exception& e) {
-         DLOG(LS_FATAL) << "exception occurred: " << e.what();
-        return "";
-    }
-}
+    bool bigEndian_ = false;
+    const char HEX_STRING[17] = "0123456789abcdef"; /* to convert to hex */
+};
 
 /*
     * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
@@ -317,5 +295,69 @@ void MD5::byteSwap(unsigned int* buf, unsigned words) {
         *buf++ = (unsigned int)((unsigned)p[3] << 8 | p[2]) << 16 | ((unsigned)p[1] << 8 | p[0]);
         p += 4;
     } while (--words);
+}
+}  // namespace internal
+
+std::string GetDataMD5(const unsigned char* buffer, size_t buffer_size) {
+    try {
+        unsigned char md5Sig[16] = {0};
+        char szMd5[33] = {0};
+
+        internal::MD5 md5;
+        internal::MD5::MD5Context md5Context;
+        md5.MD5Init(&md5Context);
+
+        size_t offset = 0;
+        while (offset < buffer_size) {
+            size_t needRead = 10240;
+            if (offset + needRead > buffer_size)
+                needRead = buffer_size - offset;
+
+            md5.MD5Update(&md5Context, buffer + offset, (unsigned int)needRead);
+            offset += needRead;
+        }
+
+        md5.MD5Final(md5Sig, &md5Context);
+        md5.MD5SigToString(md5Sig, szMd5, 33);
+
+        return szMd5;
+    } catch (std::exception& e) {
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
+        return "";
+    }
+}
+
+std::string GetFileMD5(const Path& filePath) {
+    try {
+        std::string pathA = filePath;
+        FILE* f = fopen(pathA.c_str(), "rb");
+
+        if (!f)
+            return "";
+
+        internal::MD5 md5;
+
+        unsigned char szMd5Sig[16] = {0};
+        char szMd5[33] = {0};
+        internal::MD5::MD5Context md5Context;
+        md5.MD5Init(&md5Context);
+
+        size_t readBytes = 0;
+        unsigned char szData[1024] = {0};
+
+        while ((readBytes = fread(szData, 1, 1024, f)) > 0) {
+            md5.MD5Update(&md5Context, szData, (unsigned int)readBytes);
+        }
+
+        fclose(f);
+
+        md5.MD5Final(szMd5Sig, &md5Context);
+        md5.MD5SigToString(szMd5Sig, szMd5, 33);
+
+        return szMd5;
+    } catch (std::exception& e) {
+        DLOG(LS_FATAL) << "exception occurred: " << e.what();
+        return "";
+    }
 }
 }  // namespace ashe

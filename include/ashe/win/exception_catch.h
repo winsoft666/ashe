@@ -51,10 +51,26 @@ class ASHE_API WinExceptionCatchInternal {
 }  // namespace win
 }  // namespace ashe
 
+// 捕获程序异常并生成Dump文件
+// 生成的Dump文件位于：EXE所在目录\szDumpNamePrefix_pid_yyyyMMdd.HH.mm.ss.fff.dmp
+//
+// 使用方法：
+// 使用WINMAIN_BEGIN(szDumpNamePrefix)替换WinMain函数定义的开始部分，使用WINMAIN_END替换WinMain函数结束部分
+// 
+// int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
+//      ... your code ...
+// }
+// 
+// 替换为：
+// 
+// WINMAIN_BEGIN(szDumpNamePrefix)
+//    ... your code ...
+// WINMAIN_END
+//
 #define WINMAIN_BEGIN(szDumpNamePrefix)                                                                                  \
     int __96A9695E_RUN_WINMAIN_FUNC(HINSTANCE hInstance, LPTSTR lpCmdLine);                                              \
     LONG WINAPI __96A9695E_UnhandledExceptionHandler(_EXCEPTION_POINTERS* pExceptionInfo) {                              \
-        OutputDebugString(TEXT("Create a dump file sine an exception occurred in sub-thread.\n"));                       \
+        OutputDebugString(TEXT("Create a dump file since an exception occurred in sub-thread.\n"));                      \
         int iRet = ashe::WinExceptionCatchInternal::RecordExceptionInfo(pExceptionInfo, szDumpNamePrefix);               \
         return iRet;                                                                                                     \
     }                                                                                                                    \
@@ -65,15 +81,19 @@ class ASHE_API WinExceptionCatchInternal {
         ::SetUnhandledExceptionFilter(__96A9695E_UnhandledExceptionHandler);                                             \
         int ret = 0;                                                                                                     \
         __try {                                                                                                          \
-            ret = __96A9695E_RUN_WINMAIN_FUNC(hInstance, lpCmdLine);                                                     \
+            ret = __96A9695E_RUN_WINMAIN_FUNC(hInstance, hPrevInstance, lpCmdLine, nCmdShow);                            \
         } __except (ashe::WinExceptionCatchInternal::RecordExceptionInfo(GetExceptionInformation(), szDumpNamePrefix)) { \
-            OutputDebugString(TEXT("Create a dump file sine an exception occurred in main-thread.\n"));                  \
+            OutputDebugString(TEXT("Create a dump file since an exception occurred in main-thread.\n"));                 \
         }                                                                                                                \
         return ret;                                                                                                      \
     }                                                                                                                    \
-    int __96A9695E_RUN_WINMAIN_FUNC(HINSTANCE hInstance, LPTSTR lpCmdLine) {
+    int __96A9695E_RUN_WINMAIN_FUNC(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
+
 #define WINMAIN_END }
 
+// 捕获程序异常并生成Dump文件
+// 与上面的WINMAIN_BEGIN/END类似，但用于wmain控制台程序
+//
 #define WMAIN_BEGIN(szDumpName)                                                                                    \
     int __96A9695E_RUN_MAIN_FUNC(int argc, wchar_t* argv[]);                                                       \
     LONG WINAPI __96A9695E_UnhandledExceptionHandler(_EXCEPTION_POINTERS* pExceptionInfo) {                        \
@@ -94,6 +114,10 @@ class ASHE_API WinExceptionCatchInternal {
         return ret;                                                                                                \
     }                                                                                                              \
     int __96A9695E_RUN_MAIN_FUNC(int argc, wchar_t* argv[]) {
+
+// 捕获程序异常并生成Dump文件
+// 与上面的WINMAIN_BEGIN/END类似，但用于main控制台程序
+//
 #define MAIN_BEGIN(szDumpName)                                                                                     \
     int __96A9695E_RUN_MAIN_FUNC(int argc, char* argv[]);                                                          \
     LONG WINAPI __96A9695E_UnhandledExceptionHandler(_EXCEPTION_POINTERS* pExceptionInfo) {                        \

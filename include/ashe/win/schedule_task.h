@@ -28,20 +28,23 @@
 
 namespace ashe {
 namespace win {
+// Windows 任务计划
+//
 class ASHE_API ScheduleTask {
    public:
-    ASHE_DISALLOW_COPY_AND_MOVE(ScheduleTask);
-
     ScheduleTask();
 
     virtual ~ScheduleTask();
 
+    // 根据名称删除计划任务
+    //
     bool deleteTask(const wchar_t* pszTaskName);
 
+    // 删除任务文件夹，文件夹下的任务也会被删除
+    //
     bool deleteFolder(const wchar_t* pszFolderName);
 
-    // ITrigger type is TASK_TRIGGER_LOGON
-    // Action number is 1
+    // 创建一个系统登录时（TASK_TRIGGER_LOGON）触发的计划任务
     //
     bool createLoginTriggerTask(const wchar_t* pszTaskName,
                                 const wchar_t* pszProgramPath,
@@ -51,6 +54,8 @@ class ASHE_API ScheduleTask {
 
     bool isExist(const wchar_t* pszTaskName);
 
+    // 计划任务存在并且没有被禁用
+    //
     bool isTaskValid(const wchar_t* pszTaskName);
 
     bool run(const wchar_t* pszTaskName, const wchar_t* pszParam);
@@ -59,13 +64,19 @@ class ASHE_API ScheduleTask {
 
     bool setEnabled(const wchar_t* pszTaskName, bool bEnable);
 
+    // 获取计划任务操作的程序路径
+    //
     bool getProgramPath(const wchar_t* pszTaskName, long lActionIndex, std::wstring& programPath);
 
+    // 获取计划任务操作的程序参数
+    //
     bool getParameters(const wchar_t* pszTaskName, long lActionIndex, std::wstring& parameters);
 
    protected:
     class Private;
     Private* p_ = nullptr;
+
+    ASHE_DISALLOW_COPY_AND_MOVE(ScheduleTask);
 };
 }  // namespace win
 }  // namespace ashe

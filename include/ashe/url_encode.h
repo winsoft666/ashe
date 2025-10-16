@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -26,14 +26,15 @@
 #include "ashe/hex_encode.h"
 
 namespace ashe {
-// 'str' is encoded with utf8,
+// URL编码
+// 参数str：待编码字符串，需要以UTF-8编码
+//
 ASHE_API std::string UrlEncode(const std::string& str);
 
 ASHE_API std::wstring UrlEncode(const std::wstring& str);
 
 ASHE_API size_t UrlDecode(char* buffer, size_t buflen, const char* source, size_t srclen);
 
-// 'str' is encoded with utf8,
 ASHE_API std::string UrlDecode(const std::string& source);
 
 ASHE_API std::wstring UrlDecode(const std::wstring& source);

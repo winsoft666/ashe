@@ -1,35 +1,46 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/win/process_finder.h"
 #include "ashe/string_encode.h"
 
 namespace ashe {
 namespace win {
 ProcessFinder::ProcessFinder(DWORD dwFlags, DWORD dwProcessID) {
-    m_hSnapShot = INVALID_HANDLE_VALUE;
+    hSnapShot_ = INVALID_HANDLE_VALUE;
     createSnapShot(dwFlags, dwProcessID);
 }
 
+ProcessFinder::ProcessFinder(ProcessFinder&& that) noexcept {
+    swap(*this, that);
+}
+
+ProcessFinder& ProcessFinder::operator=(ProcessFinder&& that) noexcept {
+    if (this != &that) {
+        swap(*this, that);
+    }
+    return *this;
+}
+
 ProcessFinder::~ProcessFinder() {
-    if (m_hSnapShot != INVALID_HANDLE_VALUE) {
-        CloseHandle(m_hSnapShot);
-        m_hSnapShot = INVALID_HANDLE_VALUE;
+    if (hSnapShot_ != INVALID_HANDLE_VALUE) {
+        CloseHandle(hSnapShot_);
+        hSnapShot_ = INVALID_HANDLE_VALUE;
     }
 }
 
 bool ProcessFinder::createSnapShot(DWORD dwFlag, DWORD dwProcessID) {
-    if (m_hSnapShot != INVALID_HANDLE_VALUE)
-        CloseHandle(m_hSnapShot);
+    if (hSnapShot_ != INVALID_HANDLE_VALUE)
+        CloseHandle(hSnapShot_);
 
     if (dwFlag == 0)
-        m_hSnapShot = INVALID_HANDLE_VALUE;
+        hSnapShot_ = INVALID_HANDLE_VALUE;
     else
-        m_hSnapShot = CreateToolhelp32Snapshot(dwFlag, dwProcessID);
+        hSnapShot_ = CreateToolhelp32Snapshot(dwFlag, dwProcessID);
 
-    return (m_hSnapShot != INVALID_HANDLE_VALUE);
+    return (hSnapShot_ != INVALID_HANDLE_VALUE);
 }
 
 bool ProcessFinder::processFirst(PPROCESSENTRY32 ppe) const {
-    bool fOk = Process32First(m_hSnapShot, ppe);
+    bool fOk = Process32First(hSnapShot_, ppe);
 
     if (fOk && (ppe->th32ProcessID == 0))
         fOk = processNext(ppe);  // remove the "[System Process]" (PID = 0)
@@ -38,7 +49,7 @@ bool ProcessFinder::processFirst(PPROCESSENTRY32 ppe) const {
 }
 
 bool ProcessFinder::processNext(PPROCESSENTRY32 ppe) const {
-    bool fOk = Process32Next(m_hSnapShot, ppe);
+    bool fOk = Process32Next(hSnapShot_, ppe);
 
     if (fOk && (ppe->th32ProcessID == 0))
         fOk = processNext(ppe);  // remove the "[System Process]" (PID = 0)
@@ -82,11 +93,11 @@ bool ProcessFinder::processFind(PCTSTR pszExeName, PPROCESSENTRY32 ppe, BOOL bEx
 }
 
 bool ProcessFinder::moduleFirst(PMODULEENTRY32 pme) const {
-    return (Module32First(m_hSnapShot, pme));
+    return (Module32First(hSnapShot_, pme));
 }
 
 bool ProcessFinder::moduleNext(PMODULEENTRY32 pme) const {
-    return (Module32Next(m_hSnapShot, pme));
+    return (Module32Next(hSnapShot_, pme));
 }
 
 bool ProcessFinder::moduleFind(PVOID pvBaseAddr, PMODULEENTRY32 pme) const {
@@ -162,6 +173,11 @@ bool ProcessFinder::IsExist(DWORD dwPID) {
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
     bool b = wpf.processFind(dwPID, &pe32);
     return b;
+}
+
+void swap(ProcessFinder& first, ProcessFinder& second) noexcept {
+    using std::swap;
+    swap(first.hSnapShot_, second.hSnapShot_);
 }
 }  // namespace win
 }  // namespace ashe

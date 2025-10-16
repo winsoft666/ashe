@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/sha1.h"
 #include "ashe/file.h"
 #include "ashe/logging.h"
@@ -114,7 +114,7 @@ void SHA1::getHash(unsigned char* uDest) {
         uDest[i] = m_digest[i];
 }
 
-std::string GetFileSHA1(const std::wstring& filePath) {
+std::string GetFileSHA1(const Path& filePath) {
     std::string result;
 
     try {

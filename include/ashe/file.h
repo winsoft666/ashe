@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include "ashe/macros.h"
+#include "ashe/path.h"
 #ifdef ASHE_WIN
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_
@@ -33,54 +34,33 @@
 #endif  // ASHE_WIN
 
 namespace ashe {
+// 线程安全的文件读写类
+//
 class ASHE_API File {
    public:
-    File(const std::wstring& path);
-    File(const std::string& path);
+    File(const Path& path);
 
     virtual ~File();
 
-    std::wstring pathW() const;
-
-    std::string pathA() const;
+    Path path() const;
 
     bool isOpen();
 
-    // [r]  read
-    //      Open file for input operations.
-    //      The file must exist.
+    // [r]  读操作，文件必须已经存在
     //
-    // [w]  write
-    //      Create an empty file for output operations.
-    //      If a file with the same name already exists, its contents are discarded and the file is treated as a new empty file.
+    // [w]  写操作，创建一个空文件，如果同名文件已存在，则清空原有内容
     //
-    // [a]  append
-    //      Open file for output at the end of a file.
-    //      Output operations always write data at the end of the file, expanding it.
-    //      Repositioning operations (fseek, fsetpos, rewind) are ignored.
-    //      The file is created if it does not exist.
+    // [a]  附加写操作，文件指针总是指向文件末尾（忽略fseek, fsetpos, rewind等操作），如果文件不存在则创建该文件
     //
-    // [r+] read/update
-    //      Open a file for update (both for input and output).
-    //      The file must exist.
+    // [r+] 读/写操作，文件必须已经存在
     //
-    // [w+] write/update
-    //      Create an empty file and open it for update (both for input and output).
-    //      If a file with the same name already exists its contents are discarded and the file is treated as a new empty file.
+    // [w+] 读/写操作，创建一个空文件进行读写，如果同名文件已存在，则清空原有内容
     //
-    // [a+] append/update
-    //      Open a file for update (both for input and output) with all output operations writing data at the end of the file.
-    //      Repositioning operations (fseek, fsetpos, rewind) affects the next input operations,
-    //          but output operations move the position back to the end of file.
-    //      The file is created if it does not exist.
+    // [a+] 附加读写操作，如果文件不存在则创建该文件。进行写操作时，始终从文件尾开始写；读操作则从文件当前指针位置开始读
     //
-    // [b]  binary mode
-    //      With the mode specifiers above the file is open as a text file.
-    //      In order to open a file as a binary file, a "b" character has to be included in the mode string.
-    //      This additional "b" character can either be appended at the end of the string ("rb", "wb", "ab", "r+b", "w+b", "a+b")
-    //         or be inserted between the letter and the "+" sign for the mixed modes ("rb+", "wb+", "ab+").
+    // [b]  二进制模式，如rb, wb, ab, r+b, w+b, a+b 或 rb+, wb+, ab+
     //
-    // see: https://www.cplusplus.com/reference/cstdio/fopen/
+    // 参考: https://www.cplusplus.com/reference/cstdio/fopen/
     //
     bool open(const std::wstring& openMode);
     bool open(const std::string& openMode);
@@ -89,57 +69,78 @@ class ASHE_API File {
 
     bool flush();
 
+    // 检查文件是否存在
+    // 无需调用 open(...) 打开文件
+    //
     bool isExist() const;
 
     bool canRW() const;
 
-    // Must be call open(...) first!
-    // This function will NOT change file pointer position.
-    // Return: < 0 failed
+    // 获取文件大小，单位字节
+    // 需要先调用 open(...) 打开文件
+    // 失败时返回 -1
     //
     int64_t fileSize();
 
-    // Must be call open(...) first!
+    // 从当前文件指针位置偏移 offset 个字节
+    //
     bool seekFromCurrent(int64_t offset);
 
-    // Return: -1 is failed
+    // 获取当前文件指针位置
+    // 失败时返回 -1
+    // 
     int64_t currentPointerPos();
 
-    // Must be call open(...) first!
+    // 从文件开头偏移 offset 个字节
+    //
     bool seekFromBeginning(int64_t offset);
 
-    // Must be call open(...) first!
+    // 从文件结尾偏移 offset 个字节
+    // offset 通常为负数
+    //
     bool seekFromEnd(int64_t offset);
 
-    // Must be call open(...) first!
-    // This function will change file pointer position.
-    // Caller need allocate/free buffer.
+    // 从文件指定位置（from）读取 needRead 字节到 buffer 中
+    // 调用者需要分配和释放 buffer
+    // 
+    // 如果 from 为 -1，则从当前文件指针位置读取
+    // 该方法会改变文件指针位置
+    // 
+    // 返回实际读取的字节数，失败为0
+    //
     size_t readFrom(void* buffer, size_t needRead, int64_t from = -1);
 
-    // Must be call open(...) first!
-    // This function will change file pointer position.
-    // Caller need allocate/free buffer.
+    // 从指定位置（from）写入 needRead 字节到文件中
+    //
+    // 如果 from 为 -1，则从当前文件指针位置开始写入
+    // 该方法会改变文件指针位置
+    // 
+    // 返回实际写入的字节数，失败为0
+    //
     size_t writeFrom(const void* buffer, size_t needWrite, int64_t from = -1);
 
-    // Must be call open(...) first!
-    // This function will NOT change file pointer position.
+    // 读取文件所有内容到 buffer 中
+    // 
+    // 该方法不会改变文件指针位置
+    //
     bool readAll(std::vector<uint8_t>& buffer);
 
-    // Must be call open(...) first!
-    // This function will NOT change file pointer position.
+    // 读取文件所有内容
+    // 读取失败返回空字符串
+    //
+    // 该方法不会改变文件指针位置
+    //
     std::string readAll();
 
-    // Must be call open(...) first!
-    // This function will NOT change file pointer position.
+    // 读取文件所有内容
+    //
+    // 该方法不会改变文件指针位置
+    //
     bool readAll(std::string& ret);
 
    protected:
     FILE* f_ = nullptr;
-#ifdef ASHE_WIN
-    std::wstring path_;
-#else
-    std::string path_;
-#endif
+    Path path_;
     std::recursive_mutex mutex_;
 
     ASHE_DISALLOW_COPY_AND_MOVE(File);

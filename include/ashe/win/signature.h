@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -27,20 +27,26 @@
 
 namespace ashe {
 namespace win {
+// Windows 下的文件数字签名的校验及相关信息获取
+//
 class ASHE_API Signature {
    public:
     enum class SignVerifyResult {
         UnknownError = 0,
-        Verified = 1,
+        Verified = 1,  // 签名合法
         NotSigned = 2,
         SubjectNotTrusted = 3,
         CertificateNotTrusted = 4,
         VerifyFailedDueToSecurityOption = 5,
+        Expired = 6,
     };
 
     Signature(const wchar_t* pFilePath);
 
+    // 校验签名是否合法
     SignVerifyResult verify();
+
+    // 获取签名者姓名
     std::wstring getSigner();
 
    protected:

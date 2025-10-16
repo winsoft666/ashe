@@ -22,62 +22,12 @@
 #include "ashe/config.h"
 #include <string>
 #include <memory.h>
-#ifndef _WINSOCKAPI_
-#define _WINSOCKAPI_
-#endif  // !_WINSOCKAPI_
+#include "ashe/path.h"
 
 namespace ashe {
-class ASHE_API MD5 {
-   public:
-    struct MD5Context {
-        unsigned int buf[4];
-        unsigned int bytes[2];
-        unsigned int in[16];
-    };
-
-   public:
-    /*
-       * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
-       * initialization constants.
-    */
-    void MD5Init(struct MD5Context* ctx);
-
-    /*
-       * Update context to reflect the concatenation of another buffer full
-       * of bytes.
-    */
-    void MD5Update(struct MD5Context* ctx, unsigned char const* buf, unsigned len);
-
-    /*
-       * Final wrapup - pad to 64-byte boundary with the bit pattern
-       * 1 0* (64-bit count of bits processed, MSB-first)
-    */
-    void MD5Final(unsigned char digest[16], struct MD5Context* ctx);
-
-    void MD5Buffer(const unsigned char* buf, unsigned int len, unsigned char sig[16]);
-
-    void MD5SigToString(unsigned char signature[16], char* str, int len);
-
-   private:
-#ifndef ASM_MD5
-    /*
-     * The core of the MD5 algorithm, this alters an existing MD5 hash to
-     * reflect the addition of 16 longwords of new data.  MD5Update blocks
-     * the data and converts bytes into longwords for this routine.
-     */
-    static void MD5Transform(unsigned int buf[4], unsigned int const in[16]);
-
-#endif
-
-    void byteSwap(unsigned int* buf, unsigned words);
-
-    bool bigEndian_ = false;
-    const char HEX_STRING[17] = "0123456789abcdef"; /* to convert to hex */
-};
-
-// Support large memory.
+// Support large memory or file.
 //
 ASHE_API std::string GetDataMD5(const unsigned char* buffer, size_t buffer_size);
-ASHE_API std::string GetFileMD5(const std::wstring& filePath);
+ASHE_API std::string GetFileMD5(const Path& filePath);
 }  // namespace ashe
 #endif  // !ASHE_MD5_HPP__

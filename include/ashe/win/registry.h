@@ -38,10 +38,11 @@
 
 namespace ashe {
 namespace win {
+// Windows 注册表 操作类
+// 支持 32/64 位视图
+//
 class ASHE_API Registry {
    public:
-    ASHE_DISALLOW_COPY_AND_MOVE(Registry);
-
     // hkeyRoot can be one of :
     // HKEY_CLASSES_ROOT
     // HKEY_CURRENT_CONFIG
@@ -62,7 +63,7 @@ class ASHE_API Registry {
     // KEY_WRITE,
     // KEY_WOW64_32KEY,
     // KEY_WOW64_64KEY
-    // and so on.
+    // ......
     //
     LSTATUS open(REGSAM samDesired, bool bCreate) noexcept;
 
@@ -127,6 +128,8 @@ class ASHE_API Registry {
     DWORD dwChangeFilter_;
     std::wstring strSubKey_;
     bool bWatchSubtree_;
+
+    ASHE_DISALLOW_COPY_AND_MOVE(Registry);
 };
 }  // namespace win
 }  // namespace ashe

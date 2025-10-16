@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -26,10 +26,13 @@
 
 namespace ashe {
 #ifdef ASHE_WIN
+// Windows快速重启
 ASHE_API bool OsFastReboot();
+
+// Windows快速关机
 ASHE_API bool OsFastShutdown();
 #else
 #endif
 }  // namespace ashe
 
-#endif // !ASHE_OS_UTIL_H_
+#endif  // !ASHE_OS_UTIL_H_

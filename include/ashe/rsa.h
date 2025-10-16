@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2025 winsoft666 <winsoft666@outlook.com>.
@@ -26,7 +26,7 @@
 #include <vector>
 
 namespace ashe {
-// Non-standard implementation methods of RSA, which are not compatible with OpenSSL.
+// 非标准的RSA加密/解密实现，与OpenSSL不兼容
 //
 void RSAGenKeys(std::string& pub, std::string& priv);
 

@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/buffer_queue.h"
 
 ashe::BufferQueue::BufferQueue(const std::string& name) {
@@ -45,7 +45,7 @@ bool ashe::BufferQueue::pushElementToFront(void* pData, size_t nDataSize) {
         element_num_++;
 
         if (first_element_ == nullptr) {  // Add first element in queue.
-            // Now,no element in queue.
+            // Now no element in queue.
             elem->prev = nullptr;
             elem->next = nullptr;
             first_element_ = elem;

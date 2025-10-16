@@ -20,15 +20,14 @@
 #ifndef ASHE_WIN_CRITICAL_SECTION_HPP__
 #define ASHE_WIN_CRITICAL_SECTION_HPP__
 #pragma once
-//
-// Windows CriticalSection wrapper.
-//
 #include "ashe/config.h"
 #include "ashe/arch.h"
 #include "ashe/macros.h"
 
 namespace ashe {
 namespace win {
+// Windows 临界区的封装类
+//
 class ASHE_API CriticalSection {
    public:
     CriticalSection() noexcept;
@@ -44,6 +43,7 @@ class ASHE_API CriticalSection {
     ASHE_DISALLOW_COPY_AND_MOVE(CriticalSection);
 };
 
+// Windows 临界区 RAII 封装类
 class ASHE_API ScopedWinCriticalSection {
    public:
     explicit ScopedWinCriticalSection(const CriticalSection* pCS) noexcept :

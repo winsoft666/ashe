@@ -1,4 +1,4 @@
-#include "catch.hpp"
+﻿#include "catch.hpp"
 #include "ashe/arch.h"
 #ifdef ASHE_WIN
 #include "ashe/win/schedule_task.h"
@@ -8,7 +8,7 @@ using namespace ashe;
 using namespace ashe::win;
 
 TEST_CASE("ScheduleTest", "") {
-    if (IsRunAsAdminPrivilege(GetCurrentProcess())) {
+    if (IsRunningAsElevation(GetCurrentProcess())) {
         const wchar_t pszTaskName[] = {L"test-task-name-1111"};
         ScheduleTask st;
         REQUIRE(st.createLoginTriggerTask(

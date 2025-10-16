@@ -71,7 +71,10 @@ class ASHE_API DriverInfo {
 
     static bool IsRemovablePath(const wchar_t* szPathName);
 
-    // -1 = no such path, else TRUE/FALSE
+    // 检测驱动器是否为只读
+    // 如果路径不存在，则返回-1
+    // 1表示只读，0表示非只读
+    //
     static int IsReadonlyPath(const wchar_t* szPathName);
 
     static unsigned long GetSerialNumber(int nDrive);

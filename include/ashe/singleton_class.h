@@ -23,7 +23,9 @@
 
 #include "ashe/at_exit.h"
 
-// Singleton class implement based on the Lazy Loading Mode.
+// 基于懒加载模式的单例类实现
+//    T: 单例类类型
+//    releaseAtExitManager: 是否在 AtExitManager 中注册析构回调函数，默认false
 //
 namespace ashe {
 template <class T, bool releaseAtExitManager = false>

@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/path_util.h"
 
 #ifdef ASHE_WIN
@@ -18,6 +18,23 @@
 
 namespace ashe {
 #ifdef ASHE_WIN
+namespace {
+std::wstring GetKnownFolderPath(REFKNOWNFOLDERID rfid) {
+    std::wstring result;
+    PWSTR buf = NULL;
+    HRESULT hr = SHGetKnownFolderPath(rfid, KF_FLAG_DEFAULT, NULL, &buf);
+    if (hr == S_OK) {
+        if (buf) {
+            result = buf;
+            if (result.back() != L'\\')
+                result.push_back(L'\\');
+            CoTaskMemFree(buf);
+        }
+    }
+    return result;
+}
+}  // namespace
+
 std::wstring GetWindowsFolder() {
     wchar_t szBuf[MAX_PATH] = {0};
     const DWORD result = ::GetWindowsDirectoryW(szBuf, MAX_PATH);
@@ -45,8 +62,8 @@ std::wstring GetSystemFolder() {
 }
 
 std::wstring GetTempFolder() {
-    wchar_t szBuf[MAX_PATH] = {0};
-    const DWORD result = ::GetTempPathW(MAX_PATH, szBuf);
+    wchar_t szBuf[MAX_PATH + 2] = {0};
+    const DWORD result = ::GetTempPathW(MAX_PATH + 2, szBuf);
     if (result == 0)
         return std::wstring();
 
@@ -58,51 +75,27 @@ std::wstring GetTempFolder() {
 }
 
 std::wstring GetCurrentUserDesktopFolder() {
-    wchar_t szDesktopDir[MAX_PATH] = {0};
-    SHGetSpecialFolderPathW(NULL, szDesktopDir, CSIDL_DESKTOPDIRECTORY, 0);
-    PathAddBackslashW(szDesktopDir);
-
-    return szDesktopDir;
+    return GetKnownFolderPath(FOLDERID_Desktop);
 }
 
-std::wstring GetAllUserDesktopFolder() {
-    wchar_t szDesktopDir[MAX_PATH] = {0};
-    SHGetSpecialFolderPathW(NULL, szDesktopDir, CSIDL_COMMON_DESKTOPDIRECTORY, 0);
-    PathAddBackslashW(szDesktopDir);
-
-    return szDesktopDir;
+std::wstring GetPublicDesktopFolder() {
+    return GetKnownFolderPath(FOLDERID_PublicDesktop);
 }
 
 std::wstring GetCurrentUserProgramsFolder() {
-    wchar_t szDesktopDir[MAX_PATH] = {0};
-    SHGetSpecialFolderPathW(NULL, szDesktopDir, CSIDL_PROGRAMS, 0);
-    PathAddBackslashW(szDesktopDir);
-
-    return szDesktopDir;
+    return GetKnownFolderPath(FOLDERID_UserProgramFiles);
 }
 
-std::wstring GetAllUserProgramsFolder() {
-    wchar_t szDesktopDir[MAX_PATH] = {0};
-    SHGetSpecialFolderPathW(NULL, szDesktopDir, CSIDL_COMMON_PROGRAMS, 0);
-    PathAddBackslashW(szDesktopDir);
-
-    return szDesktopDir;
+std::wstring GetProgramFilesX86Folder() {
+    return GetKnownFolderPath(FOLDERID_ProgramFilesX86);
 }
 
-std::wstring GetProgramFilesx86Folder() {
-    wchar_t szDir[MAX_PATH] = {0};
-    SHGetSpecialFolderPathW(NULL, szDir, CSIDL_PROGRAM_FILESX86, 0);
-    PathAddBackslashW(szDir);
-
-    return szDir;
+std::wstring GetProgramFilesX64Folder() {
+    return GetKnownFolderPath(FOLDERID_ProgramFilesX64);
 }
 
 std::wstring GetProgramFilesFolder() {
-    wchar_t szDir[MAX_PATH] = {0};
-    SHGetSpecialFolderPathW(NULL, szDir, CSIDL_PROGRAM_FILES, 0);
-    PathAddBackslashW(szDir);
-
-    return szDir;
+    return GetKnownFolderPath(FOLDERID_ProgramFiles);
 }
 
 std::wstring GetLocalAppDataFolder() {

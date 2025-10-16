@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -30,7 +30,8 @@
 
 namespace ashe {
 namespace win {
-// TODO: Use WinHTTP in asynchronous mode.
+// 对 WinHttp 接口的封装，见 HttpClient 类
+// TODO: 异步模式待实现
 //
 class ASHE_API Http {
    public:

@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -20,49 +20,11 @@
 #ifndef ASHE_SHA256_HPP__
 #define ASHE_SHA256_HPP__
 #include "ashe/config.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 #include <string>
-#ifndef _WINSOCKAPI_
-#define _WINSOCKAPI_
-#endif  // !_WINSOCKAPI_
+#include "ashe/path.h"
 
 namespace ashe {
-class ASHE_API SHA256 {
-   public:
-    SHA256();
-    ~SHA256();
-
-    /* Initialize the SHA values */
-    void init();
-
-    void update(const unsigned char* buffer, uint32_t length);
-
-    /* Final wrapup - pad to SHA1_DATA_SIZE-byte boundary with the bit pattern
-      1 0* (64-bit count of bits processed, MSB-first) */
-    void final();
-
-    void digest(unsigned char* s);
-
-    std::string digest();
-
-   private:
-    void sha256_block(const unsigned char* block);
-
-    /* Perform the SHA transformation.  Note that this code, like MD5, seems to
-      break some optimizing compilers due to the complexity of the expressions
-      and the size of the basic block.  It may be necessary to split it into
-      sections, e.g. based on the four subrounds
-
-      Note that this function destroys the data area */
-    void sha256_transform(uint32_t* state, uint32_t* data);
-
-    class Private;
-    Private* p_ = nullptr;
-};
-
-ASHE_API std::string GetFileSHA256(const std::wstring& filePath);
+ASHE_API std::string GetFileSHA256(const Path& filePath);
 ASHE_API std::string GetDataSHA256(const unsigned char* data, size_t dataSize);
 }  // namespace ashe
 #endif  // !ASHE_SHA256_HPP__

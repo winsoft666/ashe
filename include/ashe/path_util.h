@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -25,7 +25,8 @@
 #include "ashe/arch.h"
 
 namespace ashe {
-// On Windows, the directory path ends with a "\"
+// 在Windows上，返回的目录路径都以“\”结尾
+//
 #ifdef ASHE_WIN
 ASHE_API std::wstring GetWindowsFolder();
 
@@ -35,12 +36,12 @@ ASHE_API std::wstring GetTempFolder();
 
 ASHE_API std::wstring GetCurrentUserDesktopFolder();
 
-ASHE_API std::wstring GetAllUserDesktopFolder();
+ASHE_API std::wstring GetPublicDesktopFolder();
 
 ASHE_API std::wstring GetCurrentUserProgramsFolder();
-ASHE_API std::wstring GetAllUserProgramsFolder();
 
-ASHE_API std::wstring GetProgramFilesx86Folder();
+ASHE_API std::wstring GetProgramFilesX86Folder();
+ASHE_API std::wstring GetProgramFilesX64Folder();
 ASHE_API std::wstring GetProgramFilesFolder();
 
 ASHE_API std::wstring GetLocalAppDataFolder();

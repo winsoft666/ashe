@@ -1,4 +1,4 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/file.h"
 
 #ifdef ASHE_WIN
@@ -24,40 +24,15 @@
 
 namespace ashe {
 
-File::File(const std::wstring& path) {
-#ifdef ASHE_WIN
-    path_ = path;
-#else
-    path_ = w2u(path);
-#endif
-}
-
-File::File(const std::string& path) {
-#ifdef ASHE_WIN
-    path_ = a2w(path);
-#else
-    path_ = path;
-#endif
+File::File(const Path& path) : path_(path) {
 }
 
 File::~File() {
     close();
 }
 
-std::wstring File::pathW() const {
-#ifdef ASHE_WIN
+Path File::path() const {
     return path_;
-#else
-    return u2w(path_);
-#endif
-}
-
-std::string File::pathA() const {
-#ifdef ASHE_WIN
-    return w2a(path_);
-#else
-    return path_;
-#endif
 }
 
 bool File::isOpen() {
@@ -74,9 +49,9 @@ bool File::open(const std::wstring& openMode) {
         return false;
 
 #ifdef ASHE_WIN
-    _wfopen_s(&f_, path_.c_str(), openMode.c_str());
+    _wfopen_s(&f_, static_cast<std::wstring>(path_).c_str(), openMode.c_str());
 #else
-    f_ = fopen(path_.c_str(), w2u(openMode).c_str());
+    f_ = fopen(static_cast<std::string>(path_).c_str(), w2u(openMode).c_str());
 #endif
 
     return (f_ != nullptr);
@@ -114,9 +89,9 @@ bool File::isExist() const {
     if (path_.empty())
         return false;
 #ifdef ASHE_WIN
-    return (_waccess(path_.c_str(), 0) == 0);
+    return (_waccess(static_cast<std::wstring>(path_).c_str(), 0) == 0);
 #else
-    return (access(path_.c_str(), F_OK) == 0);
+    return (access(static_cast<std::string>(path_).c_str(), F_OK) == 0);
 #endif
 }
 
@@ -125,9 +100,9 @@ bool File::canRW() const {
         return false;
 
 #ifdef ASHE_WIN
-    return (_waccess(path_.c_str(), 6) == 0);
+    return (_waccess(static_cast<std::wstring>(path_).c_str(), 6) == 0);
 #else
-    return (access(path_.c_str(), R_OK | W_OK) == 0);
+    return (access(static_cast<std::string>(path_).c_str(), R_OK | W_OK) == 0);
 #endif
 }
 

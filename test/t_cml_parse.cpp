@@ -1,4 +1,4 @@
-#include "catch.hpp"
+﻿#include "catch.hpp"
 #include "ashe/cmd_line_parser.h"
 
 // Test: command line parser.
@@ -11,7 +11,7 @@ TEST_CASE("CommandLineParseTest") {
         printf("Key:%ls, Value:%ls\n", it->first.c_str(), it->second.c_str());
     printf("\n");
 
-    REQUIRE(clp.getVal(L"k1") == L"v1");
+    REQUIRE(clp.getVal(L"K1") == L"v1");
     REQUIRE(clp.getVal(L"k2") == L"v2");
     REQUIRE(clp.getVal(L"k3") == L"v3");
     REQUIRE(clp.getVal(L"k4") == L"v4");

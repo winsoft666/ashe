@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *    C++ Common Library
  *    ---------------------------------------------------------------------------
  *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -26,15 +26,10 @@
 #include <cstdint>
 
 namespace ashe {
-class ASHE_API UUID {
-   public:
-    static std::string Create();
-
-   private:
-#ifndef ASHE_WIN
-    static uint32_t Rand32();
-    static std::string GenUuid4();
-#endif
-};
+// 生成一个新的UUID字符串，格式为 xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+// 返回的字符串使用小写字母
+// 如果生成失败，返回空字符串
+//
+ASHE_API std::string CreateUuid();
 }  // namespace ashe
 #endif  // !ASHE_GUID_HPP__

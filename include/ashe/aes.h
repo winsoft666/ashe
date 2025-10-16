@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2025 winsoft666 <winsoft666@outlook.com>.
@@ -27,30 +27,32 @@
 #include <stdint.h>
 
 namespace ashe {
+// 如果填充模式为None，则明文的长度将自动扩展至 16 的整数倍，并以 0 进行填充
 enum class AESPaddingMode {
     PKCS7 = 0,
-    None = 1,  // If the padding mode is None, the length of the plaintext will be automatically expanded to an integer multiple of 16, and it will be padded with 0.
+    None = 1,
 };
 
-// AES 128bit CBC Mode.
-// The length of key, iv is 16.
+// 仅支持AES128-CBC模式
+// key与iv的长度均为16
+//
 bool ASHE_API AES128CBCEncrypt(const std::vector<uint8_t>& key,
                                const std::vector<uint8_t>& iv,
                                AESPaddingMode paddingMode,
                                const std::vector<uint8_t>& plain,
                                std::vector<uint8_t>& cipher);
 
-bool ASHE_API AES128CBCDecrypt(const std::vector<uint8_t>& key,
-                               const std::vector<uint8_t>& iv,
-                               AESPaddingMode paddingMode,
-                               const std::vector<uint8_t>& cipher,
-                               std::vector<uint8_t>& plain);
-
 bool ASHE_API AES128CBCEncrypt(const std::string& key,
                                const std::string& iv,
                                AESPaddingMode paddingMode,
                                const std::string& plain,
                                std::string& cipher);
+
+bool ASHE_API AES128CBCDecrypt(const std::vector<uint8_t>& key,
+                               const std::vector<uint8_t>& iv,
+                               AESPaddingMode paddingMode,
+                               const std::vector<uint8_t>& cipher,
+                               std::vector<uint8_t>& plain);
 
 bool ASHE_API AES128CBCDecrypt(const std::string& key,
                                const std::string& iv,

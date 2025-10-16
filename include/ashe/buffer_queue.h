@@ -37,6 +37,8 @@ typedef struct QueueElem {
     struct QueueElem* next;
 } QUEUE_ELEMENT;
 
+// 使用双向链表实现的线程安全的缓冲区队列
+//
 class ASHE_API BufferQueue {
    public:
     explicit BufferQueue(const std::string& name = "");
@@ -44,42 +46,46 @@ class ASHE_API BufferQueue {
 
     std::string getQueueName() const;
 
-    // Push element to queue's front.
-    // The queue will allocate buffer to save pData, so caller can free pData after call.
+    // 将元素放置到队列首部，元素中存放 pData 指向的数据
+    // BufferQueue将分配缓冲区来保存 pData，因此在调用后可以释放 pData
     //
     bool pushElementToFront(void* pData, size_t nDataSize);
 
-    // Push element to queue's last.
-    // The queue will allocate buffer to save pData, so caller can free pData after call.
+    // 将元素放置到队列尾部，元素中存放 pData 指向的数据
+    // BufferQueue将分配缓冲区来保存 pData，因此在调用后可以释放 pData
     //
     bool pushElementToLast(void* pData, size_t nDataSize);
 
-    // Pop queue's first element, and copy element's data to pBuffer.
-    // Caller need allocate/free pBuffer's memory.
-    // Return: actual size of copy into pBuffer
+    // 弹出队列首部元素并返回该元素中的数据，由调用方负责分配和释放 pBuffer
+    // 如果元素中的数据大小大于 nBufferSize，则只复制 nBufferSize 字节到 pBuffer；如果nBufferSize为0，则不复制数据
+    // 
+    // 返回实际复制到 pBuffer 的字节数
     //
     size_t popElementFromFront(void* pBuffer, size_t nBufferSize);
 
-    // Pop queue's last element, and copy element's data to pBuffer.
-    // Caller need allocate/free pBuffer's memory.
-    // Return: actual size of copy into pBuffer
+    // 弹出队列尾部元素并返回该元素中的数据，由调用方负责分配和释放 pBuffer
+    // 如果元素中的数据大小大于 nBufferSize，则只复制 nBufferSize 字节到 pBuffer；如果nBufferSize为0，则不复制数据
+    //
+    // 返回实际复制到 pBuffer 的字节数
     //
     size_t popElementFromLast(void* pBuffer, size_t nBufferSize);
 
-    // Copy data of the first element to pBuffer.
-    // Caller need allocate/free pBuffer's memory.
-    // Return: actual size of copy into pBuffer.
+    // 拷贝队列首部元素的数据到 pBuffer，由调用方分配和释放 pBuffer
+    // 实际复制数据大小为 min(元素数据大小, nBufferSize)
+    //
+    // 返回实际复制到 pBuffer 的字节数
     //
     size_t getDataFromFrontElement(void* pBuffer, size_t nBufferSize);
 
-    // Copy data of the last element to pBuffer.
-    // Caller need allocate/free pBuffer's memory.
-    // Return: the actual size that be copied into pBuffer.
+    // 拷贝队列尾部元素的数据到 pBuffer，由调用方分配和释放 pBuffer
+    // 实际复制数据大小为 min(元素数据大小, nBufferSize)
+    //
+    // 返回实际复制到 pBuffer 的字节数
     //
     size_t getDataFromLastElement(void* pBuffer, size_t nBufferSize);
 
-    // Clear and free all elements.
-    // Return: the total number that be freed elements.
+    // 清空并释放所有元素
+    // 返回被释放的元素总数
     //
     size_t clear();
 
@@ -89,8 +95,10 @@ class ASHE_API BufferQueue {
 
     size_t popDataCrossElement(void* pOutputBuffer, size_t nBytesToRead, size_t* pBufferIsThrown);
 
-    // Remove data from element(maybe cross elements).
-    // Return: the element number that been removed.
+    // 从队列中移除指定字节数的数据，可能会跨越多个元素
+    // 如元素1有100字节，元素2有200字节，调用 removeData(150) 将移除元素1和元素2的前50字节
+    //
+    // 返回被移除数据所跨越的元素总数
     //
     size_t removeData(size_t nBytesToRemove);
 
@@ -98,8 +106,14 @@ class ASHE_API BufferQueue {
 
     size_t getLastElementDataSize();
 
+    // 将队列中所有数据合并到一个连续的缓冲区中
+    // BufferQueue分配缓冲区，但由调用方释放该缓冲区
+    // 返回缓冲区大小
+    //
     size_t toOneBuffer(char** ppBuf);
 
+    // 与toOneBuffer类似，但在缓冲区末尾添加一个空字符('\0')
+    //
     size_t toOneBufferWithNullEnding(char** ppBuf);
 
    private:

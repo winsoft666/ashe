@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 *    C++ Common Library
 *    ---------------------------------------------------------------------------
 *    Copyright (C) 2020~2024 winsoft666 <winsoft666@outlook.com>.
@@ -39,28 +39,41 @@
 #endif  // ASHE_CPP_STANDARD_VER
 
 namespace ashe {
+// 异步工作线程类
+// 通过invoke方法将任务投递到工作线程，任务以先进先出的顺序执行
+// invoke方法返回一个std::future对象，可用于获取任务的返回值
+// 如果工作线程未启动，则invoke方法返回的future对象将处于未决状态，直到工作线程启动并执行任务
+//
 class ASHE_API AsyncWorker {
    public:
     ASHE_DISALLOW_COPY_AND_MOVE(AsyncWorker);
 
     AsyncWorker();
-    AsyncWorker(const std::string& name);
 
+    // 会自动调用stop()
+    //
     virtual ~AsyncWorker();
-
-    void setName(const std::string& name);
-    std::string name() const;
-
-    long id();
 
     virtual bool start();
 
-    virtual void stop(bool waitUntilAllTasksFinish);
+    // 清除未执行的任务，并等待当前正在执行的任务，待执行完成后退出工作线程
+    //
+    virtual void stop();
 
     bool isRunning() const;
 
     virtual void run();
 
+    // 线程安全的
+    //
+    void clearTasks();
+
+    // 线程安全的
+    //
+    size_t tasksCount() const;
+
+    // 线程安全的
+    //
     template <class F, class... Args>
     auto invoke(F&& f, Args&&... args)
 #if ASHE_CPP_STANDARD_VER >= 201703L  // >= C++ 17
@@ -83,15 +96,9 @@ class ASHE_API AsyncWorker {
         return res;
     }
 
-    static void SetCurrentThreadName(const char* name);
-
-    static long GetCurThreadId();
-
    protected:
-    std::string thread_name_;
     std::future<void> thread_;
-    long thread_id_;
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
     std::condition_variable exit_cond_var_;
     bool exit_;
     std::queue<std::function<void()>> work_queue_;

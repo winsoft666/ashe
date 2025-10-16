@@ -16,15 +16,52 @@
 *    You should have received a copy of the GNU General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-
-#ifndef ASHE_SHA512_HPP__
-#define ASHE_SHA512_HPP__
+#ifndef ASHE_PATH_HPP_
+#define ASHE_PATH_HPP_
+#pragma once
 #include "ashe/config.h"
+#include "ashe/arch.h"
 #include <string>
-#include "ashe/path.h"
 
 namespace ashe {
-ASHE_API std::string GetFileSHA512(const Path& filePath);
-ASHE_API std::string GetDataSHA512(const unsigned char* data, size_t dataSize);
+// 用于存储路径字符串，抹平不同平台的路径字符串的编码差异
+//
+// 在Windows平台，std::string或char*字符串视为ANSI编码，其他平台则视为UTF8编码
+//
+class ASHE_API Path {
+   public:
+    Path(const char* p);
+    Path(const std::string& s);
+    Path(std::string&& s);
+
+    Path(const wchar_t* p);
+    Path(const std::wstring& s);
+    Path(std::wstring&& s);
+
+    Path& operator=(const std::string& s);
+    Path& operator=(std::string&& s) noexcept;
+
+    Path& operator=(const std::wstring& s);
+    Path& operator=(std::wstring&& s) noexcept;
+
+    Path operator+(const Path& that);
+    Path& operator+=(const Path& that);
+
+    operator std::string() const;
+    operator std::wstring() const;
+
+    bool empty() const;
+
+    // 返回当前平台的路径分隔符
+    //
+    static Path Separator();
+
+   protected:
+#ifdef ASHE_WIN
+    std::wstring s_;
+#else
+    std::string s_;
+#endif
+};
 }  // namespace ashe
-#endif  // !ASHE_SHA512_HPP__
+#endif

@@ -87,8 +87,7 @@ set_target_properties(ashe PROPERTIES
 	DEBUG_OUTPUT_NAME $<IF:$<BOOL:${ASHE_BUILD_SHARED_LIBS}>,ashe-d,ashe-static-d>)
 
 if (WIN32)
-  target_compile_definitions(ashe PRIVATE 
-  	_WIN32 UNICODE _UNICODE NOMINMAX)
+  target_compile_definitions(ashe PRIVATE _WIN32 UNICODE _UNICODE NOMINMAX)
 endif()
 
 

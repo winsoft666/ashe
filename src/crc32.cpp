@@ -1,9 +1,23 @@
-#include "ashe/config.h"
+﻿#include "ashe/config.h"
 #include "ashe/crc32.h"
 #include "ashe/file.h"
 #include "ashe/logging.h"
 
 namespace ashe {
+namespace internal {
+class CRC32 {
+   public:
+    void init();
+
+    void update(const unsigned char* pData, uint32_t uSize);
+
+    void finish();
+
+    std::string digest();
+
+   private:
+    uint32_t ulCRC32_ = 0;
+};
 
 void CRC32::init() {
     ulCRC32_ = 0xFFFFFFFF;
@@ -65,14 +79,15 @@ std::string CRC32::digest() {
     snprintf(szCRC, sizeof(szCRC), "%08x", ulCRC32_);
     return szCRC;
 }
+};  // namespace internal
 
-std::string GetFileCRC32(const std::wstring& filePath) {
+std::string GetFileCRC32(const Path& filePath) {
     try {
         File file(filePath);
         if (!file.open(L"rb"))
             return "";
 
-        CRC32 crc32;
+        internal::CRC32 crc32;
         crc32.init();
 
         size_t readBytes = 0;
@@ -94,7 +109,7 @@ std::string GetFileCRC32(const std::wstring& filePath) {
 
 std::string GetDataCRC32(const unsigned char* data, size_t dataSize) {
     try {
-        CRC32 crc32;
+        internal::CRC32 crc32;
         crc32.init();
 
         size_t offset = 0;
