@@ -16,12 +16,12 @@ ScopedClearLastError::~ScopedClearLastError() {
     SetLastError(lastError_);
 }
 #elif defined(ASHE_POSIX)
-ScopedClearLastErrorBase::ScopedClearLastErrorBase() :
+ScopedClearLastError::ScopedClearLastError() :
     lastError_(errno) {
     errno = 0;
 }
 
-ScopedClearLastErrorBase::~ScopedClearLastErrorBase() {
+ScopedClearLastError::~ScopedClearLastError() {
     errno = lastError_;
 }
 #endif  // defined(ASHE_WIN)
