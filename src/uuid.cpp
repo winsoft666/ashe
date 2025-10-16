@@ -17,12 +17,12 @@
 namespace ashe {
 #ifndef ASHE_WIN
 namespace {
-uint32_t UUID::Rand32() {
+uint32_t Rand32() {
     return ((rand() & 0x3) << 30) | ((rand() & 0x7fff) << 15) |
            (rand() & 0x7fff);
 }
 
-std::string UUID::GenUuid4() {
+std::string GenUuid4() {
     return StrFormat(
         "%08x-%04x-%04x-%04x-%04x%08x",
         Rand32(),           // Generates a 32-bit Hex number
