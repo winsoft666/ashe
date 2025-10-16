@@ -82,7 +82,8 @@ void AsyncWorker::run() {
 
 void AsyncWorker::clearTasks() {
     std::unique_lock<std::mutex> lg(mutex_);
-    work_queue_.swap(std::queue<std::function<void()>>());
+    std::queue<std::function<void()>> empty_queue;
+    work_queue_.swap(empty_queue);
 }
 
 size_t AsyncWorker::tasksCount() const {
