@@ -63,7 +63,7 @@ class TimerManager::Private {
 };
 
 TimerManager::TimerManager() noexcept :
-    p_(std::make_unique<TimerManager::Private>()) {
+    p_(new TimerManager::Private()) {
 }
 
 TimerManager::~TimerManager() {
