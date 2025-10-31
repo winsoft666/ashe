@@ -107,6 +107,7 @@ ASHE_API bool KillProcessTree(unsigned long pid, unsigned int exitCode = 0);
 ASHE_API bool KillProcess(unsigned long pid, unsigned int exitCode = 0);
 
 // 根据进程ID获取进程可执行文件的完整路径
+// 仅支持 Windows Vista 及更高版本
 //
 ASHE_API std::string GetProcessPathA(unsigned long pid);
 ASHE_API std::wstring GetProcessPathW(unsigned long pid);

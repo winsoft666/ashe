@@ -161,7 +161,7 @@ bool RunAsAdmin(const std::wstring& path, const std::wstring& param, int nShowCm
                       path.c_str(),
                       param.c_str(),
                       szDir,
-                      nShowCmd)) > 31;
+                      nShowCmd)) > 32;
     return result;
 }
 
@@ -469,48 +469,32 @@ bool KillProcess(const std::string& exeName, unsigned int exitCode) {
 std::wstring GetProcessPathW(unsigned long id) {
     std::wstring strPath;
     wchar_t szFilename[MAX_PATH] = {0};
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, id);
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, id);
     if (hProcess == NULL)
         return strPath;
 
-    HMODULE hModule = NULL;
-    DWORD cbNeeded;
-    if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
-        if (GetModuleFileNameExW(hProcess, hModule, szFilename, MAX_PATH)) {
-            strPath = szFilename;
-        }
+    DWORD size = MAX_PATH;
+    if (QueryFullProcessImageNameW(hProcess, 0, szFilename, &size)) {
+        strPath = szFilename;
     }
-    else {
-        DWORD size = MAX_PATH;
-        if (QueryFullProcessImageNameW(hProcess, 0, szFilename, &size)) {
-            strPath = szFilename;
-        }
-    }
+
     CloseHandle(hProcess);
 
     return strPath;
 }
 
-std::string GetProcessPathA(unsigned long id) {
+std::string GetProcoessPathA(unsigned long id) {
     std::string strPath;
     char szFilename[MAX_PATH] = {0};
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, id);
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, id);
     if (hProcess == NULL)
         return strPath;
 
-    HMODULE hModule = NULL;
-    DWORD cbNeeded;
-    if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
-        if (GetModuleFileNameExA(hProcess, hModule, szFilename, MAX_PATH)) {
-            strPath = szFilename;
-        }
+    DWORD size = MAX_PATH;
+    if (QueryFullProcessImageNameA(hProcess, 0, szFilename, &size)) {
+        strPath = szFilename;
     }
-    else {
-        DWORD size = MAX_PATH;
-        if (QueryFullProcessImageNameA(hProcess, 0, szFilename, &size)) {
-            strPath = szFilename;
-        }
-    }
+
     CloseHandle(hProcess);
 
     return strPath;
